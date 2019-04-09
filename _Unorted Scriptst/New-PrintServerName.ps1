@@ -30,7 +30,7 @@ function New-PrintServerName {
     Try {
         Write-Log -Message ("{0}: Checking for printers mapped to old print server" -f $Env:USERNAME)
         $printers = @(Get-WmiObject -Class Win32_Printer -Filter "SystemName='\\\\$oldPrintServer'" -ErrorAction Stop)
-        $defaultPrinter = Get-WmiObject -Class Win32_Printer | Where-Object {$_.Default -eq $true}
+        $defaultPrinter = Get-WmiObject -Class Win32_Printer |Where-Object {$_.Default -eq $true}
 
         If ($printers.count -gt 0) {
             ForEach ($printer in $printers) {
