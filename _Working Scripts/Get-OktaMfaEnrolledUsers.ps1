@@ -52,7 +52,7 @@ foreach ($User in $OktaUser) {
   if ($MfaEnabled) {$TotalEnrolled ++}
 }
 
-$PSList | Export-Csv $CSVFile -NoTypeInformation
+$PSList |Export-Csv $CSVFile -NoTypeInformation
 
 $InfoBody = [pscustomobject]@{
   'Task'               = "Azure Hybrid Runbook Worker - Tier-2"
