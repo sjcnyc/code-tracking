@@ -1,6 +1,6 @@
 using namespace System.Collections.Generic
 
-Import-Module "C:\Users\sconnea\Documents\WindowsPowerShell\Modules\Okta.Core.Automation\1.0.1\Okta.Core.Automation.psd1" | Out-Null
+Import-Module "C:\Users\sconnea\Documents\WindowsPowerShell\Modules\Okta.Core.Automation\1.0.1\Okta.Core.Automation.psd1" |Out-Null
 
 Connect-Okta -Token "00jCWv0g5qQK98CQN_zG9tlwvyMyFCpFBE8t5UCzNb" -FullDomain "https://sonymusic.okta.com"
 
@@ -33,10 +33,10 @@ foreach ($User in $OktaUser) {
   $FactorInfo = Get-OktaUserFactor -IdOrLogin $user.Id
 
   switch ($factorInfo.FactorType) {
-    'sms'                 {$mfaenabled = $true; $Factor = $FactorInfo.FactorType; $Status = $FactorInfo.Status }
-    'call'                {$mfaenabled = $true; $Factor = $FactorInfo.FactorType; $Status = $FactorInfo.Status }
-    'push'                {$mfaenabled = $true; $Factor = $FactorInfo.FactorType; $Status = $FactorInfo.Status }
-    'token:software:totp' {$MfaEnabled = $true; $Factor = $FactorInfo.FactorType; $Status = $FactorInfo.Status }
+    'sms'                 {$mfaenabled = $true; $Factor = $FactorInfo.FactorType; $Status = $FactorInfo.Status}
+    'call'                {$mfaenabled = $true; $Factor = $FactorInfo.FactorType; $Status = $FactorInfo.Status}
+    'push'                {$mfaenabled = $true; $Factor = $FactorInfo.FactorType; $Status = $FactorInfo.Status}
+    'token:software:totp' {$MfaEnabled = $true; $Factor = $FactorInfo.FactorType; $Status = $FactorInfo.Status}
     'token:hardware'      {$MfaEnabled = $true; $Factor = $FactorInfo.FactorType; $Status = $FactorInfo.Status}
     Default {}
   }
