@@ -1,3 +1,4 @@
+using namespace System.Collections.Generic
 function ConvertFrom-DN {
   param([string]$DN)
   foreach ( $item in ($DN.replace('\,', '~').split(','))) {
@@ -74,7 +75,7 @@ function Disable-ADStaleAccounts {
   $DaysAgo = (Get-Date).AddDays(-$StaleThreshold)
   $Date = (get-date -f yyyy-MM-dd)
   $CSVFile = "C:\temp\StaleUserAccounts_$($StaleThreshold)Days_$($Date).csv"
-  $PSArrayList = New-Object System.Collections.ArrayList
+  $PSList = [List[psobject]]::new()
 
   # Exclude below ous
   $Filter = [RegEx]'^*OU=LOH*|^*OU=Service*|^*OU=LOA*|^*OU=Test'
@@ -88,10 +89,10 @@ function Disable-ADStaleAccounts {
   try {
 
     if ($SourceOU) {
-      $StaleAccounts = &"Get-AD$AccountType" @ADObjectSplat -SearchBase $SourceOu | Where-Object {$_.distinguishedName -notmatch $Filter}
+      $StaleAccounts = &"Get-AD$AccountType" @ADObjectSplat -SearchBase $SourceOu |Where-Object {$_.distinguishedName -notmatch $Filter}
     }
     else {
-      $StaleAccounts = &"Get-AD$AccountType" @ADObjectSplat | Where-Object {$_.distinguishedName -notmatch $Filter}
+      $StaleAccounts = &"Get-AD$AccountType" @ADObjectSplat |Where-Object {$_.distinguishedName -notmatch $Filter}
     }
     if ($Disable) {
 
@@ -110,21 +111,22 @@ function Disable-ADStaleAccounts {
           PwdLastSet         = [datetime]::FromFileTime($StaleAccount.PwdLastSet)
           SourceOU           = $StaleAccount.CanonicalName -replace "me.sonymusic.com/", ""
         }
-        [void]$PSArrayList.Add($PSUserObj)
+        [void]$PSList.Add($PSUserObj)
       }
 
       $InfoBody = [pscustomobject]@{
         'Task'        = "Azure Hybrid Runbook Worker - Tier-2"
         'Action'      = "Disable & Move ME AD User Objects"
-        'Threshold'  = "$($StaleThreshold) Days"
+        'Threshold'   = "$($StaleThreshold) Days"
         'Source Ou'   = ConvertFrom-DN -DN $SourceOu -replace "me.sonymusic.com/", ""
         'Target Ou'   = ConvertFrom-DN -DN $TargetOu -replace "me.sonymusic.com", ""
         'Total Users' = $StaleAccounts.Count
       }
 
+      $PSArrayList |Export-Csv $CSVFile -NoTypeInformation
+
       $HTML = New-HTMLHead -title "ME Stale User Account Cleanup Report" -style $Style1
       $HTML += New-HTMLTable -inputObject $(ConvertTo-PropertyValue -inputObject $InfoBody)
-      $PSArrayList | Export-Csv $CSVFile -NoTypeInformation
       $HTML += "<h4>See Attached CSV Report</h4>"
       $HTML += "<h4>Script Completed: $(Get-Date -Format G)</h4>" | Close-HTML
 
@@ -133,7 +135,7 @@ function Disable-ADStaleAccounts {
         From        = 'Posh Alerts poshalerts@sonymusic.com'
         Subject     = 'ME Stale User Account Cleanup Report'
         SmtpServer  = 'cmailsony.servicemail24.de'
-        Body        = ($HTML | Out-String)
+        Body        = ($HTML |Out-String)
         BodyAsHTML  = $true
         Attachments = $CSVFile
       }
@@ -143,9 +145,9 @@ function Disable-ADStaleAccounts {
       Remove-Item $CSVFile
     }
     else {
-      $StaleAccounts = $StaleAccounts | Select-Object -Property DistinguishedName, Name, Enabled, Description, @{Name = "PwdLastSet"; Expression = {[datetime]::FromFileTime($_.PwdLastSet)}}, @{Name = "LastLogonTimeStamp"; Expression = {[datetime]::FromFileTime($_.LastLogonTimeStamp)}}
+      $StaleAccounts = $StaleAccounts |Select-Object -Property DistinguishedName, Name, Enabled, Description, @{Name = "PwdLastSet"; Expression = {[datetime]::FromFileTime($_.PwdLastSet)}}, @{Name = "LastLogonTimeStamp"; Expression = {[datetime]::FromFileTime($_.LastLogonTimeStamp)}}
 
-      $StaleAccounts | export-csv C:\Temp\Stale_ME_User_accounts_00092.csv -NoTypeInformation
+      $StaleAccounts |Export-Csv C:\Temp\Stale_ME_User_accounts_00092.csv -NoTypeInformation
     }
   }
   catch {
