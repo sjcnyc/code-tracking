@@ -123,7 +123,7 @@ function Disable-ADStaleAccounts {
         'Total Users' = $StaleAccounts.Count
       }
 
-      $PSArrayList |Export-Csv $CSVFile -NoTypeInformation
+      $PSList |Export-Csv $CSVFile -NoTypeInformation
 
       $HTML = New-HTMLHead -title "ME Stale User Account Cleanup Report" -style $Style1
       $HTML += New-HTMLTable -inputObject $(ConvertTo-PropertyValue -inputObject $InfoBody)
