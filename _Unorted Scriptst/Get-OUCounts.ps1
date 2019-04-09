@@ -1,0 +1,1 @@
+(Import-Csv c:\temp\Remaining329.csv).samaccountname | Get-QADGroup -SizeLimit 0 -Service 'me.sonymusic.com' | Select-Object name, DN, {$_.members.count} | Export-Csv C:\Temp\Remaining329_new.csv -NoTypeInformation
