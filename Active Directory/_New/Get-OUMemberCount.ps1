@@ -1,15 +1,21 @@
-$PSArray = New-Object System.Collections.ArrayList
+using namespace System.Collections.Generic
 
-$ous = Get-QADObject -SizeLimit 0 -SearchScope OneLevel -Type 'organizationalunit' | Select-Object dn
+$PSList = [List[psobject]]::new()
 
-foreach ($ou in $ous) {
+$getADOrganizationalUnitSplat = @{
+  Filter      = '*'
+  Properties  = 'DistinguishedName', 'CanonicalName'
+  #SearchScope = 'OneLevel'
+  Server      = 'me.sonymusic.com'
+}
+$OUs = Get-ADOrganizationalUnit @getADOrganizationalUnitSplat
 
-    $psObject = [pscustomobject]@{
-
-        'OU'    = $ou.DN
-        'Count' = (Get-QADUser -SearchRoot $ou.DN -SizeLimit 0).count
-    }
-    [void]$PSArray.Add($psObject)
+foreach ($OU in $OUs) {
+  $PSObject = [pscustomobject]@{
+    'OrganizationalUnit' = $OU.CanonicalName
+    'UserCount'          = (Get-ADUser -SearchBase $OU.DistinguishedName -Filter * -Server 'me.sonymusic.com').Count
+  }
+  [void]$PSList.Add($PSObject)
 }
 
-$PSArray | Export-Csv C:\Temp\ou_count_bmg.csv -NoTypeInformation
+$PSList

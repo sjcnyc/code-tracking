@@ -1,3 +1,18 @@
+function Get-IsMember {
+  param (
+    [string]
+    $GroupName,
+
+    [array]
+    $Users
+  )
+  $users | ForEach-Object {
+    if ((Get-ADGroupMember $GroupName |Select-Object -ExpandProperty SamAccountName) -contains $_) {
+      return $_
+    }
+  }
+}
+
 $AutomationPSCredentialName = "t2_cloud_cred"
 
 #TODO  add users to group if no strong auth methods found  O365_Access_OnPremOnly
@@ -25,6 +40,9 @@ Connect-MsolService -Credential $Credential -ErrorAction SilentlyContinue
 $MFAUsers = Get-Msoluser -all
 $UserCounter = 1
 $MethodTypeCount = 0
+$NoMfaGroup = "O365_Access_OnPremOnly"  #TODO  DN
+
+Get-IsMember -GroupName $NoMfaGroup -Users $MFAUsers
 
 foreach ($User in $MFAUsers) {
   $UserCounter += 1
@@ -51,8 +69,10 @@ foreach ($User in $MFAUsers) {
 $InfoBody = [pscustomobject]@{
   'Task'              = "Azure Hybrid Runbook Worker - Tier-2"
   'Action'            = "Azure MFA Registration Report"
-  'Total Users'       = $UserCounter
-  'Total MFA Users'   = $methodTypeCount
+  'Mfa Users Added'   = ""
+  'Mfa Users Total'   = $methodTypeCount
+  'Users Total'       = $UserCounter
+
 }
 
 $PSArrayList |Export-Csv $CSVFile -NoTypeInformation

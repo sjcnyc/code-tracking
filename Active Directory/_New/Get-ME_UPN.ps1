@@ -10,7 +10,7 @@ Farley.Barbara
 
 foreach ($user in $users) {
     Get-QADUser "Moldoveanu, Alex" -IncludeAllProperties -Service 'me.sonymusic.com' |
-        Select-Object UserPrincipalName | ft -auto # Out-File c:\temp\names.txt -Encoding utf8 -Append #, FirstName, lastName, Mail, @{N = 'AccountStatus'; E = {if ($_.AccountIsDisabled -eq 'TRUE') {'Disabled'}else {'Enabled'}}}
+        Select-Object UserPrincipalName | Format-Table -auto # Out-File c:\temp\names.txt -Encoding utf8 -Append #, FirstName, lastName, Mail, @{N = 'AccountStatus'; E = {if ($_.AccountIsDisabled -eq 'TRUE') {'Disabled'}else {'Enabled'}}}
     <#
     $PSObj               = [pscustomobject]@{
         'USER_ID'        = $user.USER_ID

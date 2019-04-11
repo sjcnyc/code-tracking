@@ -1,12 +1,19 @@
-﻿$group = 'CN=USA-GBL Wireless Computers Certificate,OU=Non-Restricted,OU=GRP,OU=GBL,OU=USA,DC=bmg,DC=bagint,DC=com'
+﻿function Get-IsMember {
+  param (
+    [string]
+    $GroupName,
 
-Get-QADComputer -SearchRoot 'bmg.bagint.com/USA/GBL/WST/Windows7' -SizeLimit 0 -IncludedProperties MemberOf | 
-    ForEach-Object { 
-    if (! $_.MemberOf -eq $group) {
-        write-host "$($_.Name) is not member"
+    [array]
+    $Users
+  )
+  $Users | ForEach-Object {
+    if ((Get-ADGroupMember $GroupName |Select-Object -ExpandProperty SamAccountName) -notcontains $_) {
+      return $_
     }
+  }
 }
 
-$AdminCredentials = Get-Credential "me\admsconnea"
+$gp = "USA-GBL Member Server Administrators"
+$Users = @("sconnea", "klee123", "bobxxx")
 
-Get-ADPrincipalGroupMembership -server me.sonymusic.com -Credential $AdminCredentials -Identity sconnea | Select-Object samaccountname
+Get-ismember -GroupName $gp -Users $Users
