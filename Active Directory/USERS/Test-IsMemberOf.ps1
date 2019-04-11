@@ -6,7 +6,7 @@
     [array]
     $Users
   )
-  $Users | ForEach-Object {
+  $Users |ForEach-Object {
     if ((Get-ADGroupMember $GroupName |Select-Object -ExpandProperty SamAccountName) -notcontains $_) {
       return $_
     }
