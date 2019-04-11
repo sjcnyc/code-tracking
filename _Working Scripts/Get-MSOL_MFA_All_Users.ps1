@@ -13,14 +13,12 @@ function Get-IsMember {
   }
 }
 
-$AutomationPSCredentialName = "t2_cloud_cred"
-
-#TODO  add users to group if no strong auth methods found  O365_Access_OnPremOnly
+#$AutomationPSCredentialName = "t2_cloud_cred"
 
 $Date = (get-date -f yyyy-MM-dd)
 $CSVFile = "C:\support\MFAUserReport_$($Date).csv"
 $PSArrayList = New-Object System.Collections.ArrayList
-$Credential = Get-AutomationPSCredential -Name $AutomationPSCredentialName -ErrorAction Stop
+#$Credential = Get-AutomationPSCredential -Name $AutomationPSCredentialName -ErrorAction Stop
 
 $Style1 =
 '<style>
@@ -35,14 +33,17 @@ $Style1 =
   .even { background-color:#E9E9E9; }
   </style>'
 
-Connect-MsolService -Credential $Credential -ErrorAction SilentlyContinue
+Connect-MsolService #-Credential $Credential -ErrorAction SilentlyContinue
 
 $MFAUsers = Get-Msoluser -all
 $UserCounter = 1
 $MethodTypeCount = 0
-$NoMfaGroup = "O365_Access_OnPremOnly"  #TODO  DN
+$NoMfaGroup = "O365_Access_OnPremOnly"
 
-Get-IsMember -GroupName $NoMfaGroup -Users $MFAUsers
+#$notingroup = Get-IsMember -GroupName $NoMfaGroup -Users $MFAUsers
+
+#$NonMfaUsers = Get-MsolUser -All | Where-Object {$_.StrongAuthenticationMethods.Count -eq 0}
+
 
 foreach ($User in $MFAUsers) {
   $UserCounter += 1
