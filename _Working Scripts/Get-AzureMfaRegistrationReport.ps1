@@ -9,7 +9,7 @@ function Get-IsMember {
     $Users
   )
   $users | ForEach-Object {
-    if ((Get-ADGroupMember $GroupName |Select-Object -ExpandProperty SamAccountName) -contains $_) {
+    if ((Get-ADGroupMember $GroupName |Select-Object -ExpandProperty SamAccountName) -notcontains $_) {
       return $_
     }
   }
@@ -43,11 +43,11 @@ $NonMfaUserCounter = 1
 $MethodTypeCount = 0
 #$NoMfaGroup = "O365_Access_OnPremOnly"
 
-#$notingroup = Get-IsMember -GroupName $NoMfaGroup -Users $MFAUsers
-
 $NonMfaUsers = $MFAUsers |Where-Object {$_.StrongAuthenticationMethods.Count -eq 0}
 
-foreach ($NonMfaUser in $NonMfaUsers) {
+$NonGroupUsers = Get-IsMember -GroupName "" -Users $NonMfaUsers
+
+foreach ($NonGroupUser in $NonGroupUsers) {
   $NonMfaUserCounter ++
   #TODO Add Non-Mfa user to O365_Access_OnPremOnly
 }
