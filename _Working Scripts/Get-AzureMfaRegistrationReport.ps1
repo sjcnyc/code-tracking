@@ -38,15 +38,13 @@ $Style1 =
 
 #Connect-MsolService #-Credential $Credential -ErrorAction SilentlyContinue
 
-$MFAUsers = Get-Msoluser -all
-$UserCounter = 1
+$MFAUsers          = Get-Msoluser -all
+$UserCounter       = 1
 $NonMfaUserCounter = 1
-$MethodTypeCount = 0
-#$NoMfaGroup = "O365_Access_OnPremOnly"
-
-$NonMfaUsers = $MFAUsers |Where-Object {$_.StrongAuthenticationMethods.Count -eq 0}
-
-$NonGroupUsers = Get-IsMember -GroupName "" -Users $NonMfaUsers
+$MethodTypeCount   = 0
+#$NoMfaGroup       = "O365_Access_OnPremOnly"
+$NonMfaUsers       = $MFAUsers |Where-Object {$_.StrongAuthenticationMethods.Count -eq 0}
+$NonGroupUsers     = Get-IsMember -GroupName "" -Users $NonMfaUsers
 
 foreach ($NonGroupUser in $NonGroupUsers) {
   $NonMfaUserCounter ++
