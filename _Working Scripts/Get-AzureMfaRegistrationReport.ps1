@@ -19,7 +19,6 @@ function Get-IsMember {
 
 $Date = (get-date -f yyyy-MM-dd)
 $CSVFile = "C:\support\MFAUserReport_$($Date).csv"
-#$PSArrayList = New-Object System.Collections.ArrayList
 $PSList = [List[psobject]]::new()
 #$Credential = Get-AutomationPSCredential -Name $AutomationPSCredentialName -ErrorAction Stop
 
@@ -36,20 +35,25 @@ $Style1 =
   .even { background-color:#E9E9E9; }
   </style>'
 
-Connect-MsolService #-Credential $Credential -ErrorAction SilentlyContinue
+#Connect-MsolService #-Credential $Credential -ErrorAction SilentlyContinue
 
 $MFAUsers = Get-Msoluser -all
 $UserCounter = 1
+$NonMfaUserCounter = 1
 $MethodTypeCount = 0
-$NoMfaGroup = "O365_Access_OnPremOnly"
+#$NoMfaGroup = "O365_Access_OnPremOnly"
 
 #$notingroup = Get-IsMember -GroupName $NoMfaGroup -Users $MFAUsers
 
-#$NonMfaUsers = Get-MsolUser -All | Where-Object {$_.StrongAuthenticationMethods.Count -eq 0}
+$NonMfaUsers = $MFAUsers |Where-Object {$_.StrongAuthenticationMethods.Count -eq 0}
 
+foreach ($NonMfaUser in $NonMfaUsers) {
+  $NonMfaUserCounter ++
+  #TODO Add Non-Mfa user to O365_Access_OnPremOnly
+}
 
 foreach ($User in $MFAUsers) {
-  $UserCounter += 1
+  $UserCounter ++
 
   $StrongAuthenticationRequirements = $User |Select-Object -ExpandProperty StrongAuthenticationRequirements
   $StrongAuthenticationUserDetails = $User |Select-Object -ExpandProperty StrongAuthenticationUserDetails
@@ -67,19 +71,17 @@ foreach ($User in $MFAUsers) {
     StrongAuthenticationUserDetailsEmail       = $StrongAuthenticationUserDetails.Email
     DefaultStrongAuthenticationMethodType      = ($StrongAuthenticationMethods |Where-Object {$_.IsDefault -eq $True}).MethodType
   }
-  # [void]$PSArrayList.Add($PSObj)
   [void]$PSList.Add($PSObj)
 }
 
 $InfoBody = [pscustomobject]@{
-  'Task'            = "Azure Hybrid Runbook Worker - Tier-2"
-  'Action'          = "Azure MFA Registration Report"
-  'Mfa Users Added' = ""
-  'Mfa Users Total' = $methodTypeCount
-  'Users Total'     = $UserCounter
+  'Task'                       = "Azure Hybrid Runbook Worker - Tier-2"
+  'Action'                     = "Azure MFA Registration Report"
+  'Users Added to Block Group' = $NonMfaUserCounter
+  'Mfa Users Total'            = $MethodTypeCount
+  'Users Total'                = $UserCounter
 }
 
-#$PSArrayList |Export-Csv $CSVFile -NoTypeInformation
 $PSList |Export-Csv $CSVFile -NoTypeInformation
 
 $HTML = New-HTMLHead -title "Azure MFA Registration Report" -style $Style1
@@ -88,8 +90,8 @@ $HTML += "<h4>See Attached CSV Report</h4>"
 $HTML += "<h4>Script Completed: $(Get-Date -Format G)</h4>" |Close-HTML
 
 $EmailParams = @{
-  To          = "sconnea@sonymusic.com", "Alex.Moldoveanu@sonymusic.com", "bobby.thomas@sonymusic.com", "Rohan.Simpson@sonymusic.com"
-  CC          = "jorge.ocampo.peak@sonymusic.com", "suminder.singh.itopia@sonymusic.com"
+  To          = "sconnea@sonymusic.com" #, "Alex.Moldoveanu@sonymusic.com", "bobby.thomas@sonymusic.com", "Rohan.Simpson@sonymusic.com"
+  #CC          = "jorge.ocampo.peak@sonymusic.com", "suminder.singh.itopia@sonymusic.com"
   From        = 'PwSh poshalerts@sonymusic.com'
   Subject     = "Azure MFA Registration Report"
   SmtpServer  = 'cmailsony.servicemail24.de'
