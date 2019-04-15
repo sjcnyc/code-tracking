@@ -1,3 +1,5 @@
+using namespace System.Collections.Generic
+
 function Get-IsMember {
   param (
     [string]
@@ -17,7 +19,8 @@ function Get-IsMember {
 
 $Date = (get-date -f yyyy-MM-dd)
 $CSVFile = "C:\support\MFAUserReport_$($Date).csv"
-$PSArrayList = New-Object System.Collections.ArrayList
+#$PSArrayList = New-Object System.Collections.ArrayList
+$PSList = [List[psobject]]::new()
 #$Credential = Get-AutomationPSCredential -Name $AutomationPSCredentialName -ErrorAction Stop
 
 $Style1 =
@@ -64,19 +67,20 @@ foreach ($User in $MFAUsers) {
     StrongAuthenticationUserDetailsEmail       = $StrongAuthenticationUserDetails.Email
     DefaultStrongAuthenticationMethodType      = ($StrongAuthenticationMethods |Where-Object {$_.IsDefault -eq $True}).MethodType
   }
-  [void]$PSArrayList.Add($PSObj)
+  # [void]$PSArrayList.Add($PSObj)
+  [void]$PSList.Add($PSObj)
 }
 
 $InfoBody = [pscustomobject]@{
-  'Task'              = "Azure Hybrid Runbook Worker - Tier-2"
-  'Action'            = "Azure MFA Registration Report"
-  'Mfa Users Added'   = ""
-  'Mfa Users Total'   = $methodTypeCount
-  'Users Total'       = $UserCounter
-
+  'Task'            = "Azure Hybrid Runbook Worker - Tier-2"
+  'Action'          = "Azure MFA Registration Report"
+  'Mfa Users Added' = ""
+  'Mfa Users Total' = $methodTypeCount
+  'Users Total'     = $UserCounter
 }
 
-$PSArrayList |Export-Csv $CSVFile -NoTypeInformation
+#$PSArrayList |Export-Csv $CSVFile -NoTypeInformation
+$PSList |Export-Csv $CSVFile -NoTypeInformation
 
 $HTML = New-HTMLHead -title "Azure MFA Registration Report" -style $Style1
 $HTML += New-HTMLTable -inputObject $(ConvertTo-PropertyValue -inputObject $InfoBody)
