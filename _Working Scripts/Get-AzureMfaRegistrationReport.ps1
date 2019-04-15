@@ -15,12 +15,13 @@ function Get-IsMember {
   }
 }
 
+$PSList = [List[psobject]]::new()
+
 #$AutomationPSCredentialName = "t2_cloud_cred"
+#$Credential = Get-AutomationPSCredential -Name $AutomationPSCredentialName -ErrorAction Stop
 
 $Date = (get-date -f yyyy-MM-dd)
 $CSVFile = "C:\support\MFAUserReport_$($Date).csv"
-$PSList = [List[psobject]]::new()
-#$Credential = Get-AutomationPSCredential -Name $AutomationPSCredentialName -ErrorAction Stop
 
 $Style1 =
 '<style>
@@ -56,8 +57,8 @@ foreach ($User in $MFAUsers) {
   $UserCounter ++
 
   $StrongAuthenticationRequirements = $User |Select-Object -ExpandProperty StrongAuthenticationRequirements
-  $StrongAuthenticationUserDetails = $User |Select-Object -ExpandProperty StrongAuthenticationUserDetails
-  $StrongAuthenticationMethods = $User |Select-Object -ExpandProperty StrongAuthenticationMethods
+  $StrongAuthenticationUserDetails  = $User |Select-Object -ExpandProperty StrongAuthenticationUserDetails
+  $StrongAuthenticationMethods      = $User |Select-Object -ExpandProperty StrongAuthenticationMethods
 
   $MethodTypeCount += ($StrongAuthenticationMethods |Where-Object {$_.IsDefault -eq $True}).count
 
@@ -84,7 +85,7 @@ $InfoBody = [pscustomobject]@{
 
 $PSList |Export-Csv $CSVFile -NoTypeInformation
 
-$HTML = New-HTMLHead -title "Azure MFA Registration Report" -style $Style1
+$HTML =  New-HTMLHead -title "Azure MFA Registration Report" -style $Style1
 $HTML += New-HTMLTable -inputObject $(ConvertTo-PropertyValue -inputObject $InfoBody)
 $HTML += "<h4>See Attached CSV Report</h4>"
 $HTML += "<h4>Script Completed: $(Get-Date -Format G)</h4>" |Close-HTML
