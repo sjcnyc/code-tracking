@@ -1,4 +1,5 @@
 #Connect-MsolService
+#Connect-AzureAD
 
 $MFAUsers = Get-Msoluser -all
 
@@ -8,16 +9,29 @@ $NonMfaUsers = $MFAUsers |Where-Object {$_.StrongAuthenticationMethods.Count -eq
 
 $UsersAddedToGroup = 0
 
-foreach ($user in $NonMfaUsers) {
+foreach ($User in $NonMfaUsers) {
   try {
 
-    Add-MsolGroupMember -GroupObjectId $NoMfaGroup -GroupMemberObjectId $user.ObjectId -ErrorAction Stop
-    $UsersAddedToGroup ++
+    $InGroup = (Get-AzureADUser -SearchString $User.UserPrincipalName | Get-AzureADUserMembership).Displayname -eq "AZ_OnPremOnly_NoMFA_TEST"
+
+    if (!($InGroup)) {
+      #Add-MsolGroupMember -GroupObjectId $NoMfaGroup -GroupMemberObjectId $user.ObjectId -ErrorAction Stop
+      $UsersAddedToGroup ++
+      Write-Output "Adding $($User.UserPrincipalName) to group.."
+    }
+    else {
+
+    }
   }
   catch [Microsoft.Online.Administration.Automation.MicrosoftOnlineException] {
-  #  $_.Exception.Message
+    #  $_.Exception.Message  # Commented because output not required
   }
   catch {
-   # $_.Exception.Message
+    # $_.Exception.Message  # Commented because output not required
   }
 }
+
+$NoMfaGroupUserCount = (Get-MsolGroupMember -GroupObjectId $NoMfaGroup -All).Count
+
+Write-Output "Syncronized Users Added: $($UsersAddedToGroup)"
+Write-Output "Syncronyzed Users Total: $($NoMfaGroupUserCount)"
