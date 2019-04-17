@@ -8,9 +8,7 @@ Select-Object SAMAccountName, Displayname,useraccountcontrol,distinguishedname, 
 
 
 @"
-OU=ADM,OU=Tier-0,DC=me,DC=sonymusic,DC=com
-OU=ADM,OU=Tier-1,DC=me,DC=sonymusic,DC=com
-OU=ADM,OU=Tier-2,DC=me,DC=sonymusic,DC=com
+DC=me,DC=sonymusic,DC=com
 "@ -split [environment]::NewLine | ForEach-Object {
 
   $Filter = [RegEx]'^*OU=Employee*|^*OU=Non-Employee'
