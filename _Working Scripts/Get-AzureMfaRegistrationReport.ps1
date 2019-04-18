@@ -1,25 +1,33 @@
 using namespace System.Collections.Generic
-
-function Get-IsMember {
+function Get-IsAzGroupmember {
   param (
     [string]
-    $GroupName,
-
-    [array]
-    $Users
+    $GroupObjectId,
+    [string]
+    $UserName
   )
-  $users | ForEach-Object {
-    if ((Get-ADGroupMember $GroupName -Server 'me.sonymusic.com' |Select-Object -ExpandProperty SamAccountName) -notcontains $_) {
-      return $_
-    }
+
+  $g = [Microsoft.Open.AzureAD.Model.GroupIdsForMembershipCheck]::new()
+  $g.GroupIds = $GroupObjectId
+  $User = (Get-AzureADUser -Filter "userprincipalname eq '$($Username)'").ObjectId
+  $InGroup = Select-AzureADGroupIdsUserIsMemberOf -ObjectId $User -GroupIdsForMembershipCheck $g
+
+  if ($InGroup -eq $GroupObjectId) {
+    return $true
+  }
+  else {
+    return $false
   }
 }
-
-$PSList = [List[psobject]]::new()
 
 #$AutomationPSCredentialName = "t2_cloud_cred"
 #$Credential = Get-AutomationPSCredential -Name $AutomationPSCredentialName -ErrorAction Stop
 
+#Connect-MsolService #-Credential $Credential -ErrorAction SilentlyContinue
+#Connect-AzureAD #-Credential $Credential -ErrorAction SilentlyContinue
+
+$PSList = [List[psobject]]::new()
+$PListUsersAdded = $PSList = [List[psobject]]::new()
 $Date = (get-date -f yyyy-MM-dd)
 $CSVFile = "C:\support\MFAUserReport_$($Date).csv"
 
@@ -28,7 +36,7 @@ $Style1 =
   body {color:#333333;font-family:Calibri,Tahoma,arial,verdana;font-size: 10pt;}
   h1 {text-align:center;}
   h2 {border-top:1px solid #E9E9E9;}
-  h4 {font-size: 10pt;}
+  h4 {font-size: 8pt;}
   table {border-collapse:collapse;}
   th {text-align:left;font-weight:bold;color:#FFFFFF;background-color:#2980B9;border:1px solid #2980B9;padding:4px;}
   td {padding:4px; border:1px solid #E9E9E9;}
@@ -36,29 +44,41 @@ $Style1 =
   .even { background-color:#E9E9E9; }
   </style>'
 
-Connect-MsolService #-Credential $Credential -ErrorAction SilentlyContinue
-
-$MFAUsers = Get-Msoluser -all
-$UserCounter = 1
-$UsersAddedToGroup = 1
+$UserCounter = 0
+$UsersAddedToGroup = 0
 $MethodTypeCount = 0
-$NoMfaGroup       = "AZ_OnPremOnly_NoMFA"
-$NonMfaUsers = $MFAUsers |Where-Object {$_.StrongAuthenticationMethods.Count -eq 0}
-#$NonGroupUsers     = Get-IsMember -GroupName $NoMfaGroup -Users $NonMfaUsers
+$MFAUsers = Get-Msoluser -all
 
-foreach ($NonMfaUser in $NonMfaUsers) {
-  switch -wildcard ($NonMfaUser.UserPrincipalName) {
-    "*.onmicrosoft.com" { Write-Host "cloud : $($NonMfaUser.UserPrincipalName)" }
-    "*.sonymusic.com" { Write-Host "onprem : $($NonMfaUser.UserPrincipalName)" }
-    Default {}
+$NoMfaGroup = "af67af47-8f94-45c7-a806-2b0b9f3c760e" #"AZ_OnPremOnly_NoMFA_Test"
+
+$NonMfaUsers = $MFAUsers |Where-Object {$_.StrongAuthenticationMethods.Count -eq 0  } # -and $_.ImmutableID -eq $null
+
+foreach ($User in $NonMfaUsers) {
+  try {
+
+    $Group = Get-IsAzGroupmember -GroupObjectId $NoMfaGroup -UserName $User.UserPrincipalName
+
+    if ($Group -ne $true) {
+      # Add-MsolGroupMember -GroupObjectId $NoMfaGroup -GroupMemberObjectId $user.ObjectId -ErrorAction Stop
+      $UsersAddedToGroup ++
+      Write-Output "Adding $($User.UserPrincipalName) to group.."
+
+      $PSUserObj = [PSCustomObject]@{
+        'DisplayName'       = $User.DisplayName
+        'UserPrincipalName' = $User.UserPrincipalName
+      }
+      [void]$PListUsersAdded.Add($PSUserObj)
+    }
+  }
+  catch [Microsoft.Online.Administration.Automation.MicrosoftOnlineException] {
+    $_.Exception.Message  # Commented because output not required
+  }
+  catch {
+    $_.Exception.Message  # Commented because output not required
   }
 }
 
-foreach ($NonGroupUser in $NonGroupUsers) {
-  $UsersAddedToGroup ++
-  #TODO: Add Non-Mfa user to "AZ_OnPremOnly_NoMFA"
-  # "CN=AZ_OnPremOnly_NoMFA,OU=Groups,OU=GBL,OU=USA,OU=NA,OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
-}
+$NoMfaGroupUserCount = (Get-MsolGroupMember -GroupObjectId $NoMfaGroup -All).Count
 
 foreach ($User in $MFAUsers) {
   $UserCounter ++
@@ -83,24 +103,32 @@ foreach ($User in $MFAUsers) {
 }
 
 $InfoBody = [pscustomobject]@{
-  'Task'                       = "Azure Hybrid Runbook Worker - Tier-2"
-  'Action'                     = "Azure MFA Registration Report"
-  'Users Added to Block Group' = $UsersAddedToGroup
-  'Mfa Users Total'            = $MethodTypeCount
-  'Users Total'                = $UserCounter
+  'Task'            = "Azure Hybrid Runbook Worker - Tier-2"
+  'Action'          = "Azure MFA Registration Report"
+  'Mfa Users Total' = $MethodTypeCount
+  'Users Total'     = $UserCounter
+}
+
+$SyncUsers = [PSCustomObject]@{
+  'Add to Group' = "AZ_OnPremOnly_NoMFA_Test"
+  'Users Added'  = $UsersAddedToGroup
+  'Users Total'  = $NoMfaGroupUserCount
 }
 
 $PSList |Export-Csv $CSVFile -NoTypeInformation
 
 $HTML = New-HTMLHead -title "Azure MFA Registration Report" -style $Style1
 $HTML += New-HTMLTable -inputObject $(ConvertTo-PropertyValue -inputObject $InfoBody)
+$HTML += "<h4>&nbsp;</h4>"
+$HTML += New-HTMLTable -inputObject $(ConvertTo-PropertyValue -inputObject $SyncUsers)
+$HTML += New-HTMLTable -InputObject $($PListUsersAdded)
 $HTML += "<h4>See Attached CSV Report</h4>"
 $HTML += "<h4>Script Completed: $(Get-Date -Format G)</h4>" |Close-HTML
 
 $EmailParams = @{
   To          = "sconnea@sonymusic.com" #, "Alex.Moldoveanu@sonymusic.com", "bobby.thomas@sonymusic.com", "Rohan.Simpson@sonymusic.com"
   #CC          = "jorge.ocampo.peak@sonymusic.com", "suminder.singh.itopia@sonymusic.com"
-  From        = 'PwSh poshalerts@sonymusic.com'
+  From        = 'PwSh Alerts poshalerts@sonymusic.com'
   Subject     = "Azure MFA Registration Report"
   SmtpServer  = 'cmailsony.servicemail24.de'
   Body        = ($HTML |Out-String)

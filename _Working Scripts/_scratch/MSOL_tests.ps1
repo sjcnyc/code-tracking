@@ -1,3 +1,24 @@
+function Get-IsAzGroupmember {
+  param (
+    [string]
+    $GroupObjectId,
+    [string]
+    $UserName
+  )
+
+  $g = New-Object Microsoft.Open.AzureAD.Model.GroupIdsForMembershipCheck
+  $g.GroupIds = $GroupObjectId
+  $User = (Get-AzureADUser -Filter "userprincipalname eq '$($Username)'").ObjectId
+  $InGroup = Select-AzureADGroupIdsUserIsMemberOf -ObjectId $User -GroupIdsForMembershipCheck $g
+
+  if ($InGroup -eq $GroupObjectId) {
+    return $true
+  }
+  else {
+    return $false
+  }
+}
+
 #Connect-MsolService
 #Connect-AzureAD
 
@@ -12,22 +33,19 @@ $UsersAddedToGroup = 0
 foreach ($User in $NonMfaUsers) {
   try {
 
-    $InGroup = (Get-AzureADUser -SearchString $User.UserPrincipalName | Get-AzureADUserMembership).Displayname -eq "AZ_OnPremOnly_NoMFA_TEST"
+    $Group = Get-IsAzGroupmember -GroupObjectId $NoMfaGroup -UserName $User.UserPrincipalName
 
-    if (!($InGroup)) {
-      #Add-MsolGroupMember -GroupObjectId $NoMfaGroup -GroupMemberObjectId $user.ObjectId -ErrorAction Stop
+    if ($Group -ne $true) {
+      # Add-MsolGroupMember -GroupObjectId $NoMfaGroup -GroupMemberObjectId $user.ObjectId -ErrorAction Stop
       $UsersAddedToGroup ++
       Write-Output "Adding $($User.UserPrincipalName) to group.."
     }
-    else {
-
-    }
   }
   catch [Microsoft.Online.Administration.Automation.MicrosoftOnlineException] {
-    #  $_.Exception.Message  # Commented because output not required
+      $_.Exception.Message  # Commented because output not required
   }
   catch {
-    # $_.Exception.Message  # Commented because output not required
+     $_.Exception.Message  # Commented because output not required
   }
 }
 
@@ -35,3 +53,5 @@ $NoMfaGroupUserCount = (Get-MsolGroupMember -GroupObjectId $NoMfaGroup -All).Cou
 
 Write-Output "Syncronized Users Added: $($UsersAddedToGroup)"
 Write-Output "Syncronyzed Users Total: $($NoMfaGroupUserCount)"
+
+(Get-AzureADGroupMembers -ObjectId $NoMfaGroup).Count
