@@ -27,7 +27,7 @@ function Get-IsAzGroupmember {
 #Connect-AzureAD #-Credential $Credential -ErrorAction SilentlyContinue
 
 $PSList = [List[psobject]]::new()
-$PListUsersAdded = $PSList = [List[psobject]]::new()
+$PListUsersAdded = [List[psobject]]::new()
 $Date = (get-date -f yyyy-MM-dd)
 $CSVFile = "C:\support\MFAUserReport_$($Date).csv"
 
@@ -51,7 +51,7 @@ $MFAUsers = Get-Msoluser -all
 
 $NoMfaGroup = "af67af47-8f94-45c7-a806-2b0b9f3c760e" #"AZ_OnPremOnly_NoMFA_Test"
 
-$NonMfaUsers = $MFAUsers |Where-Object {$_.StrongAuthenticationMethods.Count -eq 0  } # -and $_.ImmutableID -eq $null
+$NonMfaUsers = $MFAUsers |Where-Object {$_.StrongAuthenticationMethods.Count -eq 0} # -and $_.ImmutableID -eq $null
 
 foreach ($User in $NonMfaUsers) {
   try {
@@ -71,10 +71,10 @@ foreach ($User in $NonMfaUsers) {
     }
   }
   catch [Microsoft.Online.Administration.Automation.MicrosoftOnlineException] {
-    $_.Exception.Message  # Commented because output not required
+    $_.Exception.Message  #Comment because output not required in runbook
   }
   catch {
-    $_.Exception.Message  # Commented because output not required
+    $_.Exception.Message  #Comment because output not required in runbook
   }
 }
 
@@ -121,6 +121,7 @@ $HTML = New-HTMLHead -title "Azure MFA Registration Report" -style $Style1
 $HTML += New-HTMLTable -inputObject $(ConvertTo-PropertyValue -inputObject $InfoBody)
 $HTML += "<h4>&nbsp;</h4>"
 $HTML += New-HTMLTable -inputObject $(ConvertTo-PropertyValue -inputObject $SyncUsers)
+$HTML += "<h4>&nbsp;</h4>"
 $HTML += New-HTMLTable -InputObject $($PListUsersAdded)
 $HTML += "<h4>See Attached CSV Report</h4>"
 $HTML += "<h4>Script Completed: $(Get-Date -Format G)</h4>" |Close-HTML
