@@ -140,3 +140,4 @@ $EmailParams = @{
 Send-MailMessage @EmailParams
 Start-Sleep -Seconds 5
 Remove-Item $CSVFile
+# finished for now
