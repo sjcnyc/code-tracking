@@ -48,7 +48,7 @@ $Style1 =
 $UserCounter = 0
 $UsersAddedToGroup = 0
 $MethodTypeCount = 0
-$MFAUsers = Get-Msoluser -maxresults -All
+$MFAUsers = Get-Msoluser -All
 
 $NoMfaGroup = "af67af47-8f94-45c7-a806-2b0b9f3c760e" #"AZ_OnPremOnly_NoMFA_Test"
 
