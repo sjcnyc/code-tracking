@@ -1,4 +1,5 @@
 using namespace System.Collections.Generic
+
 function Get-IsAzGroupmember {
   param (
     [string]
@@ -7,7 +8,7 @@ function Get-IsAzGroupmember {
     $UserName
   )
 
-  $g = [Microsoft.Open.AzureAD.Model.GroupIdsForMembershipCheck]::new()
+  $g = New-Object Microsoft.Open.AzureAD.Model.GroupIdsForMembershipCheck
   $g.GroupIds = $GroupObjectId
   $User = (Get-AzureADUser -Filter "userprincipalname eq '$($Username)'").ObjectId
   $InGroup = Select-AzureADGroupIdsUserIsMemberOf -ObjectId $User -GroupIdsForMembershipCheck $g
@@ -20,11 +21,11 @@ function Get-IsAzGroupmember {
   }
 }
 
-#$AutomationPSCredentialName = "t2_cloud_cred"
-#$Credential = Get-AutomationPSCredential -Name $AutomationPSCredentialName -ErrorAction Stop
+$AutomationPSCredentialName = "t2_cloud_cred"
+$Credential = Get-AutomationPSCredential -Name $AutomationPSCredentialName -ErrorAction Stop
 
-#Connect-MsolService #-Credential $Credential -ErrorAction SilentlyContinue
-#Connect-AzureAD #-Credential $Credential -ErrorAction SilentlyContinue
+Connect-MsolService -Credential $Credential -ErrorAction SilentlyContinue
+Connect-AzureAD -Credential $Credential -ErrorAction SilentlyContinue
 
 $PSList = [List[psobject]]::new()
 $PListUsersAdded = [List[psobject]]::new()
@@ -47,11 +48,11 @@ $Style1 =
 $UserCounter = 0
 $UsersAddedToGroup = 0
 $MethodTypeCount = 0
-$MFAUsers = Get-Msoluser -all
+$MFAUsers = Get-Msoluser -maxresults -All
 
 $NoMfaGroup = "af67af47-8f94-45c7-a806-2b0b9f3c760e" #"AZ_OnPremOnly_NoMFA_Test"
 
-$NonMfaUsers = $MFAUsers |Where-Object {$_.StrongAuthenticationMethods.Count -eq 0} # -and $_.ImmutableID -eq $null
+$NonMfaUsers = $MFAUsers | Where-Object { $_.StrongAuthenticationMethods.Count -eq 0 } # -and $_.ImmutableID -eq $null
 
 foreach ($User in $NonMfaUsers) {
   try {
@@ -71,10 +72,10 @@ foreach ($User in $NonMfaUsers) {
     }
   }
   catch [Microsoft.Online.Administration.Automation.MicrosoftOnlineException] {
-    $_.Exception.Message  #Comment because output not required in runbook
+    Write-Error $_.Exception.Message  #Comment because output not required in runbook
   }
   catch {
-    $_.Exception.Message  #Comment because output not required in runbook
+    Write-Error $_.Exception.Message  #Comment because output not required in runbook
   }
 }
 
@@ -83,11 +84,11 @@ $NoMfaGroupUserCount = (Get-MsolGroupMember -GroupObjectId $NoMfaGroup -All).Cou
 foreach ($User in $MFAUsers) {
   $UserCounter ++
 
-  $StrongAuthenticationRequirements = $User |Select-Object -ExpandProperty StrongAuthenticationRequirements
-  $StrongAuthenticationUserDetails = $User |Select-Object -ExpandProperty StrongAuthenticationUserDetails
-  $StrongAuthenticationMethods = $User |Select-Object -ExpandProperty StrongAuthenticationMethods
+  $StrongAuthenticationRequirements = $User | Select-Object -ExpandProperty StrongAuthenticationRequirements
+  $StrongAuthenticationUserDetails = $User | Select-Object -ExpandProperty StrongAuthenticationUserDetails
+  $StrongAuthenticationMethods = $User | Select-Object -ExpandProperty StrongAuthenticationMethods
 
-  $MethodTypeCount += ($StrongAuthenticationMethods |Where-Object {$_.IsDefault -eq $True}).count
+  $MethodTypeCount += ($StrongAuthenticationMethods | Where-Object { $_.IsDefault -eq $True }).count
 
   $PSObj = [pscustomobject]@{
     DisplayName                                = $User.DisplayName -replace "#EXT#", ""
@@ -97,7 +98,7 @@ foreach ($User in $MFAUsers) {
     RememberDevicesNotIssuedBefore             = $StrongAuthenticationRequirements.RememberDevicesNotIssuedBefore
     StrongAuthenticationUserDetailsPhoneNumber = $StrongAuthenticationUserDetails.PhoneNumber
     StrongAuthenticationUserDetailsEmail       = $StrongAuthenticationUserDetails.Email
-    DefaultStrongAuthenticationMethodType      = ($StrongAuthenticationMethods |Where-Object {$_.IsDefault -eq $True}).MethodType
+    DefaultStrongAuthenticationMethodType      = ($StrongAuthenticationMethods | Where-Object { $_.IsDefault -eq $True }).MethodType
   }
   [void]$PSList.Add($PSObj)
 }
@@ -109,22 +110,26 @@ $InfoBody = [pscustomobject]@{
   'Users Total'     = $UserCounter
 }
 
+if ($UsersAddedToGroup -eq 0) { $UserCount = '0' } else { $UserCount = $UsersAddedToGroup }
+
 $SyncUsers = [PSCustomObject]@{
   'Add to Group' = "AZ_OnPremOnly_NoMFA_Test"
-  'Users Added'  = $UsersAddedToGroup
+  'Users Added'  = $UserCount
   'Users Total'  = $NoMfaGroupUserCount
 }
 
-$PSList |Export-Csv $CSVFile -NoTypeInformation
+$PSList | Export-Csv $CSVFile -NoTypeInformation
 
 $HTML = New-HTMLHead -title "Azure MFA Registration Report" -style $Style1
 $HTML += New-HTMLTable -inputObject $(ConvertTo-PropertyValue -inputObject $InfoBody)
 $HTML += "<h4>&nbsp;</h4>"
 $HTML += New-HTMLTable -inputObject $(ConvertTo-PropertyValue -inputObject $SyncUsers)
 $HTML += "<h4>&nbsp;</h4>"
-$HTML += New-HTMLTable -InputObject $($PListUsersAdded)
+if ($UserCount -ne 0) {
+  $HTML += New-HTMLTable -InputObject $($PListUsersAdded)
+}
 $HTML += "<h4>See Attached CSV Report</h4>"
-$HTML += "<h4>Script Completed: $(Get-Date -Format G)</h4>" |Close-HTML
+$HTML += "<h4>Script Completed: $(Get-Date -Format G)</h4>" | Close-HTML
 
 $EmailParams = @{
   To          = "sconnea@sonymusic.com" #, "Alex.Moldoveanu@sonymusic.com", "bobby.thomas@sonymusic.com", "Rohan.Simpson@sonymusic.com"
@@ -132,7 +137,7 @@ $EmailParams = @{
   From        = 'PwSh Alerts poshalerts@sonymusic.com'
   Subject     = "Azure MFA Registration Report"
   SmtpServer  = 'cmailsony.servicemail24.de'
-  Body        = ($HTML |Out-String)
+  Body        = ($HTML | Out-String)
   BodyAsHTML  = $true
   Attachments = $CSVFile
 }
