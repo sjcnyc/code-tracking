@@ -66,6 +66,8 @@ $BodyHTML =
 "@
 #endregion
 
+
+#TODO: check by date last used     
 #region Main Loop
 foreach ($tok in $tokens) {
   ForEach-Object { $i++; $_ }

@@ -1,5 +1,8 @@
 ﻿Add-PSSnapin -Name Quest.Defender.AdminTools
 
+$Date            = (get-date -f yyyy-MM-dd)
+$CSVFile         = "C:\Temp\DefenderTokenReport_$($Date).csv"
+
 Function Convert-IntTodate {
     Param ($Integer = 0)
     if ($Integer -eq $null) {
@@ -31,27 +34,27 @@ $UserSplat = @{
     ErrorAction                      = '0'
 }
 
-$result = New-Object -TypeName System.Collections.ArrayList
+$Result = New-Object -TypeName System.Collections.ArrayList
 
-Get-QADObject @TokenSplat | Where-Object { $_.'defender-tokenUsersDNs' -ne $null } -PipelineVariable token |
+Get-QADObject @TokenSplat |Where-Object { $_.'defender-tokenUsersDNs' -ne $null } -PipelineVariable token |
 
 ForEach-Object {
 
     try {
         Get-QADUser -Identity $token.'defender-tokenUsersDNs' @UserSplat |
             ForEach-Object {
-            $info = [pscustomobject]@{
+            $Info = [pscustomobject]@{
                 'Name'                      = $_.Name
-                'User-ID'                   = $_.samAccountName
+                'User-ID'                   = $_.SamAccountName
                 'Defender-ViolationCount'   = $_.'defender-violationCount'
                 'Defender-ResetCount'       = $_.'defender-resetCount'
                 'Defender-LockoutTime'      = (Convert-IntTodate $_.'defender-lockoutTime')
                 'Defender-LastLogon'        = (Convert-IntTodate $_.'defender-lastlogon')
                 'Defender-TokenName'        = $token.Name
                 'Defender-TokenDescription' = $token.Description
-                'Defender-ParentContainer'  = $_.parentcontainer
+                'Defender-ParentContainer'  = $_.ParentContainer
             }
-            $null = $result.Add($info)
+            [void]$Result.Add($Info)
         }
     }
     catch [System.Object] {
@@ -59,4 +62,4 @@ ForEach-Object {
     }
 }
 
-$result | Export-Csv -Path 'c:\temp\defenderInfo_0014.csv' -NoTypeInformation
+$Result |Export-Csv -Path $CSVFile -NoTypeInformation
