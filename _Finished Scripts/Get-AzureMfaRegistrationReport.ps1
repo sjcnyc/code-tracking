@@ -31,6 +31,9 @@ $PSList = [List[psobject]]::new()
 $PListUsersAdded = [List[psobject]]::new()
 $Date = (get-date -f yyyy-MM-dd)
 $CSVFile = "C:\support\MFAUserReport_$($Date).csv"
+$UserCsv = "C:\support\UsersAddedTo_AZ_OnPremOnly_NoMFA_Test_$($Date).csv"
+
+$CSVFiles =@($CSVFile)
 
 $Style1 =
 '<style>
@@ -49,6 +52,7 @@ $UserCounter = 0
 $UsersAddedToGroup = 0
 $MethodTypeCount = 0
 $MFAUsers = Get-Msoluser -All
+$MaxUsersToDisplay = 10
 
 $NoMfaGroup = "af67af47-8f94-45c7-a806-2b0b9f3c760e" #"AZ_OnPremOnly_NoMFA_Test"
 
@@ -125,8 +129,12 @@ $HTML += New-HTMLTable -inputObject $(ConvertTo-PropertyValue -inputObject $Info
 $HTML += "<h4>&nbsp;</h4>"
 $HTML += New-HTMLTable -inputObject $(ConvertTo-PropertyValue -inputObject $SyncUsers)
 $HTML += "<h4>&nbsp;</h4>"
-if ($UserCount -ne 0) {
+if ($UserCount -ne 0 -and $UserCount -le $MaxUsersToDisplay) {
   $HTML += New-HTMLTable -InputObject $($PListUsersAdded)
+}
+else {
+  $PListUsersAdded | Export-Csv $UserCsv -NoTypeInformation
+  $CSVFiles += $UserCsv
 }
 $HTML += "<h4>See Attached CSV Report</h4>"
 $HTML += "<h4>Script Completed: $(Get-Date -Format G)</h4>" | Close-HTML
@@ -139,10 +147,10 @@ $EmailParams = @{
   SmtpServer  = 'cmailsony.servicemail24.de'
   Body        = ($HTML | Out-String)
   BodyAsHTML  = $true
-  Attachments = $CSVFile
+  Attachments = $CSVFiles
 }
 
 Send-MailMessage @EmailParams
 Start-Sleep -Seconds 5
-Remove-Item $CSVFile
+Remove-Item $CSVFiles
 # finished for now
