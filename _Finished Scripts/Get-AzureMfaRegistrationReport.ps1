@@ -54,7 +54,7 @@ $MethodTypeCount   = 0
 $MFAUsers          = Get-Msoluser -All
 $MaxUsersToDisplay = 10
 
-$NoMfaGroup = "af67af47-8f94-45c7-a806-2b0b9f3c760e" #"AZ_OnPremOnly_NoMFA_Test"
+$NoMfaGroup = "af67af47-8f94-45c7-a806-2b0b9f3c760e" #"AZ_OnPremOnly"
 
 $NonMfaUsers = $MFAUsers |Where-Object { $_.StrongAuthenticationMethods.Count -eq 0 } # -and $_.ImmutableID -eq $null
 
@@ -64,15 +64,19 @@ foreach ($User in $NonMfaUsers) {
     $Group = Get-IsAzGroupMember -GroupObjectId $NoMfaGroup -UserName $User.UserPrincipalName
 
     if ($Group -ne $true) {
-      # Add-MsolGroupMember -GroupObjectId $NoMfaGroup -GroupMemberObjectId $user.ObjectId -ErrorAction Stop
       $UsersAddedToGroup ++
       Write-Output "Adding $($User.UserPrincipalName) to group.."
+       #Add-MsolGroupMember -GroupObjectId $NoMfaGroup -GroupMemberObjectId $user.ObjectId -ErrorAction Continue
 
       $PSUserObj = [PSCustomObject]@{
         'DisplayName'       = $User.DisplayName
         'UserPrincipalName' = $User.UserPrincipalName
       }
       [void]$PListUsersAdded.Add($PSUserObj)
+    }
+    else {
+      #Write-Output "Removing $($User.UserPrincipalName) from group.."
+      #Remove-MsolGroupMember -GroupObjectId $NoMfaGroup -GroupMemberObjectId $user.ObjectId -ErrorAction Continue
     }
   }
   catch [Microsoft.Online.Administration.Automation.MicrosoftOnlineException] {
@@ -117,7 +121,7 @@ $InfoBody = [pscustomobject]@{
 if ($UsersAddedToGroup -eq 0) { $UserCount = '0' } else { $UserCount = $UsersAddedToGroup }
 
 $SyncUsers = [PSCustomObject]@{
-  'Add to Group' = "AZ_OnPremOnly_NoMFA_Test"
+  'Add to Group' = "AZ_OnPremOnly"
   'Users Added'  = $UserCount
   'Users Total'  = $NoMfaGroupUserCount
 }
