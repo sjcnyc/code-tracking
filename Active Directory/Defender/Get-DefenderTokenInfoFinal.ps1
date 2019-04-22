@@ -5,7 +5,7 @@ $CSVFile         = "C:\Temp\DefenderTokenReport_$($Date).csv"
 
 Function Convert-IntTodate {
     Param ($Integer = 0)
-    if ($Integer -eq $null) {
+    if ($null -eq $Integer) {
         $date = $null
     }
     else {
@@ -34,7 +34,7 @@ $UserSplat = @{
     ErrorAction                      = '0'
 }
 
-$Result = New-Object -TypeName System.Collections.ArrayList
+$Result = [List[psobject]]::new()
 
 Get-QADObject @TokenSplat |Where-Object { $_.'defender-tokenUsersDNs' -ne $null } -PipelineVariable token |
 
