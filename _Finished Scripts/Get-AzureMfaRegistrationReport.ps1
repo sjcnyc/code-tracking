@@ -27,11 +27,11 @@ $Credential = Get-AutomationPSCredential -Name $AutomationPSCredentialName -Erro
 Connect-MsolService -Credential $Credential -ErrorAction SilentlyContinue
 Connect-AzureAD -Credential $Credential -ErrorAction SilentlyContinue
 
-$PSList = [List[psobject]]::new()
+$PSList          = [List[psobject]]::new()
 $PListUsersAdded = [List[psobject]]::new()
-$Date = (get-date -f yyyy-MM-dd)
-$CSVFile = "C:\support\MFAUserReport_$($Date).csv"
-$UserCsv = "C:\support\UsersAddedTo_AZ_OnPremOnly_NoMFA_Test_$($Date).csv"
+$Date            = (get-date -f yyyy-MM-dd)
+$CSVFile         = "C:\support\MFAUserReport_$($Date).csv"
+$UserCsv         = "C:\support\UsersAddedTo_AZ_OnPremOnly_NoMFA_Test_$($Date).csv"
 
 $CSVFiles =@($CSVFile)
 
@@ -48,10 +48,10 @@ $Style1 =
   .even { background-color:#E9E9E9; }
   </style>'
 
-$UserCounter = 0
+$UserCounter       = 0
 $UsersAddedToGroup = 0
-$MethodTypeCount = 0
-$MFAUsers = Get-Msoluser -All
+$MethodTypeCount   = 0
+$MFAUsers          = Get-Msoluser -All
 $MaxUsersToDisplay = 10
 
 $NoMfaGroup = "af67af47-8f94-45c7-a806-2b0b9f3c760e" #"AZ_OnPremOnly_NoMFA_Test"
@@ -89,8 +89,8 @@ foreach ($User in $MFAUsers) {
   $UserCounter ++
 
   $StrongAuthenticationRequirements = $User | Select-Object -ExpandProperty StrongAuthenticationRequirements
-  $StrongAuthenticationUserDetails = $User | Select-Object -ExpandProperty StrongAuthenticationUserDetails
-  $StrongAuthenticationMethods = $User | Select-Object -ExpandProperty StrongAuthenticationMethods
+  $StrongAuthenticationUserDetails  = $User | Select-Object -ExpandProperty StrongAuthenticationUserDetails
+  $StrongAuthenticationMethods      = $User | Select-Object -ExpandProperty StrongAuthenticationMethods
 
   $MethodTypeCount += ($StrongAuthenticationMethods | Where-Object { $_.IsDefault -eq $True }).count
 
@@ -129,6 +129,7 @@ $HTML += New-HTMLTable -inputObject $(ConvertTo-PropertyValue -inputObject $Info
 $HTML += "<h4>&nbsp;</h4>"
 $HTML += New-HTMLTable -inputObject $(ConvertTo-PropertyValue -inputObject $SyncUsers)
 $HTML += "<h4>&nbsp;</h4>"
+
 if ($UserCount -ne 0 -and $UserCount -le $MaxUsersToDisplay) {
   $HTML += New-HTMLTable -InputObject $($PListUsersAdded)
 }
@@ -152,5 +153,7 @@ $EmailParams = @{
 
 Send-MailMessage @EmailParams
 Start-Sleep -Seconds 5
-Remove-Item $CSVFiles
+foreach ($Item in $CSVFiles) {
+  Remove-Item $item
+}
 # finished for now
