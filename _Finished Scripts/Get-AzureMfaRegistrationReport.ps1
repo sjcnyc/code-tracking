@@ -31,7 +31,7 @@ $PSList          = [List[psobject]]::new()
 $PListUsersAdded = [List[psobject]]::new()
 $Date            = (get-date -f yyyy-MM-dd)
 $CSVFile         = "C:\support\MFAUserReport_$($Date).csv"
-$UserCsv         = "C:\support\UsersAddedTo_AZ_OnPremOnly_NoMFA_Test_$($Date).csv"
+$UserCsv         = "C:\support\UsersAddedTo_AZ_OnPremOnly_$($Date).csv"
 
 $CSVFiles =@($CSVFile)
 
