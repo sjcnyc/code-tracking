@@ -1,6 +1,6 @@
 using namespace System.Collections.Generic
 
-function Get-IsAzGroupmember {
+function Get-IsAzGroupMember {
   param (
     [string]
     $GroupObjectId,
@@ -56,12 +56,12 @@ $MaxUsersToDisplay = 10
 
 $NoMfaGroup = "af67af47-8f94-45c7-a806-2b0b9f3c760e" #"AZ_OnPremOnly_NoMFA_Test"
 
-$NonMfaUsers = $MFAUsers | Where-Object { $_.StrongAuthenticationMethods.Count -eq 0 } # -and $_.ImmutableID -eq $null
+$NonMfaUsers = $MFAUsers |Where-Object { $_.StrongAuthenticationMethods.Count -eq 0 } # -and $_.ImmutableID -eq $null
 
 foreach ($User in $NonMfaUsers) {
   try {
 
-    $Group = Get-IsAzGroupmember -GroupObjectId $NoMfaGroup -UserName $User.UserPrincipalName
+    $Group = Get-IsAzGroupMember -GroupObjectId $NoMfaGroup -UserName $User.UserPrincipalName
 
     if ($Group -ne $true) {
       # Add-MsolGroupMember -GroupObjectId $NoMfaGroup -GroupMemberObjectId $user.ObjectId -ErrorAction Stop
@@ -88,11 +88,11 @@ $NoMfaGroupUserCount = (Get-MsolGroupMember -GroupObjectId $NoMfaGroup -All).Cou
 foreach ($User in $MFAUsers) {
   $UserCounter ++
 
-  $StrongAuthenticationRequirements = $User | Select-Object -ExpandProperty StrongAuthenticationRequirements
-  $StrongAuthenticationUserDetails  = $User | Select-Object -ExpandProperty StrongAuthenticationUserDetails
-  $StrongAuthenticationMethods      = $User | Select-Object -ExpandProperty StrongAuthenticationMethods
+  $StrongAuthenticationRequirements = $User |Select-Object -ExpandProperty StrongAuthenticationRequirements
+  $StrongAuthenticationUserDetails  = $User |Select-Object -ExpandProperty StrongAuthenticationUserDetails
+  $StrongAuthenticationMethods      = $User |Select-Object -ExpandProperty StrongAuthenticationMethods
 
-  $MethodTypeCount += ($StrongAuthenticationMethods | Where-Object { $_.IsDefault -eq $True }).count
+  $MethodTypeCount += ($StrongAuthenticationMethods |Where-Object { $_.IsDefault -eq $True }).count
 
   $PSObj = [pscustomobject]@{
     DisplayName                                = $User.DisplayName -replace "#EXT#", ""
@@ -102,7 +102,7 @@ foreach ($User in $MFAUsers) {
     RememberDevicesNotIssuedBefore             = $StrongAuthenticationRequirements.RememberDevicesNotIssuedBefore
     StrongAuthenticationUserDetailsPhoneNumber = $StrongAuthenticationUserDetails.PhoneNumber
     StrongAuthenticationUserDetailsEmail       = $StrongAuthenticationUserDetails.Email
-    DefaultStrongAuthenticationMethodType      = ($StrongAuthenticationMethods | Where-Object { $_.IsDefault -eq $True }).MethodType
+    DefaultStrongAuthenticationMethodType      = ($StrongAuthenticationMethods |Where-Object { $_.IsDefault -eq $True }).MethodType
   }
   [void]$PSList.Add($PSObj)
 }
@@ -122,7 +122,7 @@ $SyncUsers = [PSCustomObject]@{
   'Users Total'  = $NoMfaGroupUserCount
 }
 
-$PSList | Export-Csv $CSVFile -NoTypeInformation
+$PSList |Export-Csv $CSVFile -NoTypeInformation
 
 $HTML = New-HTMLHead -title "Azure MFA Registration Report" -style $Style1
 $HTML += New-HTMLTable -inputObject $(ConvertTo-PropertyValue -inputObject $InfoBody)
@@ -134,11 +134,11 @@ if ($UserCount -ne 0 -and $UserCount -le $MaxUsersToDisplay) {
   $HTML += New-HTMLTable -InputObject $($PListUsersAdded)
 }
 else {
-  $PListUsersAdded | Export-Csv $UserCsv -NoTypeInformation
+  $PListUsersAdded |Export-Csv $UserCsv -NoTypeInformation
   $CSVFiles += $UserCsv
 }
 $HTML += "<h4>See Attached CSV Report</h4>"
-$HTML += "<h4>Script Completed: $(Get-Date -Format G)</h4>" | Close-HTML
+$HTML += "<h4>Script Completed: $(Get-Date -Format G)</h4>" |Close-HTML
 
 $EmailParams = @{
   To          = "sconnea@sonymusic.com" #, "Alex.Moldoveanu@sonymusic.com", "bobby.thomas@sonymusic.com", "Rohan.Simpson@sonymusic.com"
@@ -146,7 +146,7 @@ $EmailParams = @{
   From        = 'PwSh Alerts poshalerts@sonymusic.com'
   Subject     = "Azure MFA Registration Report"
   SmtpServer  = 'cmailsony.servicemail24.de'
-  Body        = ($HTML | Out-String)
+  Body        = ($HTML |Out-String)
   BodyAsHTML  = $true
   Attachments = $CSVFiles
 }
