@@ -112,10 +112,10 @@ foreach ($User in $MfaUsers) {
     }
   }
   catch [Microsoft.Online.Administration.Automation.MicrosoftOnlineException] {
-    Write-Error $_.Exception.Message
+    Write-Output $_.Exception.Message
   }
   catch {
-    Write-Error $_.Exception.Message
+    Write-Output $_.Exception.Message
   }
 }
 
@@ -138,7 +138,9 @@ $SyncUsers = [PSCustomObject]@{
   'Users Total'   = $NoMfaGroupUserCount
 }
 
-$PSList | Export-Csv $CSVFile -NoTypeInformation
+$PSList |Export-Csv $CSVFile -NoTypeInformation
+
+try {
 
 $HTML = New-HTMLHead -title "Azure MFA Registration Report" -style $Style1
 $HTML += New-HTMLTable -inputObject $(ConvertTo-PropertyValue -inputObject $InfoBody)
@@ -155,13 +157,17 @@ else {
   $CSVFiles += $UserAddedCsv
 }
 
-if ($UserRemovedCount -ne 0 -and $UserRemovedCount -le $MaxUsersToDisplay) {
-  $HTML += "<h3>Users Removed from AZ_OnPremOnly</h3>"
-  $HTML += New-HTMLTable -InputObject $($PListUsersRemoved)
+  if ($UserRemovedCount -ne 0 -and $UserRemovedCount -le $MaxUsersToDisplay) {
+    $HTML += "<h3>Users Removed from AZ_OnPremOnly</h3>"
+    $HTML += New-HTMLTable -InputObject $($PListUsersRemoved)
+  }
+  else {
+    $PListUsersRemoved |Export-Csv $UserremovedCsv -NoTypeInformation
+    $CSVFiles += $UserRemovedCsv
+  }
 }
-else {
-  $PListUsersRemoved |Export-Csv $UserremovedCsv -NoTypeInformation
-  $CSVFiles += $UserRemovedCsv
+catch {
+  Write-Output $_.Exception.Message
 }
 
 $HTML += "<h4>See Attached CSV Report</h4>"
