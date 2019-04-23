@@ -171,7 +171,7 @@ $HTML += "<h4>&nbsp;</h4>"
 $HTML += New-HTMLTable -inputObject $(ConvertTo-PropertyValue -inputObject $SyncUsers)
 $HTML += "<h4>&nbsp;</h4>"
 
-if ($UserAddedCount -ne $null -and $UserAddedCount -lt $MaxUsersToDisplay) {
+if ($null -ne $UserAddedCount -and $UserAddedCount -lt $MaxUsersToDisplay) {
   $HTML += "<h3>Users Added to AZ_OnPremOnly</h3>"
   $HTML += New-HTMLTable -InputObject $($PListUsersAdded)
 }
@@ -180,7 +180,7 @@ else {
   $CSVFiles += $UserAddedCsv
 }
 
-  if ($UserRemovedCount -ne $null -and $UserRemovedCount -lt $MaxUsersToDisplay) {
+  if ($null -ne $UserRemovedCount -and $UserRemovedCount -lt $MaxUsersToDisplay) {
     $HTML += "<h3>Users Removed from AZ_OnPremOnly</h3>"
     $HTML += New-HTMLTable -InputObject $($PListUsersRemoved)
   }
