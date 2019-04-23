@@ -27,14 +27,14 @@ $Credential = Get-AutomationPSCredential -Name $AutomationPSCredentialName -Erro
 Connect-MsolService -Credential $Credential -ErrorAction SilentlyContinue
 Connect-AzureAD -Credential $Credential -ErrorAction SilentlyContinue
 
-$PSList = [List[psobject]]::new()
-$PListUsersAdded = [List[psobject]]::new()
+$PSList            = [List[psobject]]::new()
+$PListUsersAdded   = [List[psobject]]::new()
 $PListUsersRemoved = [List[psobject]]::new()
 
-$Date = (get-date -f yyyy-MM-dd)
-$CSVFile = "C:\support\MFAUserReport_$($Date).csv"
-$UserAddedCsv = "C:\support\UsersAdded_AZ_OnPremOnly_$($Date).csv"
-$UserRemovedCsv = "C:\support\UsersRemoved_AZ_OnPremOnly_$($Date).csv"
+$Date              = (get-date -f yyyy-MM-dd)
+$CSVFile           = "C:\support\MFAUserReport_$($Date).csv"
+$UserAddedCsv      = "C:\support\UsersAdded_AZ_OnPremOnly_$($Date).csv"
+$UserRemovedCsv    = "C:\support\UsersRemoved_AZ_OnPremOnly_$($Date).csv"
 
 $CSVFiles = @($CSVFile)
 
@@ -51,12 +51,12 @@ $Style1 =
   .even { background-color:#E9E9E9; }
   </style>'
 
-$UserCounter = 0
-$UsersAddedToGroup = 0
+$UserCounter           = 0
+$UsersAddedToGroup     = 0
 $UsersRemovedFromGroup = 0
-$MethodTypeCount = 0
-$MFAUsers = Get-Msoluser -All
-$MaxUsersToDisplay = 10
+$MethodTypeCount       = 0
+$MFAUsers              = Get-Msoluser -All
+$MaxUsersToDisplay     = 10
 
 $NoMfaGroup = "af67af47-8f94-45c7-a806-2b0b9f3c760e" #"AZ_OnPremOnly"
 
@@ -66,11 +66,11 @@ foreach ($User in $MfaUsers) {
 
   $UserCounter ++
 
-  $StrongAuthenticationRequirements = $User | Select-Object -ExpandProperty StrongAuthenticationRequirements
-  $StrongAuthenticationUserDetails = $User | Select-Object -ExpandProperty StrongAuthenticationUserDetails
-  $StrongAuthenticationMethods = $User | Select-Object -ExpandProperty StrongAuthenticationMethods
+  $StrongAuthenticationRequirements = $User |Select-Object -ExpandProperty StrongAuthenticationRequirements
+  $StrongAuthenticationUserDetails  = $User |Select-Object -ExpandProperty StrongAuthenticationUserDetails
+  $StrongAuthenticationMethods      = $User |Select-Object -ExpandProperty StrongAuthenticationMethods
 
-  $MethodTypeCount += ($StrongAuthenticationMethods | Where-Object { $_.IsDefault -eq $True }).count
+  $MethodTypeCount += ($StrongAuthenticationMethods |Where-Object { $_.IsDefault -eq $True }).count
 
   $PSObj = [pscustomobject]@{
     DisplayName                                = $User.DisplayName -replace "#EXT#", ""
@@ -80,7 +80,7 @@ foreach ($User in $MfaUsers) {
     RememberDevicesNotIssuedBefore             = $StrongAuthenticationRequirements.RememberDevicesNotIssuedBefore
     StrongAuthenticationUserDetailsPhoneNumber = $StrongAuthenticationUserDetails.PhoneNumber
     StrongAuthenticationUserDetailsEmail       = $StrongAuthenticationUserDetails.Email
-    DefaultStrongAuthenticationMethodType      = ($StrongAuthenticationMethods | Where-Object { $_.IsDefault -eq $True }).MethodType
+    DefaultStrongAuthenticationMethodType      = ($StrongAuthenticationMethods |Where-Object { $_.IsDefault -eq $True }).MethodType
   }
   [void]$PSList.Add($PSObj)
 
@@ -112,36 +112,14 @@ foreach ($User in $MfaUsers) {
     }
   }
   catch [Microsoft.Online.Administration.Automation.MicrosoftOnlineException] {
-    Write-Error $_.Exception.Message  #Comment because output not required in runbook
+    Write-Error $_.Exception.Message
   }
   catch {
-    Write-Error $_.Exception.Message  #Comment because output not required in runbook
+    Write-Error $_.Exception.Message
   }
 }
 
 $NoMfaGroupUserCount = (Get-MsolGroupMember -GroupObjectId $NoMfaGroup -All).Count
-
-<# foreach ($User in $MFAUsers) {
-  $UserCounter ++
-
-  $StrongAuthenticationRequirements = $User | Select-Object -ExpandProperty StrongAuthenticationRequirements
-  $StrongAuthenticationUserDetails = $User | Select-Object -ExpandProperty StrongAuthenticationUserDetails
-  $StrongAuthenticationMethods = $User | Select-Object -ExpandProperty StrongAuthenticationMethods
-
-  $MethodTypeCount += ($StrongAuthenticationMethods | Where-Object { $_.IsDefault -eq $True }).count
-
-  $PSObj = [pscustomobject]@{
-    DisplayName                                = $User.DisplayName -replace "#EXT#", ""
-    UserPrincipalName                          = $user.UserPrincipalName -replace "#EXT#", ""
-    IsLicensed                                 = $user.IsLicensed
-    MFAState                                   = $StrongAuthenticationRequirements.State
-    RememberDevicesNotIssuedBefore             = $StrongAuthenticationRequirements.RememberDevicesNotIssuedBefore
-    StrongAuthenticationUserDetailsPhoneNumber = $StrongAuthenticationUserDetails.PhoneNumber
-    StrongAuthenticationUserDetailsEmail       = $StrongAuthenticationUserDetails.Email
-    DefaultStrongAuthenticationMethodType      = ($StrongAuthenticationMethods | Where-Object { $_.IsDefault -eq $True }).MethodType
-  }
-  [void]$PSList.Add($PSObj)
-} #>
 
 $InfoBody = [pscustomobject]@{
   'Task'            = "Azure Hybrid Runbook Worker - Tier-2"
@@ -173,7 +151,7 @@ if ($UserAddedCount -ne 0 -and $UserAddedCount -le $MaxUsersToDisplay) {
   $HTML += New-HTMLTable -InputObject $($PListUsersAdded)
 }
 else {
-  $PListUsersAdded | Export-Csv $UserAddedCsv -NoTypeInformation
+  $PListUsersAdded |Export-Csv $UserAddedCsv -NoTypeInformation
   $CSVFiles += $UserAddedCsv
 }
 
@@ -182,12 +160,12 @@ if ($UserRemovedCount -ne 0 -and $UserRemovedCount -le $MaxUsersToDisplay) {
   $HTML += New-HTMLTable -InputObject $($PListUsersRemoved)
 }
 else {
-  $PListUsersRemoved | Export-Csv $UserremovedCsv -NoTypeInformation
+  $PListUsersRemoved |Export-Csv $UserremovedCsv -NoTypeInformation
   $CSVFiles += $UserRemovedCsv
 }
 
 $HTML += "<h4>See Attached CSV Report</h4>"
-$HTML += "<h4>Script Completed: $(Get-Date -Format G)</h4>" | Close-HTML
+$HTML += "<h4>Script Completed: $(Get-Date -Format G)</h4>" |Close-HTML
 
 $EmailParams = @{
   To          = "sconnea@sonymusic.com" #, "Alex.Moldoveanu@sonymusic.com", "bobby.thomas@sonymusic.com", "Rohan.Simpson@sonymusic.com"
@@ -195,7 +173,7 @@ $EmailParams = @{
   From        = 'PwSh Alerts poshalerts@sonymusic.com'
   Subject     = "Azure MFA Registration Report"
   SmtpServer  = 'cmailsony.servicemail24.de'
-  Body        = ($HTML | Out-String)
+  Body        = ($HTML |Out-String)
   BodyAsHTML  = $true
   Attachments = $CSVFiles
 }
