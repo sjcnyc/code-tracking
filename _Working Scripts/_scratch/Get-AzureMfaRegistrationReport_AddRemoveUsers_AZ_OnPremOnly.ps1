@@ -55,12 +55,13 @@ $UserCounter           = 0
 $UsersAddedToGroup     = 0
 $UsersRemovedFromGroup = 0
 $MethodTypeCount       = 0
-#$MFAUsers              = Get-Msoluser -All
 $MaxUsersToDisplay     = 10
 
-$MfaUsers = @()
+$MFAUsers              = Get-Msoluser -All
 
-@"
+#$MfaUsers = @()
+
+<# @"
 TENFW@SonyMusicEntertainment.onmicrosoft.com
 leland.robinson_tcs@sonymusic.com
 matt.deutchman@sonymusic.com
@@ -79,9 +80,9 @@ inquiries.sg@sonymusicentertainment.onmicrosoft.com
 aoma.techo@sonymusicentertainment.onmicrosoft.com
 "@ -split [environment]::NewLine | foreach-object {
   $MfaUsers += (Get-Msoluser -UserPrincipalName $_)
-}
+} #>
 
-$NoMfaGroup = "af67af47-8f94-45c7-a806-2b0b9f3c760e" #"AZ_OnPremOnly"
+$NoMfaGroup = "af67af47-8f94-45c7-a806-2b0b9f3c760e" #"AZ_Auth_OnPremOnly"
 
 #$NonMfaUsers = $MFAUsers |Where-Object { $_.StrongAuthenticationMethods.Count -eq 0 } # -and $_.ImmutableID -eq $null
 
@@ -155,7 +156,7 @@ if ($UsersAddedToGroup -eq 0) { $UserAddedCount = '0' } else { $UserAddedCount =
 if ($UsersRemovedFromGroup -eq 0) { $UserRemovedCount = '0' } else { $UserRemovedCount = $UsersRemovedFromGroup }
 
 $SyncUsers = [PSCustomObject]@{
-  'Cloud Group'   = "AZ_OnPremOnly"
+  'Cloud Group'   = "AZ_Auth_OnPremOnly"
   'Users Added'   = $UserAddedCount
   'Users Removed' = $UserRemovedCount
   'Users Total'   = $NoMfaGroupUserCount
@@ -165,11 +166,11 @@ $PSList |Export-Csv $CSVFile -NoTypeInformation
 
 try {
 
-$HTML = New-HTMLHead -title "Azure MFA Registration Report" -style $Style1
-$HTML += New-HTMLTable -inputObject $(ConvertTo-PropertyValue -inputObject $InfoBody)
-$HTML += "<h4>&nbsp;</h4>"
-$HTML += New-HTMLTable -inputObject $(ConvertTo-PropertyValue -inputObject $SyncUsers)
-$HTML += "<h4>&nbsp;</h4>"
+  $HTML = New-HTMLHead -title "Azure MFA Registration Report" -style $Style1
+  $HTML += New-HTMLTable -inputObject $(ConvertTo-PropertyValue -inputObject $InfoBody)
+  $HTML += "<h4>&nbsp;</h4>"
+  $HTML += New-HTMLTable -inputObject $(ConvertTo-PropertyValue -inputObject $SyncUsers)
+  $HTML += "<h4>&nbsp;</h4>"
 
 if ($null -ne $UserAddedCount -and $UserAddedCount -lt $MaxUsersToDisplay) {
   $HTML += "<h3>Users Added to AZ_OnPremOnly</h3>"
@@ -211,4 +212,4 @@ Start-Sleep -Seconds 5
 foreach ($Item in $CSVFiles) {
   Remove-Item $item
 }
-# finished for now
+# finished for now testing something
