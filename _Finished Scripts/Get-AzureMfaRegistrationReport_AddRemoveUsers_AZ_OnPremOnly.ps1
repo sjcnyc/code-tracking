@@ -1,10 +1,10 @@
 using namespace System.Collections.Generic
 
-$AutomationPSCredentialName = "t2_cloud_cred"
-$Credential = Get-AutomationPSCredential -Name $AutomationPSCredentialName -ErrorAction Stop
+#$AutomationPSCredentialName = "t2_cloud_cred"
+#$Credential = Get-AutomationPSCredential -Name $AutomationPSCredentialName -ErrorAction Stop
 
-Connect-MsolService -Credential $Credential -ErrorAction SilentlyContinue
-Connect-AzureAD -Credential $Credential -ErrorAction SilentlyContinue
+#Connect-MsolService -Credential $Credential -ErrorAction SilentlyContinue
+#Connect-AzureAD -Credential $Credential -ErrorAction SilentlyContinue
 
 $PSList            = [List[psobject]]::new()
 $PListUsersAdded   = [List[psobject]]::new()
@@ -16,7 +16,7 @@ $CSVFile           = "C:\support\MFAUserReport_$($Date).csv"
 $UserAddedCsv      = "C:\support\UsersAdded_$($AZ_GroupName)_$($Date).csv"
 $UserRemovedCsv    = "C:\support\UsersRemoved_$($AZ_GroupName)_$($Date).csv"
 $ScriptStartedTime = (Get-Date -Format G)
-$g                 = New-Object Microsoft.Open.AzureAD.Model.GroupIdsForMembershipCheck
+#$g                 = New-Object Microsoft.Open.AzureAD.Model.GroupIdsForMembershipCheck
 
 $CSVFiles = @($CSVFile)
 
@@ -39,14 +39,15 @@ $UsersRemovedFromGroup = 0
 $MethodTypeCount       = 0
 $MFAUsers              = Get-Msoluser -All
 $NoMfaGroup            = "af67af47-8f94-45c7-a806-2b0b9f3c760e" # AZ_Auth_OnPremOnly
+#$g.GroupIds            = $NoMfaGroup
 
 foreach ($User in $MfaUsers) {
 
   $UserCounter ++
 
   $StrongAuthenticationRequirements = $User | Select-Object -ExpandProperty StrongAuthenticationRequirements
-  $StrongAuthenticationUserDetails  = $User | Select-Object -ExpandProperty StrongAuthenticationUserDetails
-  $StrongAuthenticationMethods      = $User | Select-Object -ExpandProperty StrongAuthenticationMethods
+  $StrongAuthenticationUserDetails = $User | Select-Object -ExpandProperty StrongAuthenticationUserDetails
+  $StrongAuthenticationMethods = $User | Select-Object -ExpandProperty StrongAuthenticationMethods
 
   $MethodTypeCount += ($StrongAuthenticationMethods | Where-Object { $_.IsDefault -eq $True }).count
 
@@ -63,32 +64,37 @@ foreach ($User in $MfaUsers) {
     StrongAuthenticationUserDetailsPhoneNumber = $StrongAuthenticationUserDetails.PhoneNumber
     StrongAuthenticationUserDetailsEmail       = $StrongAuthenticationUserDetails.Email
     DefaultStrongAuthenticationMethodType      = ($StrongAuthenticationMethods | Where-Object { $_.IsDefault -eq $True }).MethodType
+    MfaEnabled                                 = $(if ($User.StrongAuthenticationMethods.Count -eq 0) { $false }elseif ($User.StrongAuthenticationMethods.Count -gt 0) { $true })
+    UserObjectId                               = $User.ObjectId
   }
   [void]$PSList.Add($PSObj)
+}
 
+foreach ($UserList in $PSList) {
   try {
-    $g.GroupIds = $NoMfaGroup
-    $Group = Select-AzureADGroupIdsUserIsMemberOf -ObjectId $User.ObjectId -GroupIdsForMembershipCheck $g
+    #$g.GroupIds = $NoMfaGroup
+   # $Group = Select-AzureADGroupIdsUserIsMemberOf -ObjectId $UserList.UserObjectId -GroupIdsForMembershipCheck $g
+    $Group = Select-AzureADGroupIdsUserIsMemberOf -ObjectId $UserList.UserObjectId -GroupIdsForMembershipCheck @{ GroupIds = $NoMfaGroup }
 
-    if ($Group -ne $NoMfaGroup -and $User.StrongAuthenticationMethods.Count -eq 0) {
+    if ($Group -ne $NoMfaGroup -and $UserList.MfaEnabled -eq $false) {
       $UsersAddedToGroup ++
-      Write-Output "Adding $($User.UserPrincipalName) to group.."
-      Add-MsolGroupMember -GroupObjectId $NoMfaGroup -GroupMemberObjectId $user.ObjectId -ErrorAction Continue
+      Write-Output "Adding $($UserList.UserPrincipalName) to group.."
+      #Add-MsolGroupMember -GroupObjectId $NoMfaGroup -GroupMemberObjectId $userList.ObjectId -ErrorAction Continue
 
       $PSUserObjAdded = [PSCustomObject]@{
-        'DisplayName'       = $User.DisplayName
-        'UserPrincipalName' = $User.UserPrincipalName
+        'DisplayName'       = $UserList.DisplayName
+        'UserPrincipalName' = $UserList.UserPrincipalName
       }
       [void]$PListUsersAdded.Add($PSUserObjAdded)
     }
-    elseif ($Group -eq $NoMfaGroup -and $User.StrongAuthenticationMethods.Count -gt 0) {
+    elseif ($Group -eq $NoMfaGroup -and $UserList.MfaEnabled -eq $true) {
       $UsersRemovedFromGroup ++
-      Write-Output "Removing $($User.UserPrincipalName) from group.."
-      Remove-MsolGroupMember -GroupObjectId $NoMfaGroup -GroupMemberObjectId $user.ObjectId -ErrorAction Continue
+      Write-Output "Removing $($UserList.UserPrincipalName) from group.."
+      #Remove-MsolGroupMember -GroupObjectId $NoMfaGroup -GroupMemberObjectId $userList.ObjectId -ErrorAction Continue
 
       $PSUserObjRemoved = [PSCustomObject]@{
-        'DisplayName'       = $User.DisplayName
-        'UserPrincipalName' = $User.UserPrincipalName
+        'DisplayName'       = $UserList.DisplayName
+        'UserPrincipalName' = $UserList.UserPrincipalName
       }
       [void]$PListUsersRemoved.Add($PSUserObjRemoved)
     }
@@ -147,8 +153,8 @@ $HTML += "<h4>Script Started: $($ScriptStartedTime)</h4>"
 $HTML += "<h4>Script Completed: $(Get-Date -Format G)</h4>" | Close-HTML
 
 $EmailParams = @{
-  To          = "sconnea@sonymusic.com", "Alex.Moldoveanu@sonymusic.com", "bobby.thomas@sonymusic.com", "heather.guthrie@sonymusic.com", "brian.lynch@sonymusic.com", "Rohan.Simpson@sonymusic.com"
-  CC          = "jorge.ocampo.peak@sonymusic.com", "Steve.Kenton@sonymusic.com", "suminder.singh.itopia@sonymusic.com"
+  To          = "sconnea@sonymusic.com"#, "Alex.Moldoveanu@sonymusic.com", "bobby.thomas@sonymusic.com", "heather.guthrie@sonymusic.com", "brian.lynch@sonymusic.com", "Rohan.Simpson@sonymusic.com"
+ # CC          = "jorge.ocampo.peak@sonymusic.com", "Steve.Kenton@sonymusic.com", "suminder.singh.itopia@sonymusic.com"
   From        = 'PwSh Alerts poshalerts@sonymusic.com'
   Subject     = "Azure MFA Registration Report"
   SmtpServer  = 'cmailsony.servicemail24.de'
