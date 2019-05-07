@@ -1,3 +1,36 @@
+function ConvertFrom-DN {
+  param([string]$DN = (Throw "$DN is required!"))
+  foreach ( $item in ($DN.replace('\,', '~').split(','))) {
+    switch -regex ($item.TrimStart().Substring(0, 3)) {
+      'CN=' {
+        $CN = '/' + $item.replace('CN=', '')
+        continue
+      }
+      'OU=' {
+        $ou += , $item.replace('OU=', '')
+        $ou += '/'
+        continue
+      }
+      'DC=' {
+        $DC += $item.replace('DC=', '')
+        $DC += '.'
+        continue
+      }
+    }
+  }
+  $canoincal = @()
+  $canoincal = $DC.Substring(0, $DC.length - 1)
+  for ($i = $ou.count; $i -ge 0; $i -- ) {
+    $canoincal += $ou[$i]
+  }
+
+  # return only OU path
+  return $canoincal.Substring($DC.length - 1)
+
+  # return full parten container path
+  # return $canoincal
+} #
+
 function Move-UserFromProvisionOU {
   [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSShouldProcess', '')]
   [CmdletBinding(SupportsShouldProcess = $true)]
@@ -28,23 +61,26 @@ function Move-UserFromProvisionOU {
 
   $PSArrayList = New-Object System.Collections.ArrayList
   $Users = Get-ADUser -SearchBase $SourceOU -Filter * -Properties * -Credential $cred | 
-    Where-Object {$null -ne $_.extensionAttribute1} | Select-Object Name, SamAccountName, UserPrincipalName, distinguishedname, extensionAttribute1
+  Where-Object { $null -ne $_.extensionAttribute1 } | Select-Object Name, SamAccountName, UserPrincipalName, distinguishedname, extensionAttribute1
   $Count = 0
   try {
-      foreach ($User in $Users) {
-        $Count ++
-        $PSObj = [pscustomobject]@{
-          User              = $User.Name
-          UPN               = $User.UserPrincipalName
-          SamAccountName    = $User.SamAccountName
-          DestOU            = $User.extensionAttribute1
-        }
-        [void]$PSArrayList.Add($PSObj)
+    foreach ($User in $Users) {
+      $Count ++
+      $ParentContainer = ConvertFrom-DN -DN $User.extensionAttribute1
+      $PSObj = [pscustomobject]@{
+        User           = $User.Name
+        #  UPN               = $User.UserPrincipalName
+        SamAccountName = $User.SamAccountName
+        DestOU         = $ParentContainer
       }
-      Move-ADObject -Identity $User.distinguishedname -TargetPath $User.extensionAttribute1 -Credential $cred #-WhatIf
-
-      $HTML = New-HTMLHead -title "Move Users From STG OU to STD OU" -style $Style1
-      $HTML += "<h3>Move Users From STG OU to STD OU</h3>"
+      [void]$PSArrayList.Add($PSObj)
+      Move-ADObject -Identity $User.distinguishedname -TargetPath $User.extensionAttribute1 -Credential $cred
+      Write-Output "Moving User: $($User.distinguishedname) to: $($ParentContainer)"
+    }
+    
+    if ($Count -gt 0) {
+      $HTML = New-HTMLHead -title "Move Users From Staging to Production" -style $Style1
+      $HTML += "<h3>Move Users From Staging to Production</h3>"
       $HTML += "<h4>Azure Hybrid Runbook Worker: Tier-2</h4>"
       $HTML += "<h4>Script started: $($StartTime)</h4>"
       $HTML += New-HTMLTable -InputObject $($PSArrayList)
@@ -53,19 +89,20 @@ function Move-UserFromProvisionOU {
 
       if ($SendEmail) {
         $EmailParams = @{
-          To         = "sean.connealy@sonymusic.com"#, "Alex.Moldoveanu@sonymusic.com"
-          From       = 'PWSH Alerts poshalerts@sonymusic.com'
-          Subject    = "Move Users From STG OU to STD OU"
+          To         = "sean.connealy@sonymusic.com", "Access.Control@sonymusic.com"
+          From       = 'PwSh Alerts pwshalerts@sonymusic.com'
+          Subject    = "Move Users From Staging to Production"
           SmtpServer = 'cmailsony.servicemail24.de'
           Body       = ($HTML | Out-String)
           BodyAsHTML = $true
         }
         Send-MailMessage @EmailParams
       }
+    }
   }
   catch {
     $_.Exception.Message
   }
 }
 
-Move-UserFromProvisionOU -SourceOU "OU=Provision,OU=STG,OU=Tier-2,DC=me,DC=sonymusic,DC=com" -SendEmail
+Move-UserFromProvisionOU -SourceOU "OU=NewSync,OU=DomainJoin,OU=USA,OU=NA,OU=Provision,OU=STG,OU=Tier-2,DC=me,DC=sonymusic,DC=com" -SendEmail
