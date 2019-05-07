@@ -24,7 +24,7 @@
         $canoincal += $ou[$i]
     }
 
-    # return only OU path  
+    # return only OU path
     return $canoincal.Substring($DC.length - 1)
 
     # return full parten container path
