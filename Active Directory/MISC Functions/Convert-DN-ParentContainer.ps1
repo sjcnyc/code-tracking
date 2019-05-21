@@ -32,4 +32,4 @@
 } # end
 
 
-ConvertFrom-DN -DN 'OU=WST,OU=GBL,OU=USA,DC=bmg,DC=bagint,DC=com'
+ConvertFrom-DN -DN 'OU=Employees,OU=Users,OU=NLD,OU=BNX,OU=EU,OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com'

@@ -1,0 +1,2 @@
+﻿1..255 | %{$result = Test-Connection -ComputerName "10.12.28.$_" -Count 1 -quiet ; if ($result){Write-host "10.12.28.$_ `t UP" -ForegroundColor Green}
+else {Write-host "10.12.28.$_ `t DOWN" -ForegroundColor RED}}
