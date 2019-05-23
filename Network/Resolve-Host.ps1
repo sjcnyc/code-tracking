@@ -1,39 +1,32 @@
 ﻿Function Resolve-Host {
-    Param(
+    param(
         [Parameter(Mandatory = $true, Position = 0)] $HostEntry,
         [Switch] $HostnameToIP,
         [Switch] $FlushDNS
     )
-    
-    If ($FlushDNS) {
+
+    if ($FlushDNS) {
         Ipconfig /FlushDNS | Out-Null
     }
-   
-    If ($HostnameToIP) {
+
+    if ($HostnameToIP) {
         $object = @()
         $HostEntry | ForEach-Object {
 
-        
             $Object += New-Object psobject -Property @{  HostName = $_
-                IPAddress = $([System.Net.Dns]::GetHostEntry(($_).AddressList.IPAddressToString)
+                IPAddress = $([System.Net.Dns]::GetHostEntry(($_).AddressList.IPAddressToString))
                 }
             }
-        
             Return $object | Select-Object Hostname, IPAddress
         }
         else {
             $object = @()
             $HostEntry | ForEach-Object {
-        
-        
+
                 $Object += New-Object psobject -Property @{  IPAddress = $_
                     HostName = $([System.Net.Dns]::gethostentry($_).HostName)
                 }
             }
-        
-            Return $object | Select-Object IPAddress, Hostname
+            return $object | Select-Object IPAddress, Hostname
         }
     }
-
-
-
