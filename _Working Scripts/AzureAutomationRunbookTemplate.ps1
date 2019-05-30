@@ -52,10 +52,10 @@ Param
     #//
     #//----------------------------------------------------------------------------
     #Constants
-    $Date = $(Get-Date)
+    #$Date = $(Get-Date)
 
     #Assets
-    $Credential = Get-AutomationCredential -Name "Admin"
+    #$Credential = Get-AutomationCredential -Name "Admin"
 
     #//----------------------------------------------------------------------------
     #//  Procedures (Logging etc.)
