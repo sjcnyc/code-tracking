@@ -56,12 +56,12 @@ $count = [int](((C:\temp\adfind\AdFind.exe -c -b "OU=USR,OU=GBL,OU=USA,DC=bmg,DC
 
 $users = (C:\temp\adfind\AdFind.exe -b 'OU=USR,OU=GBL,OU=USA,DC=bmg,DC=bagint,DC=com' -f '(&(objectclass=user)(objectcategory=person))' $($attribs) -tdc -tdcfmt %MM%/%DD%/%YYYY% -nodn -csv)
 
-$ProgressBar = New-ProgressBar -IsIndeterminate $false -MaterialDesign -Type Horizontal -Theme Light -IconPath .\Images\44_user_group_3x_ZEa_icon.ico
+$ProgressBar = New-ProgressBar -IsIndeterminate $false -Type Horizontal -Theme Light -IconPath .\Images\44_user_group_3x_ZEa_icon.ico
 1..$count | ForEach-Object {
   Write-ProgressBar -ProgressBar $ProgressBar -Activity "Counting $_ out of $($count)" -PercentComplete $_ -Status "Scanning User Objects" -CurrentOperation "some operation"
 }
 
 Close-ProgressBar $ProgressBar
 
-$ProgressBar = New-ProgressBar -Type Horizontal -Size large -materialdesign -theme light -IsIndeterminate $True -IconPath
+$ProgressBar = New-ProgressBar -Type Horizontal -Size large -theme light -IsIndeterminate $True
 New-ProgressBar -Type Horizontal -Size Large

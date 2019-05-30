@@ -21,20 +21,20 @@ $When = ((Get-Date).AddDays(-1)).Date
 $filter = [regex]'^*OU=Service*|^*OU=ADM*|^*OU=NewSync*^*OU=Test'
 
 $getADUserSplat = @{
-    Filter = {whenCreated -ge $When}
-    Properties = '*'
-    Credential = $cred
-    server = "me.sonymusic.com"
+  Filter     = { whenCreated -ge $When }
+  Properties = '*'
+  #Credential = $cred
+  server     = "me.sonymusic.com"
 }
 $selectObjectSplat = @{
-    Property = 'UserPrincipalName', 'SamAccountName', 'Surname', 'GivenName', 'DistinguishedName', 'Enabled', 'WhenCreated'
+  Property = 'UserPrincipalName', 'SamAccountName', 'Surname', 'GivenName', 'DistinguishedName', 'Enabled', 'WhenCreated'
 }
-$LastDay = Get-ADUser @getADUserSplat |Where-Object {$_.DistinguishedName -notMatch $filter} |Select-Object @selectObjectSplat
+$LastDay = Get-ADUser @getADUserSplat | Where-Object { $_.DistinguishedName -notMatch $filter } | Select-Object @selectObjectSplat
 
 if ($LastDay.Length -gt 0) {
   $msg = "See Attached CSV Report"
   $Count = $LastDay.Count
-  $LastDay |Export-Csv -Path $CSVFile -NoTypeInformation
+  $LastDay | Export-Csv -Path $CSVFile -NoTypeInformation
   $attachcsv = $true
 }
 else {
@@ -42,11 +42,16 @@ else {
   $Count = '0'
 }
 
+$InfoBody = [pscustomobject]@{
+  'Task'               = "Azure Hybrid Runbook Worker - Tier-2"
+  'Action'             = "Users Created in the Last day"
+  "Users Created"      = $Count
+}
+
 $HTML = New-HTMLHead -title "Users Created in the Last day" -style $Style1
-$HTML += "<h3>Users Created in the Last day.</h3>"
+$HTML += New-HTMLTable -inputObject $(ConvertTo-PropertyValue -inputObject $InfoBody)
 $HTML += "<h4>$($Msg)</h4>"
-$HTML += "<h4>Users Created: $($Count)"
-$HTML += "<h4>Script Completed: $(Get-Date -Format G)</h4>" |Close-HTML
+$HTML += "<h4>Script Completed: $(Get-Date -Format G)</h4>" | Close-HTML
 
 $EmailParams = @{
   to         = 'sconnea@sonymusic.com'
@@ -54,7 +59,7 @@ $EmailParams = @{
   from       = 'adjob@sonymusic.com'
   subject    = 'Users Created in the Last day'
   smtpserver = 'cmailsony.servicemail24.de'
-  Body       = ($HTML |Out-String)
+  Body       = ($HTML | Out-String)
   BodyAsHTML = $true
 }
 if ($attachcsv) {
