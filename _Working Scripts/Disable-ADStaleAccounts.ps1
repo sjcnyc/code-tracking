@@ -160,8 +160,8 @@ $disableADStaleAccountsSplat = @{
     Domain         = 'me.sonymusic.com'
     StaleThreshold = 90
     AccountType    = 'User'
-    SourceOu       = "OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
     Disable        = $true
+    SourceOu       = "OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
     TargetOu       = "OU=Users,OU=Deprovision,OU=STG,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
 }
 Disable-ADStaleAccounts @disableADStaleAccountsSplat
