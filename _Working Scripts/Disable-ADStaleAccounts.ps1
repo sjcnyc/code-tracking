@@ -35,9 +35,9 @@ function Disable-ADStaleAccounts {
   #Requires -modules ActiveDirectory
 
   [CmdletBinding(SupportsShouldProcess)]
-  Param(
+  param(
     [parameter(Mandatory, Position = 1)]
-    [ValidateScript( {Get-ADDomain -Server $_})]
+    [ValidateScript( { Get-ADDomain -Server $_ })]
     [String]$Domain,
 
     [parameter(Mandatory, Position = 2)]
@@ -49,11 +49,11 @@ function Disable-ADStaleAccounts {
     [String]$AccountType,
 
     [parameter(Position = 4)]
-    [ValidateScript( {Get-ADOrganizationalUnit -Identity $_ -Server $Domain})]
+    [ValidateScript( { Get-ADOrganizationalUnit -Identity $_ -Server $Domain })]
     [String]$SourceOu,
 
     [parameter(Position = 5)]
-    [ValidateScript( {Get-ADOrganizationalUnit -Identity $_ -Server $Domain})]
+    [ValidateScript( { Get-ADOrganizationalUnit -Identity $_ -Server $Domain })]
     [String]$TargetOu,
 
     [switch]
@@ -82,7 +82,7 @@ function Disable-ADStaleAccounts {
   $Filter = [RegEx]'^*OU=LOH*|^*OU=Service*|^*OU=LOA*|^*OU=Test'
 
   $ADObjectSplat = @{
-    Filter     = {(LastLogonTimeSTamp -lt $DaysAgo)}
+    Filter     = { (LastLogonTimeSTamp -lt $DaysAgo) }
     Properties = 'PwdLastSet', 'LastLogonTimeStamp', 'Description', 'distinguishedName', 'SamAccountName', 'CanonicalName', 'Name'
     Server     = $Domain
   }
@@ -90,10 +90,10 @@ function Disable-ADStaleAccounts {
   try {
 
     if ($SourceOU) {
-      $StaleAccounts = &"Get-AD$AccountType" @ADObjectSplat -SearchBase $SourceOu |Where-Object {$_.distinguishedName -notmatch $Filter}
+      $StaleAccounts = &"Get-AD$AccountType" @ADObjectSplat -SearchBase $SourceOu | Where-Object { $_.distinguishedName -notmatch $Filter }
     }
     else {
-      $StaleAccounts = &"Get-AD$AccountType" @ADObjectSplat |Where-Object {$_.distinguishedName -notmatch $Filter}
+      $StaleAccounts = &"Get-AD$AccountType" @ADObjectSplat | Where-Object { $_.distinguishedName -notmatch $Filter }
     }
     if ($Disable) {
 
@@ -106,7 +106,7 @@ function Disable-ADStaleAccounts {
         $PSUserObj = [pscustomobject][ordered]@{
           Name               = $StaleAccount.Name
           SamAccountName     = $StaleAccount.SamAccountName
-          Distinguishedname  = $StaleAccount.DistinguishedName
+          DistinguishedName  = $StaleAccount.DistinguishedName
           Description        = $StaleAccount.Description
           LastLogonTimeStamp = [datetime]::FromFileTime($StaleAccount.LastLogonTimeSTamp)
           PwdLastSet         = [datetime]::FromFileTime($StaleAccount.PwdLastSet)
@@ -124,7 +124,7 @@ function Disable-ADStaleAccounts {
         'Total Users' = $StaleAccounts.Count
       }
 
-      $PSList |Export-Csv $CSVFile -NoTypeInformation
+      $PSList | Export-Csv $CSVFile -NoTypeInformation
 
       $HTML = New-HTMLHead -title "ME Stale User Account Cleanup Report" -style $Style1
       $HTML += New-HTMLTable -inputObject $(ConvertTo-PropertyValue -inputObject $InfoBody)
@@ -136,7 +136,7 @@ function Disable-ADStaleAccounts {
         From        = 'Posh Alerts poshalerts@sonymusic.com'
         Subject     = 'ME Stale User Account Cleanup Report'
         SmtpServer  = 'cmailsony.servicemail24.de'
-        Body        = ($HTML |Out-String)
+        Body        = ($HTML | Out-String)
         BodyAsHTML  = $true
         Attachments = $CSVFile
       }
@@ -146,9 +146,9 @@ function Disable-ADStaleAccounts {
       Remove-Item $CSVFile
     }
     else {
-      $StaleAccounts = $StaleAccounts |Select-Object -Property DistinguishedName, Name, Enabled, Description, @{Name = "PwdLastSet"; Expression = {[datetime]::FromFileTime($_.PwdLastSet)}}, @{Name = "LastLogonTimeStamp"; Expression = {[datetime]::FromFileTime($_.LastLogonTimeStamp)}}
+      $StaleAccounts = $StaleAccounts | Select-Object -Property DistinguishedName, Name, Enabled, Description, @{Name = "PwdLastSet"; Expression = { [datetime]::FromFileTime($_.PwdLastSet) } }, @{Name = "LastLogonTimeStamp"; Expression = { [datetime]::FromFileTime($_.LastLogonTimeStamp) } }
 
-      $StaleAccounts |Export-Csv C:\Temp\Stale_ME_User_accounts_00092.csv -NoTypeInformation
+      $StaleAccounts | Export-Csv C:\Temp\Stale_ME_User_accounts_00092.csv -NoTypeInformation
     }
   }
   catch {
@@ -156,4 +156,12 @@ function Disable-ADStaleAccounts {
   }
 }
 
-Disable-ADStaleAccounts -Domain me.sonymusic.com -StaleThreshold 90 -AccountType User -SourceOu "OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com" -Disable -TargetOu "OU=Users,OU=Deprovision,OU=STG,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
+$disableADStaleAccountsSplat = @{
+    Domain         = 'me.sonymusic.com'
+    StaleThreshold = 90
+    AccountType    = 'User'
+    SourceOu       = "OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
+    Disable        = $true
+    TargetOu       = "OU=Users,OU=Deprovision,OU=STG,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
+}
+Disable-ADStaleAccounts @disableADStaleAccountsSplat
