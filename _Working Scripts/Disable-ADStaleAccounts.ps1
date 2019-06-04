@@ -165,3 +165,5 @@ $disableADStaleAccountsSplat = @{
     TargetOu       = "OU=Users,OU=Deprovision,OU=STG,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
 }
 Disable-ADStaleAccounts @disableADStaleAccountsSplat
+
+#test logon
