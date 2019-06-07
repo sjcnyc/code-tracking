@@ -114,6 +114,7 @@ if ($null -ne $ManagedDevices_Count) {
   $ManagedDevices | Export-Csv $ManagedDevices_Csv -NoTypeInformation
   $CSVFiles += $ManagedDevices_Csv
 }
+
 if ($null -ne $AZ_SeanScriptTesting_Count) {
   $AZ_SeanScriptTesting_Users | Export-Csv $AZ_SeanScriptTesting_Csv -NoTypeInformation
   $CSVFiles += $AZ_SeanScriptTesting_Csv
