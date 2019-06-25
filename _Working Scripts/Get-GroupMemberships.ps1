@@ -51,7 +51,7 @@ function Get-ADGroupMemberships {
 }
 
 $Groups = @"
-NYC-BW1540 App SBME Sales Forecasting Legacy Users
+USA-GBL ISI-Data Video Production
 "@ -split [System.Environment]::NewLine
 
-Get-ADGroupMemberships -Groups $Groups -Domain ME -Export -Extension pdf
+Get-ADGroupMemberships -Groups $Groups -Domain ME -Export -Extension csv
