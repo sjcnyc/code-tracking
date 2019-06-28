@@ -1,23 +1,34 @@
 using namespace System.Collections.Generic
 
+function Test-ComputerIsInAd {
+  [CmdletBinding()]
+  param (
+    [array]
+    $Computers,
 
+    [string]
+    $Domain
+  )
 
+  $CompList = [List[PSObject]]::new()
 
-$Computers = [List[PSObject]]::new()
-
-foreach ($Server in ((Import-Csv 'C:\Temp\Pulse computer names.csv').Computername)) {
-  try {
-    Get-ADComputer $Server -ErrorAction Stop -Server me.sonymusic.com | Out-Null
-    $Result = $true
+  foreach ($Server in $Computers) {
+    try {
+      Get-ADComputer $Server -ErrorAction Stop -Server $Domain | Out-Null
+      $Result = $true
+    }
+    catch {
+      $Result = $false
+    }
+    $PSObjs = [PSCustomObject]@{
+      ComputerName = $Server
+      Found        = $Result
+    }
+    [void]$CompList.Add($PSObjs)
   }
-  catch {
-    $Result = $False
-  }
-  $PSObjs = [PSCustomObject]@{
-    ComputerName = $Server
-    Found        = $Result
-  }
-  [void]$Computers.Add($PSObjs)
+  return $CompList
 }
 
-$Computers | Export-Csv c:\temp\Computers_ME.csv -NoTypeInformation
+$Servers = (Import-Csv 'C:\Temp\Pulse computer names.csv').Computername
+
+Test-ComputerIsInAd -Computers $Servers -Domain 'me.sonymusic.com' | Export-Csv c:\temp\Computers_ME.csv -NoTypeInformation
