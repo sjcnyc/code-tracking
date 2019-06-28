@@ -1,18 +1,21 @@
 using namespace System.Collections.Generic
 
+
+
+
 $Computers = [List[PSObject]]::new()
 
-foreach ($server in ((Import-Csv 'C:\Temp\Pulse computer names.csv').Computername)) {
-  Try {
-    Get-ADComputer $server -ErrorAction Stop -Server me.sonymusic.com | Out-Null
+foreach ($Server in ((Import-Csv 'C:\Temp\Pulse computer names.csv').Computername)) {
+  try {
+    Get-ADComputer $Server -ErrorAction Stop -Server me.sonymusic.com | Out-Null
     $Result = $true
   }
-  Catch {
+  catch {
     $Result = $False
   }
   $PSObjs = [PSCustomObject]@{
-    Name  = $server
-    Found = $Result
+    ComputerName = $Server
+    Found        = $Result
   }
   [void]$Computers.Add($PSObjs)
 }
