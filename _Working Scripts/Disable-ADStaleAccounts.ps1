@@ -99,7 +99,7 @@ function Disable-ADStaleAccounts {
 
       foreach ($StaleAccount in $StaleAccounts) {
 
-        #&"Set-AD$AccountType" -Identity $StaleAccount -Enabled $false -Server $Domain
+        #"Set-AD$AccountType" -Identity $StaleAccount -Enabled $false -Server $Domain
 
         #Move-ADObject -Identity $StaleAccount -TargetPath $TargetOu -Server $Domain
 
