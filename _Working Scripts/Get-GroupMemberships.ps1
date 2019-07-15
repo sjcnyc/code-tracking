@@ -51,7 +51,7 @@ function Get-ADGroupMemberships {
 }
 
 $Groups = @"
-USA-GBL ISI-Data Video Production
+USA-GBL ISI-Data-Share BAFFAIRS
 "@ -split [System.Environment]::NewLine
 
 Get-ADGroupMemberships -Groups $Groups -Domain ME -Export -Extension csv
