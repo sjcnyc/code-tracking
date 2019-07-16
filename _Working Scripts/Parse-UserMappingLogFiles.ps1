@@ -24,5 +24,5 @@ foreach ($log in $logs) {
     Drives   = ($filtered | Out-String).Trim()
   }
 
-  $PSObj | Export-Csv -Path C:\Temp\drive_mappings2.csv -NoTypeInformation -Append
+  $PSObj # | Export-Csv -Path C:\Temp\drive_mappings2.csv -NoTypeInformation -Append
 }
