@@ -44,7 +44,7 @@
         $Task = ForEach ($Computer in $Computername) {
             if ($Computer -as [ipaddress] -as [bool]) {
                 $Computer1 = ([system.net.dns]::GetHostByAddress($Computer)).hostname
-                if ($Computer1 -eq $null) {
+                if ($null -eq $Computer1) {
                     $computer1 = $Computer
                 }
                 [pscustomobject] @{
