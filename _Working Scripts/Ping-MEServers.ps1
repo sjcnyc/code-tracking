@@ -86,11 +86,11 @@ Function Test-ConnectionAsync {
         Catch {}
         $Task | ForEach-Object {
             If ($_.Task.IsFaulted) {
-                $Result = 'Failure' #$_.Task.Exception.InnerException.InnerException.Message
+                $Result    = 'Failure' #$_.Task.Exception.InnerException.InnerException.Message
                 $IPAddress = $Null
             }
             Else {
-                $Result = $_.Task.Result.Status
+                $Result    = $_.Task.Result.Status
                 $IPAddress = $_.task.Result.Address.ToString()
             }
             $Object = [pscustomobject]@{
@@ -130,7 +130,7 @@ $PSArray = $PSArray | Where-Object {$_.result -ne "Success"}
 $passedCount = ($PSArray | Select-Object * | Where-Object {$_.Result -eq 'Success'}).Count
 $failedCount = ($PSArray | Select-Object * | Where-Object {$_.Result -eq 'Failure'}).Count
 $timedCount  = ($PSArray | Select-Object * | Where-Object {$_.Result -eq 'TimedOut'}).Count
-$TtlExpired = ($PSArray | Select-Object * | Where-Object {$_.Result -eq 'TtlExpired'}).Count
+$TtlExpired  = ($PSArray | Select-Object * | Where-Object {$_.Result -eq 'TtlExpired'}).Count
 
 
 $summaryTable = [PSCustomObject] @{
