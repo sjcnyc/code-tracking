@@ -3,7 +3,7 @@ function Start-UsersGroupOperation {
         [Parameter(Mandatory)][ValidateSet('AddMember', 'RemoveMember')]$option,
         [Parameter(Mandatory)][string]$group,
         [Parameter(Mandatory)][string]$user,
-        [string]$server = 'NYCSMEADS0012'
+        [string]$server
     )
     $log = "c:\temp\log.log"
     Add-Type -AssemblyName Microsoft.ActiveDirectory.Management
