@@ -1,7 +1,18 @@
 ﻿$notfound = @()
 $users =
 @'
-connealy, sean
+Reece Laycock
+Debbie Thompson
+Johan Linglof
+Ivo Baetschmann
+Simon Mueller
+Joe Doerner
+Corrado Filpa
+Georges Ouaggini
+Berry van Sandwijk
+Krokan Erling
+Soren Kristensen
+William Rowe
 '@ -split [environment]::NewLine
 
 foreach ($user in $users) {
