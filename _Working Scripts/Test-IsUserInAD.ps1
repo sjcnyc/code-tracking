@@ -2,13 +2,17 @@ using namespace System.Collections.Generic
 
 function Test-IsUserInAD {
   param (
-    [string]$UserName
+    [string]
+    $UserName,
+
+    [string]
+    $Domain
   )
 
   $UserList = [List[PSObject]]::new()
   foreach ($Usr in $UserName) {
     try {
-      $User = Get-ADUser -Identity $UserName -Properties Displayname, sAMAccountName -Server me.sonymusic.com -ErrorAction Stop
+      $User = Get-ADUser -Identity $UserName -Properties Displayname, sAMAccountName -Server $Domain -ErrorAction Stop
       $Result = $true
     }
     catch {
@@ -19,9 +23,9 @@ function Test-IsUserInAD {
       UserChecked    = $UserName
       SamAccountName = $User.sAMAccountName
       DisplayName    = $User.DisplayName
-      InAD           = $Result
+      IsInAD         = $Result
     }
-    [void]$userlist.Add($PSObject)
+    [void]$UserList.Add($PSObject)
   }
 
   return $UserList
@@ -39,5 +43,5 @@ wilk002
 data014
 "@ -split [environment]::NewLine | ForEach-Object {
 
-  Test-IsUserInAD $_
+  Test-IsUserInAD $_ -Domain me.sonymusic.com
 }
