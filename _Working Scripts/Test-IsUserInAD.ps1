@@ -12,11 +12,12 @@ function Test-IsUserInAD {
   $UserList = [List[PSObject]]::new()
   foreach ($Usr in $UserName) {
     try {
+      
       $getADUserSplat = @{
-          Properties  = 'Displayname', 'sAMAccountName'
-          Server      = $Domain
-          ErrorAction = 'Stop'
-          Identity    = $UserName
+        Properties  = 'Displayname', 'sAMAccountName'
+        Server      = $Domain
+        ErrorAction = 'Stop'
+        Identity    = $UserName
       }
       $User = Get-ADUser @getADUserSplat
       $Result = $true
