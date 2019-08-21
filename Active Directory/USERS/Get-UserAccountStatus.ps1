@@ -1,4 +1,4 @@
-﻿$QADprops = 
+﻿$QADprops =
     @{N='First Name';E={$_.firstname}}, `
     @{N='Last Name';E={$_.lastname}}, `
     @{N='Sam Name';E={$_.samaccountname}}, `
@@ -14,31 +14,25 @@ $QADparams = @{
     pagesize = '2000'
     dontusedefaultincludedproperties = $true
     includedproperties = 'GivenName,sn,SamAccountName,EmployeeID,DistinguishedName,Description,WhenCreated,AccountExpires,mail'-split','
-    searchroot = 'usa,nyc,lyn,nas,bvh'-split',' | % {"bmg.bagint.com/$($_)"}	
+    searchroot = ('usa,nyc,lyn,nas,bvh').Split(",") | ForEach-Object {"bmg.bagint.com/$($_)"}
     }
 
 
-function Get-UserAccountStatus 
+function Get-UserAccountStatus
 {
   param
   (
     [System.Object]
     $status
   )
-  
+
   if ($status -eq 'e'){$acctstatus=@{enabled=$true;}
   }
   if ($status -eq 'd'){$acctstatus=@{disabled=$true;}
   }
-  
+
   Get-QADUser @acctstatus @QADparams |Select-Object $QADprops | Format-Table -a
 }
 
 
 Get-UserAccountStatus -status 'd'
-
-
-
-
-
-
