@@ -10,7 +10,7 @@ function Test-IsUserInAD {
   )
 
   $UserList = [List[PSObject]]::new()
-  foreach ($Usr in $UserName) {
+  foreach ($User in $UserName) {
     try {
 
       $getADUserSplat = @{
