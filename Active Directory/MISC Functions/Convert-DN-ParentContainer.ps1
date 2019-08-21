@@ -25,11 +25,11 @@
     }
 
     # return only OU path
-    return $canoincal.Substring($DC.length - 1)
+    #return $canoincal.Substring($DC.length - 1)
 
     # return full parten container path
-    # return $canoincal
+     return $canoincal
 } # end
 
 
-ConvertFrom-DN -DN 'OU=Employees,OU=Users,OU=NLD,OU=BNX,OU=EU,OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com'
+ConvertFrom-DN -DN 'CN=abc,OU=def,OU=ghl,DC=mno'
