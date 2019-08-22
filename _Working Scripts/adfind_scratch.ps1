@@ -38,7 +38,7 @@ serialNumber
 "@ -split [environment]::NewLine
 
 $users =
-(C:\temp\adfind\AdFind.exe -b 'OU=USR,OU=GBL,OU=USA,DC=bmg,DC=bagint,DC=com' -f '(&(objectclass=user)(objectcategory=person))' $($attribs) -tdc -tdcfmt %MM%/%DD%/%YYYY% -nodn -csv)
+(C:\temp\AdFind.exe -b 'OU=USR,OU=GBL,OU=USA,DC=bmg,DC=bagint,DC=com' -f '(&(objectclass=user)(objectcategory=person))' $($attribs) -tdc -tdcfmt %MM%/%DD%/%YYYY% -nodn -csv)
 
 $users | ConvertFrom-Csv | Out-GridView
 
@@ -54,7 +54,7 @@ $attribs | ConvertFrom-Csv | Out-GridView
 
 $count = [int](((C:\temp\adfind\AdFind.exe -c -b "OU=USR,OU=GBL,OU=USA,DC=bmg,DC=bagint,DC=com" -f '(&(objectclass=user)(objectcategory=person))' 2>&1)[-1]).split(" "))[0]
 
-$users = (C:\temp\adfind\AdFind.exe -b 'OU=USR,OU=GBL,OU=USA,DC=bmg,DC=bagint,DC=com' -f '(&(objectclass=user)(objectcategory=person))' $($attribs) -tdc -tdcfmt %MM%/%DD%/%YYYY% -nodn -csv)
+$users = (C:\temp\AdFind.exe -b 'OU=USR,OU=GBL,OU=USA,DC=bmg,DC=bagint,DC=com' -f '(&(objectclass=user)(objectcategory=person))' $($attribs) -tdc -tdcfmt %MM%/%DD%/%YYYY% -nodn -csv)
 
 $ProgressBar = New-ProgressBar -IsIndeterminate $false -Type Horizontal -Theme Light -IconPath .\Images\44_user_group_3x_ZEa_icon.ico
 1..$count | ForEach-Object {
@@ -65,3 +65,5 @@ Close-ProgressBar $ProgressBar
 
 $ProgressBar = New-ProgressBar -Type Horizontal -Size large -theme light -IsIndeterminate $True
 New-ProgressBar -Type Horizontal -Size Large
+
+c:\temp\adfind.exe -b "CN=Albert\, Caryn,OU=Employees,OU=USR,OU=GBL,OU=USA,DC=bmg,DC=bagint,DC=com" allowedAttributes | out-file c:\temp\ad_attributes.txt
