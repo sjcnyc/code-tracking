@@ -14,7 +14,7 @@ function Test-IsUserInAD {
     try {
 
       $getADUserSplat = @{
-        Properties  = 'Displayname', 'sAMAccountName'
+        Properties  = 'Displayname', 'sAMAccountName', 'mail', 'enabled'
         Server      = $Domain
         ErrorAction = 'Stop'
         Identity    = $UserName

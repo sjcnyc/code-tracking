@@ -1,4 +1,5 @@
-﻿Add-PSSnapin -Name Quest.Defender.AdminTools
+﻿using namespace System.Collections.Generic
+
 
 $Date            = (get-date -f yyyy-MM-dd)
 $CSVFile         = "C:\Temp\DefenderTokenReport_$($Date).csv"
@@ -36,7 +37,7 @@ $UserSplat = @{
 
 $Result = [List[psobject]]::new()
 
-Get-QADObject @TokenSplat |Where-Object { $_.'defender-tokenUsersDNs' -ne $null } -PipelineVariable token |
+Get-QADObject @TokenSplat | Where-Object { $_.'defender-tokenUsersDNs' -ne $null } -PipelineVariable token |
 
 ForEach-Object {
 
@@ -62,4 +63,4 @@ ForEach-Object {
     }
 }
 
-$Result |Export-Csv -Path $CSVFile -NoTypeInformation
+$Result | Export-Csv -Path $CSVFile -NoTypeInformation
