@@ -5,9 +5,11 @@
     }
     #$userInfo = Get-QADUser @qadParams
     $userInfo = Get-ADUser @qadParams | Select-Object $qadParams.Properties
+    $userInfo
 
 
-get-aduser -Properties surname, givenname -Filter * -SearchBase "OU=Arcade,OU=USR,OU=GBL,OU=USA,DC=bmg,DC=bagint,DC=com", "OU=CMR,OU=USR,OU=GBL,OU=USA,DC=bmg,DC=bagint,DC=com" | select *
+
+get-aduser -Properties surname, givenname -Filter * -SearchBase "OU=Arcade,OU=USR,OU=GBL,OU=USA,DC=bmg,DC=bagint,DC=com", "OU=CMR,OU=USR,OU=GBL,OU=USA,DC=bmg,DC=bagint,DC=com" | Select-Object *
 
 
 $attribs =
