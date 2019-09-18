@@ -2,7 +2,7 @@
 
 
 $Date            = (get-date -f yyyy-MM-dd)
-$CSVFile         = "C:\Temp\DefenderTokenReport_$($Date).csv"
+$CSVFile         = "c:\Temp\DefenderTokenReport_$($Date).csv"
 
 Function Convert-IntTodate {
     Param ($Integer = 0)

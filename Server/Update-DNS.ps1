@@ -29,3 +29,5 @@
     }
   }
 }
+
+Update-DNS -Computer "computername" -DNSServers "dnsip","dnsip"
