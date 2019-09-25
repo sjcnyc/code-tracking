@@ -40,14 +40,8 @@ function Test-IsUserInAD {
 
 
 @"
-LGERVAS
-maia007
-solty01
-kasr001
-koel001
-kart003
-wilk002
-data014
+sconnea
+sconneax
 "@ -split [environment]::NewLine | ForEach-Object {
 
   Test-IsUserInAD $_ -Domain me.sonymusic.com

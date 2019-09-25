@@ -4,26 +4,26 @@
   param
   (
     [Parameter(Mandatory)]
-    [string]$server,  
+    [string]$Server,
     [Parameter(Mandatory)]
-    [int]$range
+    [int]$Range
   )
 
   #clear DNS cache
-  invoke-expression -Command 'ipconfig.exe /flushdns'
+  Invoke-Expression -Command 'ipconfig.exe /flushdns'
 
-  Write-Verbose -Message "Query DNS for IP address of $server"
+  Write-Verbose -Message "Query DNS for IP address of $Server"
   #loop 1.. whatever's in your round-robin
-  ForEach ($null in 1..$range) {
+  ForEach ($null in 1..$Range) {
     try {
-      [Net.Dns]::GetHostEntry($server) | Select-Object -Property Hostname, @{n = 'AddressList'; e = { $_.addresslist } }
+      [Net.Dns]::GetHostEntry($Server) | Select-Object -Property Hostname, @{N = 'AddressList'; E = { $_.AddressList } }
     }
     catch {
-      Write-Verbose -Message "No DNS Name $server"
+      Write-Verbose -Message "No DNS Name $Server"
     }
     Start-Sleep -Seconds 1
   }
 
 }
 
-test-smartconnect -server storage.me.sonymusic.com -range 40
+Test-SmartConnect -server storage.me.sonymusic.com -range 40
