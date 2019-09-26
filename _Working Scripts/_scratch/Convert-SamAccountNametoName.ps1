@@ -12,7 +12,7 @@ Convert-SamAccountnametoName -SamName sconnea
 # use csv file wiht SamAccountName header
 #$users = (Import-Csv c:\users.csv).SamAccountname
 
-$ hashtable of SamAccountnames
+# hashtable of SamAccountnames
 $users = @"
 sconnea
 klee123
