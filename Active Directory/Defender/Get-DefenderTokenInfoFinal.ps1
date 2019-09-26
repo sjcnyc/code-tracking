@@ -37,29 +37,30 @@ $UserSplat = @{
 
 $Result = [List[psobject]]::new()
 
-Get-QADObject @TokenSplat | Where-Object { $_.'defender-tokenUsersDNs' -ne $null } -PipelineVariable token |
+Get-QADObject @TokenSplat | Where-Object { $($_.'defender-tokenUsersDNs') -ne $null } -PipelineVariable token |
 
 ForEach-Object {
 
     try {
-        Get-QADUser -Identity $token.'defender-tokenUsersDNs' @UserSplat |
+        Get-QADUser -Identity $($token.'defender-tokenUsersDNs') @UserSplat |
             ForEach-Object {
-            $Info = [pscustomobject]@{
-                'Name'                      = $_.Name
-                'User-ID'                   = $_.SamAccountName
-                'Defender-ViolationCount'   = $_.'defender-violationCount'
-                'Defender-ResetCount'       = $_.'defender-resetCount'
-                'Defender-LockoutTime'      = (Convert-IntTodate $_.'defender-lockoutTime')
-                'Defender-LastLogon'        = (Convert-IntTodate $_.'defender-lastlogon')
-                'Defender-TokenName'        = $token.Name
-                'Defender-TokenDescription' = $token.Description
-                'Defender-ParentContainer'  = $_.ParentContainer
+                $Info = [pscustomobject]@{
+                    'Name'                      = $_.Name
+                    'User-ID'                   = $_.SamAccountName
+                    'Defender-ViolationCount'   = $_.'defender-violationCount'
+                    'Defender-ResetCount'       = $_.'defender-resetCount'
+                    'Defender-LockoutTime'      = (Convert-IntTodate $_.'defender-lockoutTime')
+                    'Defender-LastLogon'        = (Convert-IntTodate $_.'defender-lastlogon')
+                    'Defender-TokenName'        = $token.Name
+                    'Defender-TokenDescription' = $token.Description
+                    'Defender-ParentContainer'  = $_.ParentContainer
+                }
+                [void]$Result.Add($Info)
             }
-            [void]$Result.Add($Info)
-        }
     }
     catch [System.Object] {
-        $Error[0].Exception
+        #$Error[0].Exception
+        $($token.'defender-tokenUsersDNs')
     }
 }
 
