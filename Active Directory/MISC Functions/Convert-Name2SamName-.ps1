@@ -1,33 +1,31 @@
-﻿#Requires -Version 3.0 
-<# 
-.SYNOPSIS 
-
-.DESCRIPTION 
-
- 
-.NOTES 
-    File Name  : Convert-Name2SamName-
-    Author     : Sean Connealy
-    Requires   : PowerShell Version 3.0 
-.LINK 
-    This script posted to: 
-        http://www.github/sjcnyc
-.EXAMPLE
-
-.EXAMPLE
-
-#>
+﻿# $users = import-csv <path>
+$users =
 @"
-Sam Bruce 
+Sam Bruce
 Paula Erickson
-Ron Mirro 
-Andrew Ross 
-Sue Zotian 
-Frank Lipari 
+Ron Mirro
+Andrew Ross
+Sue Zotian
+Frank Lipari
 Caroline Symannek
-"@ -split [environment]::NewLine |
+"@ -split [environment]::NewLine
 
-Get-QADUser | 
-ForEach-Object {
-	"$($_.samaccountname)" 
-} 
+$PSArray = New-Object System.Collections.ArrayList
+
+try {
+    foreach ($user in $users) {
+        $userReorder = "$($user.Split(" ")[1]), $($user.Split(" ")[0])"
+        $userSam = Get-ADUser -filter { Name -eq $userReorder } -Properties SAMAccountName, DisplayName -ErrorAction Stop | Select-Object SAMAccountName, DisplayName
+
+        $psobj = [pscustomobject]@{
+            SAMAccountName = if ($null -eq $userSam) { "User Not Found" } else { $userSam.SAMAccountName }
+            DisplayName    = if ($null -eq $userSam) { "" } else { $userSam.DisplayName }
+        }
+        [void]$PSArray.Add($psobj)
+    }
+}
+catch [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException] {
+    $Error[0].Exception.GetType().FullName
+}
+
+$PSArray

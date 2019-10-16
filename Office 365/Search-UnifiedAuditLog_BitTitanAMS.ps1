@@ -15,7 +15,7 @@ $style1 = '<style>
 $CSV = "c:\temp\BitTitan_Audit-$((get-date).ToString("yyyMMdd")).csv"
 
 $emailParams = @{
-    to         = 'sean.connealy@sonymusic.com','ist.alerts@r-ms7ku8qavaerw64s1852oljg.7jlcaeao.7.case.salesforce.com','heather.guthrie@sonymusic.com','Alex.Moldoveanu@sonymusic.com','kim.lee@sonymusic.com','bobby.thomas@sonymusic.com','Rohan.Simpson@sonymusic.com'
+    to         = 'sean.connealy@sonymusic.com'
     from       = 'Posh Alerts poshalerts@sonymusic.com'
     subject    = "BitTitan AMS log review"
     smtpserver = 'ussmtp01.bmg.bagint.com'
@@ -27,8 +27,7 @@ $endDate   = (get-date).AddDays(1).ToString("MM/dd/yyyy")
 
 $results =
 Search-UnifiedAuditLog -StartDate $startDate -EndDate $endDate -UserIds "BitTitan*" -Operations "PasswordLogonInitialAuthUsingPassword" -ResultSize 5000 |
-Select-Object * -ExpandProperty AuditData |
-ConvertFrom-Json
+Select-Object * -ExpandProperty AuditData | ConvertFrom-Json
 
 $PSArrayList = New-Object -TypeName System.Collections.ArrayList
 
@@ -65,7 +64,7 @@ $Failed = $PSArrayList | Select-Object * | Where-Object {$_.Result -eq 'Failed'}
 
 $passedCount = ($PSArrayList | Select-Object * | Where-Object {$_.Result -eq 'Passed'}).Count
 $failedCount = ($Failed.Result).Count
-$totalCount = $PSArrayList.Count
+$totalCount  = $PSArrayList.Count
 
 $summaryTable = [PSCustomObject] @{
     "Passed Count" = $passedCount

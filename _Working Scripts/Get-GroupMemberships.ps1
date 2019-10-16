@@ -51,42 +51,7 @@ function Get-ADGroupMemberships {
 }
 
 $Groups = @"
-GTL-ADA Juniper SSL 105 Music
-GTL-ADA Juniper SSL Arvato Dev
-GTL-ADA Juniper SSL BMG Rights
-GTL-ADA Juniper SSL CMG Restricted Access
-GTL-ADA Juniper SSL Coyo
-GTL-ADA Juniper SSL Gieman Restricted Access
-GTL-ADA Juniper SSL Hanse Orga
-GTL-ADA Juniper SSL Italy ExtCon
-GTL-ADA Juniper SSL Italy ExtCon2
-GTL-ADA Juniper SSL KSF Kiev
-GTL-ADA Juniper SSL Licensee users
-GTL-ADA Juniper SSL Munich Online
-GTL-ADA Juniper SSL Munich WiPro
-GTL-ADA Juniper SSL Token Users
-GTL-ADA Juniper SSL UK WMW
-GTL-ADA Juniper SSL Universum Film
-GTL-ADA Juniper SSL users
-HKG-APRO Juniper SSL DADC Users
-HKG-APRO Juniper SSL HK AS400
-HKG-APRO Juniper SSL India AS400
-HKG-APRO Juniper SSL Users
-WWI-Juniper-SSL-Asia Pacific Users
-WWI-Juniper-SSL-BitTitanUsers
-WWI-Juniper-SSL-CenturyMediaUsers
-WWI-Juniper-SSL-CulverCityLot
-WWI-Juniper-SSL-DADC-ACCT-MGT
-WWI-Juniper-SSL-DADC-Media-Prod
-WWI-Juniper-SSL-European Users
-WWI-Juniper-SSL-Latin Users
-WWI-Juniper-SSL-North America Users
-WWI-Juniper-SSL-North America-Pulsar Users
-WWI-Juniper-SSL-OrchardUsers
-WWI-US-Juniper SSL VPN Token Users
-WWI-US-Juniper SSL VPN UltraMusic Token Users
-WWI-US-Juniper SSL VPN Users
-WWI-US-Juniper SSL VPN Users SonyMusicCentralONLY
+NAS-NASH Dfs Video Drop
 "@ -split [System.Environment]::NewLine
 
-Get-ADGroupMemberships -Groups $Groups -Domain BMG -Export -Extension csv
+Get-ADGroupMemberships -Groups $Groups -Domain me -Export -Extension csv

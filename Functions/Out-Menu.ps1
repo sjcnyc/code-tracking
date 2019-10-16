@@ -16,11 +16,11 @@ function Out-Menu {
     ) 
  
     if ($input) { 
-        $Object = @($input) 
+        $Object = @($input)
     }
- 
-    if (!$Object) { 
-        throw 'Must provide an object.' 
+
+    if (!$Object) {
+        throw 'Must provide an object.'
     } 
  
     Write-Host '' 
@@ -59,9 +59,9 @@ function Out-Menu {
                 }
                 else { 
                     Write-Host 'Not an option!' -ForegroundColor Red 
-                    Write-Host '' 
+                    Write-Host ''
                     $ok = $false 
-                } 
+                }
             } 
         }
         else { 
@@ -81,7 +81,7 @@ function Out-Menu {
                 $ok = $false 
             } 
         } 
-    } while (!$ok) 
+    } while (!$ok)
 }
 
 function Invoke-Rdp {
