@@ -41,7 +41,7 @@ function Get-SharedOnedriveFiles {
       [void]$UserList.Add($PSObj)
     }
 
-    #$UserList = $UserList | Sort-Object -Property File -Unique
+    $UserList = $UserList | Where-Object { $_.Target -ne "Limited Access System Group" } | Sort-Object -Property File -Unique
 
     $HTML = New-HTMLHead -title "OneDrive Shared Files" -style $Style1
     $HTML += "<h3>UserName: $($result.UserId)</h3>"
