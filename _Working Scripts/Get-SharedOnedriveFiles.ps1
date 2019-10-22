@@ -2,7 +2,8 @@ using namespace System.Collections.Generic
 
 function Get-SharedOnedriveFiles {
   param (
-    $UserPrincipalName
+    $UserPrincipalName,
+    $UserEmail
   )
 
   $Style1 =
@@ -43,15 +44,24 @@ function Get-SharedOnedriveFiles {
 
     $UserList = $UserList | Where-Object { $_.Target -ne "Limited Access System Group" } | Sort-Object -Property File -Unique
 
-    $HTML = New-HTMLHead -title "OneDrive Shared Files" -style $Style1
-    $HTML += "<h3>UserName: $($result.UserId)</h3>"
+    $HTML = New-HTMLHead -title "OneDrive Recently Shared Files" -style $Style1
+    $HTML += "<h3 style='color:red; font-style:bold;'><i>Disclaimer: OneDrive should not contain Confidential or Secret Data</i></h3>"
+    $HTML += "<h3>Please see your recently shared OneDrive files below:</h3>"
+    $HTML += "<h3 style='font-style:italic;'>To view the full list or remove permissions please follow the below steps:</h3>"
+    $HTML += "<ol style='font-style:italic;'>"
+    $HTML += "<li>Right click on the OneDrive Icon</il>"
+    $HTML += "<li>Click ""View Online""</li>"
+    $HTML += "<li>On the left panel locate ""Shared""</li>"
+    $HTML += "<li>On top select ""Shared by you""</li>"
+    $HTML += "</ol>"
+    $HTML += "<h3><i>For any questions or assistance needed please contact the service desk at service.desk@sonymusic.com</i></h3>"
     $HTML += New-HTMLTable -inputObject $($UserList | Select-Object CreationTime, Workload, File, Target | Where-Object { $_.Workload -eq "OneDrive" })
     $HTML += "<h4>Script Completed: $(Get-Date -Format G)</h4>" | Close-HTML
 
     $EmailParams = @{
-      to         = "sconnea@sonymusic.com"
+      to         = 'sconnea@sonymusic.com' #, $UserEmail
       from       = 'PwSh Alerts pwshalerts@sonymusic.com'
-      subject    = 'OneDrive Shared Files'
+      subject    = 'OneDrive Recently Shared Files'
       smtpserver = 'cmailsony.servicemail24.de'
       Body       = ($HTML | Out-String)
       BodyAsHTML = $true
@@ -66,9 +76,14 @@ function Get-SharedOnedriveFiles {
 
 #Connect-MsolService
 
-$users = (Get-MsolUser -MaxResults 100 | Select-Object).UserPrincipalName
+#$users = (Get-MsolUser -MaxResults 100 | Select-Object).UserPrincipalName
+
+$users =
+@"
+brian.lynch@sonymusic.com
+"@ -split [environment]::NewLine
 
 foreach ($user in $users) {
 
-  Get-SharedOnedriveFiles -UserPrincipalName "brian.lynch@sonymusic.com"
+  Get-SharedOnedriveFiles -UserPrincipalName $user -UserEmail $user
 }
