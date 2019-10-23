@@ -27,8 +27,7 @@ function Get-SharedOnedriveFiles {
 
     $Results =
     Search-UnifiedAuditLog -StartDate $StartDate -EndDate $EndDate -Operations "SharingSet" -UserIds $UserPrincipalName |
-    Select-Object * -ExpandProperty AuditData |
-    ConvertFrom-Json
+    Select-Object * -ExpandProperty AuditData | ConvertFrom-Json
 
     foreach ($Result in $Results) {
 
