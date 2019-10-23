@@ -5,7 +5,7 @@ function Get-SIDHistory {
   )
   $UserList = [List[PSObject]]::new()
   function Convert-IntTodate {
-    Param ($Integer = 0)
+    param ($Integer = 0)
     if ($null -eq $Integer) {
       $date = $null
     }
