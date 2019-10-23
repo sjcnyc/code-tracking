@@ -20,25 +20,25 @@ function Get-SharedOnedriveFiles {
 
   $UserList = [List[PSObject]]::new()
 
-  $startDate = (get-date).AddDays(-30).ToString("MM/dd/yyyy")
-  $endDate   = (get-date).AddDays(1).ToString("MM/dd/yyyy")
+  $StartDate = (get-date).AddDays(-30).ToString("MM/dd/yyyy")
+  $EndDate   = (get-date).AddDays(1).ToString("MM/dd/yyyy")
 
   Try {
 
-    $results =
-    Search-UnifiedAuditLog -StartDate $startDate -EndDate $endDate -Operations "SharingSet" -UserIds $UserPrincipalName |
+    $Results =
+    Search-UnifiedAuditLog -StartDate $StartDate -EndDate $EndDate -Operations "SharingSet" -UserIds $UserPrincipalName |
     Select-Object * -ExpandProperty AuditData |
     ConvertFrom-Json
 
-    foreach ($result in $results) {
+    foreach ($Result in $Results) {
 
       $PSObj = [pscustomobject]@{
-        'UserID'         = $result.UserId
-        'CreationTime'   = $result.CreationTime
-        'Workload'       = $result.Workload
-        'File'           = $result.ObjectID -replace "https://sonymusicentertainment-my.sharepoint.com/personal/", ""
-        'SourceFileName' = $result.SourceFileName
-        'Target'         = $result.TargetUserOrGroupName
+        'UserID'         = $Result.UserId
+        'CreationTime'   = $Result.CreationTime
+        'Workload'       = $Result.Workload
+        'File'           = $Result.ObjectID -replace "https://sonymusicentertainment-my.sharepoint.com/personal/", ""
+        'SourceFileName' = $Result.SourceFileName
+        'Target'         = $Result.TargetUserOrGroupName
       }
       [void]$UserList.Add($PSObj)
     }
@@ -60,10 +60,10 @@ function Get-SharedOnedriveFiles {
     $HTML += "<h4>Script Completed: $(Get-Date -Format G)</h4>" | Close-HTML
 
     $EmailParams = @{
-      to         = 'sconnea@sonymusic.com' #, $UserEmail
-      from       = 'PwSh Alerts pwshalerts@sonymusic.com'
-      subject    = 'OneDrive Recently Shared Files'
-      smtpserver = 'cmailsony.servicemail24.de'
+      To         = 'sconnea@sonymusic.com' #, $UserEmail
+      From       = 'PwSh Alerts pwshalerts@sonymusic.com'
+      Subject    = 'OneDrive Recently Shared Files'
+      SmtpServer = 'cmailsony.servicemail24.de'
       Body       = ($HTML | Out-String)
       BodyAsHTML = $true
     }
@@ -79,12 +79,12 @@ function Get-SharedOnedriveFiles {
 
 #$users = (Get-MsolUser -MaxResults 100 | Select-Object).UserPrincipalName
 
-$users =
+$Users =
 @"
 brian.lynch@sonymusic.com
 "@ -split [environment]::NewLine
 
-foreach ($user in $users) {
+foreach ($User in $Users) {
 
-  Get-SharedOnedriveFiles -UserPrincipalName $user -UserEmail $user
+  Get-SharedOnedriveFiles -UserPrincipalName $User -UserEmail $User
 }
