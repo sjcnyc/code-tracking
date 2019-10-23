@@ -1,5 +1,4 @@
 using namespace System.Collections.Generic
-
 function Get-SharedOnedriveFiles {
   param (
     $UserPrincipalName,
@@ -22,12 +21,14 @@ function Get-SharedOnedriveFiles {
   $UserList = [List[PSObject]]::new()
 
   $startDate = (get-date).AddDays(-30).ToString("MM/dd/yyyy")
-  $endDate = (get-date).AddDays(1).ToString("MM/dd/yyyy")
+  $endDate   = (get-date).AddDays(1).ToString("MM/dd/yyyy")
 
   Try {
 
     $results =
-    Search-UnifiedAuditLog -StartDate $startDate -EndDate $endDate -Operations "SharingSet" -UserIds $UserPrincipalName | Select-Object * -ExpandProperty AuditData | ConvertFrom-Json
+    Search-UnifiedAuditLog -StartDate $startDate -EndDate $endDate -Operations "SharingSet" -UserIds $UserPrincipalName |
+    Select-Object * -ExpandProperty AuditData |
+    ConvertFrom-Json
 
     foreach ($result in $results) {
 

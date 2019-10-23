@@ -14,7 +14,7 @@ function Get-Dilbert
    $emailParams =@{
     to         = 'sean.connealy@sonymusic.com'  
     from       = 'Posh Alerts poshalerts@sonymusic.com'
-    smtpserver = 'ussmtp01.bmg.bagint.com'
+    smtpserver = 'cmailsony.servicemail24.de'
     bodyashtml = $true
     }
   
@@ -53,8 +53,8 @@ function Get-Dilbert
     }  
     
     $body = '<html>  
-               <body>  
-                 <img src="cid:image1"><br> 
+               <body>
+                 <img src="cid:image1"><br>
                </body>  
              </html>'  
 
