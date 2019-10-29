@@ -17,7 +17,7 @@ function Get-IPInfo {
   PROCESS{
     $TestIP = '8.8.8.8'
     If ([IPAddress]::TryParse($IPAddress,[ref]$TestIP)){Foreach ($IPAddress in $IPAddress) {GetIPInfo -IPAddr "$IPAddress" -mask "$SubnetMask"}} else {Write-Output -InputObject 'Please Enter a Valid IP'}
-  } 
+  }
   END{}
 }
 function GetIPInfo {
@@ -81,8 +81,8 @@ function GetIPInfo {
     Class         = $Class
   }
 
-  $PC 
-} 
+  $PC
+}
 #Get-IPInfo -IPAddress 192.168.2.5 -SubnetMask 24 
 
 #New-Alias GIP Get-IPInfo

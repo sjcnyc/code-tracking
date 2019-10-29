@@ -46,6 +46,7 @@ function Get-SIDHistory {
     return $UserList
   }
   catch {
+    $Error[0].Exception.GetType().FullName
     $Error.Message
   }
 }

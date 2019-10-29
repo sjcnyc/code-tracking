@@ -1,4 +1,23 @@
 using namespace System.Collections.Generic
+
+try {
+  Write-Output "Retrieving runbook credential object"
+  $Credential = Get-AutomationPSCredential -Name 'T2_Cloud_Cred'
+  Write-Output "Credentials retrieved"
+}
+catch {
+  Write-Error "Failed to retrieve runbook credentials" -ErrorAction Continue
+  Write-Error $_ -ErrorAction Stop
+}
+
+Connect-AzureAD -Credential $Credential -ErrorAction SilentlyContinue
+#Connect-MsolService -Credential $Credential -ErrorAction SilentlyContinue
+
+# AZ_OneDrivePilot
+$Az_UserGroup = "5fe98e81-c56d-45b9-b344-9a75de2f2586"
+
+$Az_GroupMemebersUPN = (Get-AzureADGroupMember -ObjectId $Az_UserGroup).UserPrincipalName
+
 function Get-SharedOnedriveFiles {
   param (
     $UserPrincipalName,
@@ -21,7 +40,7 @@ function Get-SharedOnedriveFiles {
   $UserList = [List[PSObject]]::new()
 
   $StartDate = (get-date).AddDays(-30).ToString("MM/dd/yyyy")
-  $EndDate   = (get-date).AddDays(1).ToString("MM/dd/yyyy")
+  $EndDate = (get-date).AddDays(1).ToString("MM/dd/yyyy")
 
   Try {
 
@@ -42,7 +61,7 @@ function Get-SharedOnedriveFiles {
       [void]$UserList.Add($PSObj)
     }
 
-    $UserList = $UserList | Where-Object { $_.Target -ne "Limited Access System Group" } | Sort-Object -Property File -Unique
+    $UserList = $UserList | Where-Object { $_.Target -ne "Limited Access System Group" -and $_.Target -notlike "*SharingLinks*" } | Sort-Object -Property File -Unique
 
     $HTML = New-HTMLHead -title "OneDrive Recently Shared Files" -style $Style1
     $HTML += "<h3 style='color:red; font-style:bold;'><i>Disclaimer: OneDrive should not contain Confidential or Secret Data</i></h3>"
@@ -53,6 +72,13 @@ function Get-SharedOnedriveFiles {
     $HTML += "<li>Click ""View Online""</li>"
     $HTML += "<li>On the left panel locate ""Shared""</li>"
     $HTML += "<li>On top select ""Shared by you""</li>"
+    $HTML += "</ol>"
+    $HTML += "<h3 style='font-style:italic;'>Manage access or stop sharing a file or folder from the Shared By Me view:</h3>"
+    $HTML += "<ol style='font-style:italic;'>"
+    $HTML += "<li>To manage access or stop sharing the file or folder, select an item, and then select Manage access near the top of the page.</il>"
+    $HTML += "<li>To stop sharing with everyone, near the top of the Manage Access pane, select Stop sharing.</il>"
+    $HTML += "<li>To stop sharing with one person, select the dropdown list, and then select Stop sharing.</il>"
+    $HTML += "<li>To change the person's permissions, select the dropdown list, and then select Can View or Can Edit.</il>"
     $HTML += "</ol>"
     $HTML += "<h3><i>For any questions or assistance needed please contact the service desk at service.desk@sonymusic.com</i></h3>"
     $HTML += New-HTMLTable -inputObject $($UserList | Select-Object CreationTime, Workload, File, Target | Where-Object { $_.Workload -eq "OneDrive" })
@@ -78,12 +104,12 @@ function Get-SharedOnedriveFiles {
 
 #$users = (Get-MsolUser -MaxResults 100 | Select-Object).UserPrincipalName
 
-$Users =
+<# $Users =
 @"
 brian.lynch@sonymusic.com
-"@ -split [environment]::NewLine
+"@ -split [environment]::NewLine #>
 
-foreach ($User in $Users) {
+foreach ($userUpn in $Az_GroupMemebersUPN) {
 
   Get-SharedOnedriveFiles -UserPrincipalName $User -UserEmail $User
 }
