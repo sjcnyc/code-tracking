@@ -67,8 +67,6 @@ if (!(Test-Path -Path "$RegPath\$AppId")) {
 <toast scenario="reminder">
     <visual>
     <binding template="ToastGeneric">
-        <text>New Software Notification</text>
-        <text placement="attribution">from Contoso IT</text>        
         <group>
             <subgroup>
                 <text hint-style="title" hint-wrap="true" >$Title</text>
