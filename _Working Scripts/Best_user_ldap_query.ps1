@@ -1,0 +1,1 @@
+$ObjSearcher.Filter = "(samAccountType=805306368)"

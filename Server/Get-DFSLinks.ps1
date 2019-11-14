@@ -1,4 +1,4 @@
-﻿.\get-dfslinks.ps1 -path \\bmg.bagint.com\usa\ | 
+﻿.\get-dfslinks.ps1 -path \\bmg.bagint.com\usa\ |
 Select-Object name,path,state,timeout, `
 @{N='Target Path';E={
 		$path=@()
@@ -14,6 +14,4 @@ Select-Object name,path,state,timeout, `
 		$site=@()
 		$_.Targets | ForEach-Object {$site+=$_.site}
 		$site -as [string]
-	}} # | export-csv C:\temp\Dfs_fullAttrib.csv -NoTypeInformation -Append
-
-#Targets is an array containing path,state,site
+	}} # |
