@@ -1,12 +1,14 @@
-#Import-Module ExchangeOnline
+Import-Module ExchangeOnline
 
-#Connect-EXOService -UserPrincipalName "admSConnea-azr@SonyMusicEntertainment.onmicrosoft.com"
+Connect-EXOService -UserPrincipalName "admSConnea-azr@SonyMusicEntertainment.onmicrosoft.com" -BypassMailboxAnchoring:$true
 
 $UserPrincipalName = "brian.lynch@sonymusic.com"
 
   $StartDate = (get-date).AddDays(-30).ToString("MM/dd/yyyy")
   $EndDate = (get-date).AddDays(1).ToString("MM/dd/yyyy")
 
+function Get-FileSharing {
+  Write-ProgressHelper -Activity 'Checking file sharing'
   $operations = @('AnonymousLinkCreated', 'SecureLinkCreated', 'AddedToSecureLink')
   $auditLinks = Search-UnifiedAuditLog -UserIds $UserPrincipalName -StartDate $StartDate -EndDate $EndDate -Operations $operations
   if ($auditLinks) {
@@ -22,7 +24,10 @@ $UserPrincipalName = "brian.lynch@sonymusic.com"
       $checkFileSharingOutput.Created = $link.CreationTime #CreationTime is returned in local time
       $checkFileSharingOutput
     }
-	}
+		}
   else {
     if ($ShowNonMatches) { Write-Host 'FileSharing: No files were shared within the search window.' }
-		}
+  }
+}
+
+Get-FileSharing

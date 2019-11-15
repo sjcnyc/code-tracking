@@ -2,7 +2,7 @@ using namespace System.Collections.Generic
 
 Import-Module ExchangeOnline
 
-$AllUsers = [List[PSObject]]::new()
+#$AllUsers = [List[PSObject]]::new()
 
 try {
   Write-Output "Retrieving runbook credential object"
