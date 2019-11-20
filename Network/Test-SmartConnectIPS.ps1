@@ -26,4 +26,4 @@
 
 }
 
-Test-SmartConnect -server storage.me.sonymusic.com -range 40
+Test-SmartConnect -server usstorage01nfs.me.sonymusic.com -range 100
