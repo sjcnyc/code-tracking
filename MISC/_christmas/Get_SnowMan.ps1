@@ -36,7 +36,7 @@ $SnowMan = @"
 Clear-Host
  
 # Set position to the bottom of the window to draw the Snowman
-$Host.UI.RawUI.CursorPosition = @{  
+$Host.UI.RawUI.CursorPosition = @{
     x=0 
     y=$Host.UI.RawUI.WindowSize.Height
 }

@@ -100,7 +100,7 @@ While($True)
         }
 
         # add row to shift the snowflake one row down
-        $Flakes.$Flake.Y += 1
+        $Flakes.$Flake.y += 1
 
         # Set new position and color for snowflake
         $host.UI.RawUI.ForegroundColor = 'white'
