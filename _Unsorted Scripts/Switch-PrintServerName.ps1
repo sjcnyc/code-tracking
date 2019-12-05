@@ -12,7 +12,7 @@ function Switch-PrintServerName {
             $Message,
             
             [string]
-            $Path = "\\storage.bmg.bagint.com\logs$\PowerShellLog.txt"
+            $Path = "\\storage.me.sonymusic.com\logs$\PowerShellLog.txt"
         )
         Write-Verbose -Message $Message
         Write-Output "$(Get-Date) $Message" | Out-File -FilePath $path -Append
@@ -47,5 +47,5 @@ function Switch-PrintServerName {
     }
 }
 
-Switch-PrintServerName -newPrintServer usbvhpwfs01 -oldPrintServer bvh1
-Switch-PrintServername -newPrintServer usbvhpwfs01 -oldPrintServer stm
+Switch-PrintServerName -newPrintServer usculvwprt402.me.sonymusic.com -oldPrintServer usbvhpwfs01.me.sonymusic.com
+#Switch-PrintServername -newPrintServer usbvhpwfs01 -oldPrintServer stm
