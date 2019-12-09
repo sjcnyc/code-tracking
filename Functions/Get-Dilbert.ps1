@@ -30,7 +30,7 @@ function Get-Dilbert
 
     $image = @{ 
     image1 = "$PSScriptRoot\$lastDate.gif" 
-    }  
+    }
     
     $body = '<html>  
                <body>  
