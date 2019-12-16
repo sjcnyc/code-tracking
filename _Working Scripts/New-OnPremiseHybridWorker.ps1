@@ -412,6 +412,6 @@ $newOnPremiseHybridWorkerSplat_T2 = @{
   SubscriptionID        = "00c72111-4b19-4041-9490-ab6a640dee52"
 }
 
-#New-OnPremiseHybridWorker @newOnPremiseHybridWorkerSplat_T1
+New-OnPremiseHybridWorker @newOnPremiseHybridWorkerSplat_T1
 
-#New-OnPremiseHybridWorker @newOnPremiseHybridWorkerSplat_T2
+New-OnPremiseHybridWorker @newOnPremiseHybridWorkerSplat_T2
