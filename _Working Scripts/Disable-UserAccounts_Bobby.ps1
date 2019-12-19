@@ -118,7 +118,7 @@ VILL093
     Disable-ADAccount -Identity $_ -WhatIf
     #Remove-ADUser -Identity $_ -WhatIf
   }
-  catch {
-    $Error.Message
+  catch [Microsoft.ActiveDirectory.Management.ADException] {
+    $_.Exception.Message
   }
 } #...
