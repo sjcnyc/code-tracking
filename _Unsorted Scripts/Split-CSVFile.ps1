@@ -1,21 +1,21 @@
 function Split-CsvFile {
   param (
     [string]
-    $sourceCSV,
+    $SourceCSV,
     [int]
-    $size
+    $Size
   )
-  $exportPath = $sourceCSV.Substring(0, $sourceCSV.LastIndexOf('.'))
-  $count = (Import-Csv $sourceCSV).count
-  $startrow = 0;
-  $counter = 1;
+  $ExportPath = $SourceCSV.Substring(0, $SourceCSV.LastIndexOf('.'))
+  $Count      = (Import-Csv $SourceCSV).Count
+  $StartRow   = 0
+  $Counter    = 1
 
-  while ($startrow -lt $count) {
-    Import-CSV $sourceCSV | select-object -skip $startrow -first $size |
-      Export-CSV "$($exportPath)_$($counter).csv" -NoClobber -Encoding UTF8
-    $startrow += $size
-    $counter++
+  while ($StartRow -lt $Count) {
+    Import-CSV $SourceCSV | select-object -Skip $StartRow -First $Size |
+    Export-CSV "$($ExportPath)_$($Counter).csv" -NoClobber -Encoding UTF8
+    $StartRow += $Size
+    $Counter++
   }
 }
 
-Split-CsvFile -sourceCSV '\\storage\pstholding$\SpamLogs\X-Headers-2018-01-30_12-55-15.csv' -size 5000
+Split-CsvFile -SourceCSV D:\temp\MpIsilon_Report2.csv -Size 6000

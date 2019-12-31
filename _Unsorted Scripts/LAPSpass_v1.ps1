@@ -35,13 +35,13 @@
 $AppNAME = "LAPSpass"
 
 # Set the default FQDN (so that users do not need to append this).
-$DefaultComputerFQDN = ".bmg.bagint.com"
+$DefaultComputerFQDN = "USDF48E38ABF907.me.sonymusic.com"
 
 # Version.
 $Ver = "1.0"
 
 # Admin Account Name (if not default).
-$AdminAccount = "Administrator"
+$AdminAccount = "me_ltech"
 
 # ============================================================================================================
 # ==== Create GUI ============================================================================================
