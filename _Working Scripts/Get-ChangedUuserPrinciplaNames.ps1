@@ -1,4 +1,4 @@
-#$cred = Get-AutomationPSCredential -Name 'T2_Cred'
+$cred = Get-AutomationPSCredential -Name 'T2_Cred'
 
 $Style1 =
 '<style>
@@ -13,40 +13,41 @@ $Style1 =
   .even { background-color:#E9E9E9; }
 </style>'
 
-$Date      = (get-date -f yyyy-MM-dd)
-$CSVFile   = "D:\Temp\UPNs_Changed_Last_day_$($Date).csv"
+$Date = (get-date -f yyyy-MM-dd)
+$CSVFile = "C:\Support\Temp\UPNs_Changed_Last_day_$($Date).csv"
 $attachcsv = $false
 
-$ReferenceCSV = (Import-CSV "D:\Temp\Reference.csv").Where{ ![string]::IsNullOrWhiteSpace($_.userPrincipalName) -or $_.userPrincipalName -ne $null }
+$ReferenceCSV = (Import-CSV "C:\Support\Temp\Reference.csv").Where{ ![string]::IsNullOrWhiteSpace($_.userPrincipalName) -or $_.userPrincipalName -ne $null }
 
 $Lookup = $ReferenceCSV | Group-Object -AsHashTable -AsString -Property sAMAccountName
 
 $getADUserSplat = @{
-  Properties       = 'Name', 'sAMAccountName', 'userPrincipalName'
-  SearchBase       = "OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
-  LDAPFilter       = "(samAccountType=805306368)(!userAccountControl:1.2.840.113556.1.4.803:=2)"
-  #Credential       = $cred
+  Properties = 'Name', 'sAMAccountName', 'userPrincipalName'
+  SearchBase = "OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
+  LDAPFilter = "(samAccountType=805306368)(!userAccountControl:1.2.840.113556.1.4.803:=2)"
+  Credential = $cred
 }
 
-Get-ADUser @getADUserSplat | Select-Object $getADUserSplat.Properties | Export-Csv D:\Temp\Difference.csv -NoTypeInformation
+$GetUser = Get-ADUser @getADUserSplat | Select-Object $getADUserSplat.Properties 
+$GetUser | Export-Csv "C:\Support\Temp\Difference.csv" -NoTypeInformation
 
-$Results = Import-Csv -Path D:\Temp\Difference.csv | ForEach-Object {
+$Results = Import-Csv -Path "C:\Support\Temp\Difference.csv" | ForEach-Object {
   $Samname = $_.sAMAccountName
   if ($Lookup.ContainsKey($Samname)) {
-      $OldUPN = ($Lookup[$Samname]).userPrincipalName
-    }
-    else {
-      $OldUPN = "Unknown"
-    }
-    if ($_.userPrincipalName -ne $OldUPN -and $OldUPN -ne "Unknown") {
-      [pscustomobject]@{
-        sAMAccontName = $Samname
-        Name          = $_.Name
-        OldUPN        = $OldUPN
-        NewUPN        = $_.userPrincipalName
-      }
+    $OldUPN = ($Lookup[$Samname]).userPrincipalName
+  }
+  else {
+    $OldUPN = "Unknown"
+  }
+  if ($_.userPrincipalName -ne $OldUPN -and $OldUPN -ne "Unknown") {
+    [pscustomobject]@{
+      sAMAccontName = $Samname
+      Name          = $_.Name
+      OldUPN        = $OldUPN
+      NewUPN        = $_.userPrincipalName
     }
   }
+}
 
 #$Results | Out-GridView
 if ($null -ne $Results ) {
@@ -57,7 +58,7 @@ if ($null -ne $Results ) {
   $attachcsv = $true
 }
 else {
-  $msg   = ""
+  $msg = ""
   $Count = '0'
 }
 
@@ -67,13 +68,13 @@ $InfoBody = [pscustomobject]@{
   "Count"  = $Count
 }
 
-$HTML =  New-HTMLHead -title "UPNs Changes in the Last Day" -style $Style1
+$HTML = New-HTMLHead -title "UPNs Changes in the Last Day" -style $Style1
 $HTML += New-HTMLTable -inputObject $(ConvertTo-PropertyValue -inputObject $InfoBody)
 $HTML += "<h4>$($Msg)</h4>"
 $HTML += "<h4>Script Completed: $(Get-Date -Format G)</h4>" | Close-HTML
 
 $EmailParams = @{
-  to         = "sconnea@sonymusic.com", "Alex.Moldoveanu@sonymusic.com"
+  to         = "sconnea@sonymusic.com" #, "Alex.Moldoveanu@sonymusic.com"
   from       = 'PwSh Alerts pwshalerts@sonymusic.com'
   subject    = 'UPNs Changes in the Last Day'
   smtpserver = 'cmailsony.servicemail24.de'
@@ -87,5 +88,8 @@ else {
   Send-MailMessage @EmailParams
 }
 
-#Get-ChildItem *.csv | ForEach-Object { Remove-Item -Path $_.FullName }
-#$Results | Export-Csv C:\Temp\Reference.csv -NoTypeInformation
+Start-Sleep 5
+
+Get-ChildItem -Path "C:\Support\Temp" -Filter "*.csv" | ForEach-Object { Remove-Item -Path $_.FullName }
+Start-Sleep 5
+$GetUser | Export-Csv "C:\Support\Temp\Reference.csv" -NoTypeInformation
