@@ -1,3 +1,5 @@
+#$cred = Get-AutomationPSCredential -Name 'T2_Cred'
+
 $Style1 =
 '<style>
   body {color:#333333;font-family:Calibri,Tahoma,arial,verdana;font-size: 10pt;}
@@ -23,6 +25,7 @@ $getADUserSplat = @{
   Properties       = 'Name', 'sAMAccountName', 'userPrincipalName'
   SearchBase       = "OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
   LDAPFilter       = "(samAccountType=805306368)(!userAccountControl:1.2.840.113556.1.4.803:=2)"
+  #Credential       = $cred
 }
 
 Get-ADUser @getADUserSplat | Select-Object $getADUserSplat.Properties | Export-Csv D:\Temp\Difference.csv -NoTypeInformation
@@ -45,7 +48,7 @@ $Results = Import-Csv -Path D:\Temp\Difference.csv | ForEach-Object {
     }
   }
 
-  #$Results | Out-GridView
+#$Results | Out-GridView
 if ($null -ne $Results ) {
 
   $msg = "See Attached CSV Report"
@@ -84,4 +87,5 @@ else {
   Send-MailMessage @EmailParams
 }
 
-#TODO remove all csv file at this point, and export $Results object as Reference.csv...
+#Get-ChildItem *.csv | ForEach-Object { Remove-Item -Path $_.FullName }
+#$Results | Export-Csv C:\Temp\Reference.csv -NoTypeInformation
