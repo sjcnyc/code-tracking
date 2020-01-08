@@ -1,7 +1,8 @@
-$Server    = (Get-ADDomainController).HostName
-$When      = ((Get-Date).AddDays(-1)).Date
-$Date      = (get-date -f yyyy-MM-dd)
-$CSVFile   = "C:\Temp\UPNs_Changed_Last_day_$($Date).csv"
+$Cred = Get-AutomationPSCredential -Name 'T2_Cred'
+$Server = (Get-ADDomainController -Credential $Cred).HostName
+$When = ((Get-Date).AddDays(-1)).Date
+$Date = (get-date -f yyyy-MM-dd)
+$CSVFile = "C:\Support\Temp\UPNs_Changed_Last_day_$($Date).csv"
 $attachcsv = $false
 
 $Style1 =
@@ -21,12 +22,14 @@ $getADUserSplat = @{
   Properties = 'Name', 'sAMAccountName', 'userPrincipalName', 'DistinguishedName', 'CanonicalName'
   SearchBase = "OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
   LDAPFilter = "(samAccountType=805306368)(!userAccountControl:1.2.840.113556.1.4.803:=2)"
+  Credential = $Cred
 }
 
 $getADReplicationAttributeMetadataSplat = @{
-  Server    = $Server
-  Attribute = "userprincipalname"
-  Filter    = { LastOriginatingChangeTime -gt $When }
+  Server     = $Server
+  Attribute  = "userprincipalname"
+  Filter     = { LastOriginatingChangeTime -gt $When }
+  Credential = $Cred
 }
 
 $Results = Get-ADUser @getADUserSplat -PipelineVariable usr | Get-ADReplicationAttributeMetadata @getADReplicationAttributeMetadataSplat |
@@ -65,7 +68,8 @@ $HTML += "<h4>$($Msg)</h4>"
 $HTML += "<h4>Script Completed: $(Get-Date -Format G)</h4>" | Close-HTML
 
 $EmailParams = @{
-  to         = "sconnea@sonymusic.com" #, "Alex.Moldoveanu@sonymusic.com"
+  to         = 'hrsystems@sonymusic.com'
+  cc         = 'Alex.Moldoveanu@sonymusic.com', 'sconnea@sonymusic.com'
   from       = 'PwSh Alerts pwshalerts@sonymusic.com'
   subject    = 'UPNs Changes in the Last Day'
   smtpserver = 'cmailsony.servicemail24.de'
@@ -78,3 +82,5 @@ if ($attachcsv) {
 else {
   Send-MailMessage @EmailParams
 }
+Start-Sleep 2
+Get-ChildItem -Path "C:\Support\Temp" -Filter "*.csv" | ForEach-Object { Remove-Item -Path $_.FullName }
