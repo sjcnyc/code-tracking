@@ -1,8 +1,4 @@
-$Server    = (Get-ADDomainController).HostName
-$When      = ((Get-Date).AddDays(-1)).Date
-$Date      = (get-date -f yyyy-MM-dd)
-$CSVFile   = "C:\Temp\UPNs_Changed_Last_day_$($Date).csv"
-$attachcsv = $false
+$cred = Get-AutomationPSCredential -Name 'T2_Cred'
 
 $Style1 =
 '<style>
@@ -17,30 +13,43 @@ $Style1 =
   .even { background-color:#E9E9E9; }
 </style>'
 
+$Date = (get-date -f yyyy-MM-dd)
+$CSVFile = "C:\Support\Temp\UPNs_Changed_Last_day_$($Date).csv"
+$attachcsv = $false
+
+$ReferenceCSV = (Import-CSV "C:\Support\Temp\Reference.csv").Where{ ![string]::IsNullOrWhiteSpace($_.userPrincipalName) -or $_.userPrincipalName -ne $null }
+
+$Lookup = $ReferenceCSV | Group-Object -AsHashTable -AsString -Property sAMAccountName
+
 $getADUserSplat = @{
-  Properties = 'Name', 'sAMAccountName', 'userPrincipalName', 'DistinguishedName', 'CanonicalName'
+  Properties = 'Name', 'sAMAccountName', 'userPrincipalName'
   SearchBase = "OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
   LDAPFilter = "(samAccountType=805306368)(!userAccountControl:1.2.840.113556.1.4.803:=2)"
+  Credential = $cred
 }
 
-$getADReplicationAttributeMetadataSplat = @{
-  Server    = $Server
-  Attribute = "userprincipalname"
-  Filter    = { LastOriginatingChangeTime -gt $When }
-}
+$GetUser = Get-ADUser @getADUserSplat | Select-Object $getADUserSplat.Properties
+$GetUser | Export-Csv "C:\Support\Temp\Difference.csv" -NoTypeInformation
 
-$Results = Get-ADUser @getADUserSplat -PipelineVariable usr | Get-ADReplicationAttributeMetadata @getADReplicationAttributeMetadataSplat |
-ForEach-Object {
-
-  [pscustomobject]@{
-    sAMAccountname = $usr.sAMAccountName
-    Name           = $usr.Name
-    UPN            = $_.AttributeValue
-    WhenChanged    = $_.LastOriginatingChangeTime
-    DN             = $usr.DistinguishedName
+$Results = Import-Csv -Path "C:\Support\Temp\Difference.csv" | ForEach-Object {
+  $Samname = $_.sAMAccountName
+  if ($Lookup.ContainsKey($Samname)) {
+    $OldUPN = ($Lookup[$Samname]).userPrincipalName
+  }
+  else {
+    $OldUPN = "Unknown"
+  }
+  if ($_.userPrincipalName -ne $OldUPN -and $OldUPN -ne "Unknown") {
+    [pscustomobject]@{
+      sAMAccontName = $Samname
+      Name          = $_.Name
+      OldUPN        = $OldUPN
+      NewUPN        = $_.userPrincipalName
+    }
   }
 }
 
+#$Results | Out-GridView
 if ($null -ne $Results ) {
 
   $msg = "See Attached CSV Report"
@@ -78,3 +87,9 @@ if ($attachcsv) {
 else {
   Send-MailMessage @EmailParams
 }
+
+Start-Sleep 5
+
+Get-ChildItem -Path "C:\Support\Temp" -Filter "*.csv" | ForEach-Object { Remove-Item -Path $_.FullName }
+Start-Sleep 5
+$GetUser | Export-Csv "C:\Support\Temp\Reference.csv" -NoTypeInformation
