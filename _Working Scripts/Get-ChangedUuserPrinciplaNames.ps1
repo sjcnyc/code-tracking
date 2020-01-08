@@ -83,4 +83,4 @@ else {
   Send-MailMessage @EmailParams
 }
 Start-Sleep 2
-Get-ChildItem -Path "C:\Support\Temp" -Filter "*.csv" | ForEach-Object { Remove-Item -Path $_.FullName }
+Remove-Item -Path $CSVFile
