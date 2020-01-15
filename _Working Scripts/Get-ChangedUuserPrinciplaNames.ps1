@@ -19,7 +19,7 @@ $Style1 =
 </style>'
 
 $getADUserSplat = @{
-  Properties = 'Name', 'sAMAccountName', 'userPrincipalName', 'DistinguishedName', 'CanonicalName'
+  Properties = 'Name', 'sAMAccountName', 'userPrincipalName', 'DistinguishedName', 'CanonicalName', 'whenCreated'
   SearchBase = "OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
   LDAPFilter = "(samAccountType=805306368)(!userAccountControl:1.2.840.113556.1.4.803:=2)"
   Credential = $Cred
@@ -39,6 +39,7 @@ ForEach-Object {
     sAMAccountname = $usr.sAMAccountName
     Name           = $usr.Name
     UPN            = $_.AttributeValue
+    WhenCreated    = $usr.WhenCreated
     WhenChanged    = $_.LastOriginatingChangeTime
     DN             = $usr.DistinguishedName
   }

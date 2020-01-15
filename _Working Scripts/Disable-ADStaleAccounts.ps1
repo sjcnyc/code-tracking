@@ -75,7 +75,7 @@ function Disable-ADStaleAccounts {
 
   $DaysAgo = (Get-Date).AddDays(-$StaleThreshold)
   $Date = (get-date -f yyyy-MM-dd)
-  $CSVFile = "C:\temp\StaleUserAccounts_$($StaleThreshold)Days_$($Date).csv"
+  $CSVFile = "C:\temp\$($AccountType)_$($StaleThreshold)_Days_$($Date).csv"
   $PSList = [List[psobject]]::new()
 
   # Exclude below ous
@@ -90,16 +90,16 @@ function Disable-ADStaleAccounts {
   try {
 
     if ($SourceOU) {
-      $StaleAccounts = &"Get-AD$AccountType" @ADObjectSplat -SearchBase $SourceOu | Where-Object { $_.distinguishedName -notmatch $Filter }
+      $StaleAccounts = &"Get-AD$($AccountType)" @ADObjectSplat -SearchBase $SourceOu | Where-Object { $_.distinguishedName -notmatch $Filter }
     }
     else {
-      $StaleAccounts = &"Get-AD$AccountType" @ADObjectSplat | Where-Object { $_.distinguishedName -notmatch $Filter }
+      $StaleAccounts = &"Get-AD$($AccountType)" @ADObjectSplat | Where-Object { $_.distinguishedName -notmatch $Filter }
     }
     if ($Disable) {
 
       foreach ($StaleAccount in $StaleAccounts) {
 
-        #"Set-AD$AccountType" -Identity $StaleAccount -Enabled $false -Server $Domain
+        #"Set-AD$($AccountType)" -Identity $StaleAccount -Enabled $false -Server $Domain
 
         #Move-ADObject -Identity $StaleAccount -TargetPath $TargetOu -Server $Domain
 
@@ -116,17 +116,17 @@ function Disable-ADStaleAccounts {
       }
 
       $InfoBody = [pscustomobject]@{
-        'Task'        = "Azure Hybrid Runbook Worker - Tier-2"
-        'Action'      = "Disable & Move ME AD User Objects"
-        'Threshold'   = "$($StaleThreshold) Days"
-        'Source Ou'   = ConvertFrom-DN -DN $SourceOu -replace "me.sonymusic.com/", ""
-        'Target Ou'   = ConvertFrom-DN -DN $TargetOu -replace "me.sonymusic.com", ""
-        'Total Users' = $StaleAccounts.Count
+        'Task'                   = "Azure Hybrid Runbook Worker - Tier-2"
+        'Action'                 = "Disable Stale ME AD $($AccountType) Objects"
+        'Threshold'              = "$($StaleThreshold) Days"
+        'Source Ou'              = (ConvertFrom-DN -DN $SourceOu) -replace "me.sonymusic.com/", ""
+        #'Target Ou'            = ConvertFrom-DN -DN $TargetOu -replace "me.sonymusic.com", ""
+        "Total $($AccountType)s" = $StaleAccounts.Count
       }
 
       $PSList | Export-Csv $CSVFile -NoTypeInformation
 
-      $HTML = New-HTMLHead -title "ME Stale User Account Cleanup Report" -style $Style1
+      $HTML = New-HTMLHead -title "ME Stale $($AccountType) Account Cleanup Report" -style $Style1
       $HTML += New-HTMLTable -inputObject $(ConvertTo-PropertyValue -inputObject $InfoBody)
       $HTML += "<h4>See Attached CSV Report</h4>"
       $HTML += "<h4>Script Completed: $(Get-Date -Format G)</h4>" | Close-HTML
@@ -148,7 +148,7 @@ function Disable-ADStaleAccounts {
     else {
       $StaleAccounts = $StaleAccounts | Select-Object -Property DistinguishedName, Name, Enabled, Description, @{Name = "PwdLastSet"; Expression = { [datetime]::FromFileTime($_.PwdLastSet) } }, @{Name = "LastLogonTimeStamp"; Expression = { [datetime]::FromFileTime($_.LastLogonTimeStamp) } }
 
-      $StaleAccounts | Export-Csv C:\Temp\Stale_ME_User_accounts_00092.csv -NoTypeInformation
+      $StaleAccounts | Export-Csv C:\Temp\Stale_ME_User_accounts_00093.csv -NoTypeInformation
     }
   }
   catch {
@@ -157,12 +157,11 @@ function Disable-ADStaleAccounts {
 }
 
 $disableADStaleAccountsSplat = @{
-    Domain         = 'me.sonymusic.com'
-    StaleThreshold = 90
-    AccountType    = 'User'
-    Disable        = $true
-    SourceOu       = "OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
-    TargetOu       = "OU=Users,OU=Deprovision,OU=STG,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
+  Domain         = 'me.sonymusic.com'
+  StaleThreshold = 90
+  AccountType    = 'User'
+  Disable        = $true
+  SourceOu       = "OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
 }
 Disable-ADStaleAccounts @disableADStaleAccountsSplat
 
