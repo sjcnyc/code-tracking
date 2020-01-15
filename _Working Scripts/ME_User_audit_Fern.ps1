@@ -8,11 +8,11 @@ OU=Non-Employees,OU=Users,OU=GBL,OU=USA,OU=NA,OU=STD,OU=Tier-2,DC=me,DC=sonymusi
 $users = @()
 foreach ($ou in $ous) {
   $getQADUserSplat = @{
-      SearchRoot = $ou
-      SizeLimit = 0
+      SearchRoot                       = $ou
+      SizeLimit                        = 0
       DontUseDefaultIncludedProperties = $true
-      IncludedProperties = 'SamAccountName', 'DisplayName', 'WhenCreated', 'whenChanged', 'LastLogonTimeStamp', 'AccountIsDisabled', 'ParentContainer'
-      Enabled = $true
+      IncludedProperties               = 'SamAccountName', 'DisplayName', 'WhenCreated', 'whenChanged', 'LastLogonTimeStamp', 'AccountIsDisabled', 'ParentContainer'
+      Enabled                          = $true
   }
 
   $users += Get-QADUser @getQADUserSplat | Select-Object $getQADUserSplat.IncludedProperties
