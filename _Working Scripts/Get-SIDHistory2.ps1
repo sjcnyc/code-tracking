@@ -51,4 +51,4 @@ function Get-SIDHistory {
   }
 }
 
-Get-SIDHistory -Domain "me.sonymusic.com" | Export-Csv D:\Temp\Me_SIDHistory_User11.csv -NoTypeInformation
+Get-SIDHistory -Domain "me.sonymusic.com" | Out-GridView #Export-Csv D:\Temp\Me_SIDHistory_User11.csv -NoTypeInformation
