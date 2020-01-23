@@ -51,7 +51,9 @@ function Get-ADGroupMemberships {
 }
 
 $Groups = @"
-NYC-BW1540 App SBME Sales Forecasting Legacy Users
+NAS-NASH IST
+NAS-NASH MacServer A&R
+NAS-NASH MacServer Digital
 "@ -split [System.Environment]::NewLine
 
-Get-ADGroupMemberships -Groups $Groups -Domain me -Export -Extension pdf
+Get-ADGroupMemberships -Groups $Groups -Domain me -Export -Extension csv
