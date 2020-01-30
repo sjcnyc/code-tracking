@@ -1,4 +1,4 @@
-function Get-AtpToken {
+function Get-ATPToken {
   param(
     [string]$TenantID,
     [string]$ApplicationID,
@@ -23,4 +23,4 @@ $getAtpTokenSplat = @{
     ApplicationID     = "a429f199-6708-4bfb-a4fc-176a191cba6d"
     ApplicationSecret = "v4xu-ppsUqgEIkbGo[N1g64YB_@B??Gt"
 }
-Get-AtpToken @getAtpTokenSplat
+Get-ATPToken @getAtpTokenSplat
