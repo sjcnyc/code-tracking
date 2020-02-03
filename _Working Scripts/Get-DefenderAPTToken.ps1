@@ -9,8 +9,8 @@ function Get-ATPToken {
   $oAuthUri = "https://login.windows.net/$TenantId/oauth2/token"
   $authBody = [Ordered] @{
     resource      = "$resourceAppIdUri"
-    client_id     = "$appId"
-    client_secret = "$appSecret"
+    client_id     = "$ApplicationID"
+    client_secret = "$ApplicationSecret"
     grant_type    = 'client_credentials'
   }
   $authResponse = Invoke-RestMethod -Method Post -Uri $oAuthUri -Body $authBody -ErrorAction Stop
@@ -21,6 +21,6 @@ function Get-ATPToken {
 $getAtpTokenSplat = @{
     TenantID          = "04fe1413-7bc4-4d52-a4ec-832569ea001c"
     ApplicationID     = "a429f199-6708-4bfb-a4fc-176a191cba6d"
-    ApplicationSecret = "v4xu-ppsUqgEIkbGo[N1g64YB_@B??Gt"
+    ApplicationSecret = "Xo.5oGy99/.p7w@vAo-]Yie@egs=N8vj"
 }
 Get-ATPToken @getAtpTokenSplat

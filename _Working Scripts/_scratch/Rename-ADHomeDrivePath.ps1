@@ -1,5 +1,5 @@
 $getADUserSplat = @{
-    Filter     = { homedirectory -like "\\USNASPLSYN001*" }
+    Filter     = { homedirectory -like "\\usnaspwfs01*" }
     Properties = 'SamAccountName', 'HomeDirectory', 'HomeDrive', 'DistinguishedName'
     Server     = 'me.sonymusic.com'
 }
