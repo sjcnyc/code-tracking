@@ -22,7 +22,7 @@ function Get-OuUserCounts {
     SearchBase  = $SearchBase
     Properties  = 'Distinguishedname', 'CanonicalName'
   }
-  Get-ADOrganizationalUnit @ADOrgSplat |ForEach-Object {
+  Get-ADOrganizationalUnit @ADOrgSplat | ForEach-Object {
 
     $Count = (Get-ADObject -SearchBase $_.DistinguishedName -Server $Server -Filter *).Count
     $psobj = [PSCustomObject]@{

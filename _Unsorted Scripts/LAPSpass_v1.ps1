@@ -35,13 +35,13 @@
 $AppNAME = "LAPSpass"
 
 # Set the default FQDN (so that users do not need to append this).
-$DefaultComputerFQDN = "USDF48E38ABF907.me.sonymusic.com"
+$DefaultComputerFQDN = ".contoso.com"
 
 # Version.
 $Ver = "1.0"
 
 # Admin Account Name (if not default).
-$AdminAccount = "me_ltech"
+$AdminAccount = "Administrator"
 
 # ============================================================================================================
 # ==== Create GUI ============================================================================================
@@ -255,7 +255,7 @@ function SearchButtonClick($object) { # Search Button clicked.
             $SearchButton.Enabled = $true # Enable Search button
             return
             }
-        }
+        } 
     	
 	# Get the Computer Name.
 	$ComputerName = $ComputerNameInput.Text
