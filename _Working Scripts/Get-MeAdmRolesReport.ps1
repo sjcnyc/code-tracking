@@ -43,4 +43,4 @@ Function Get-RolesReport {
     Invoke-Item $OutDir
 }
 
-Get-RolesReport -Tier 0 -OutDir C:\Temp
+Get-RolesReport -Tier 3 -OutDir d:\Temp
