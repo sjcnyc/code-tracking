@@ -1,18 +1,7 @@
 ﻿$notfound = @()
 $users =
 @'
-Reece Laycock
-Debbie Thompson
-Johan Linglof
-Ivo Baetschmann
-Simon Mueller
-Joe Doerner
-Corrado Filpa
-Georges Ouaggini
-Berry van Sandwijk
-Krokan Erling
-Soren Kristensen
-William Rowe
+WEIG031
 '@ -split [environment]::NewLine
 
 foreach ($user in $users) {
@@ -21,7 +10,7 @@ foreach ($user in $users) {
         $notfound += $user
     }
     else {
-        "$($result.SAMAccountName)"
+        "$($result.SAMAccountName);"
     }
 }
 
