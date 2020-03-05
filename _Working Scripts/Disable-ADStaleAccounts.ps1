@@ -1,5 +1,4 @@
 using namespace System.Collections.Generic
-
 function ConvertFrom-DN {
   param([string]$DN)
   foreach ( $item in ($DN.replace('\,', '~').split(','))) {
@@ -29,7 +28,6 @@ function ConvertFrom-DN {
   }
   return $canoincal
 }
-
 function Disable-ADStaleAccounts {
 
   #Requires -modules ActiveDirectory
@@ -58,6 +56,7 @@ function Disable-ADStaleAccounts {
 
     [switch]
     $Disable
+
   )
 
   $Style1 =
@@ -88,7 +87,6 @@ function Disable-ADStaleAccounts {
   }
 
   try {
-
     if ($SourceOU) {
       $StaleAccounts = &"Get-AD$($AccountType)" @ADObjectSplat -SearchBase $SourceOu | Where-Object { $_.distinguishedName -notmatch $Filter }
     }
@@ -96,11 +94,8 @@ function Disable-ADStaleAccounts {
       $StaleAccounts = &"Get-AD$($AccountType)" @ADObjectSplat | Where-Object { $_.distinguishedName -notmatch $Filter }
     }
     if ($Disable) {
-
       foreach ($StaleAccount in $StaleAccounts) {
-
         #"Set-AD$($AccountType)" -Identity $StaleAccount -Enabled $false -Server $Domain
-
         #Move-ADObject -Identity $StaleAccount -TargetPath $TargetOu -Server $Domain
 
         $PSUserObj = [pscustomobject][ordered]@{
@@ -120,7 +115,7 @@ function Disable-ADStaleAccounts {
         'Action'                 = "Disable Stale ME AD $($AccountType) Objects"
         'Threshold'              = "$($StaleThreshold) Days"
         'Source Ou'              = (ConvertFrom-DN -DN $SourceOu) -replace "me.sonymusic.com/", ""
-        #'Target Ou'            = ConvertFrom-DN -DN $TargetOu -replace "me.sonymusic.com", ""
+        'Target Ou'              = (ConvertFrom-DN -DN $TargetOu) -replace "me.sonymusic.com", ""
         "Total $($AccountType)s" = $StaleAccounts.Count
       }
 
@@ -133,8 +128,8 @@ function Disable-ADStaleAccounts {
 
       $EmailParams = @{
         To          = "sean.connealy@sonymusic.com"
-        From        = 'Posh Alerts poshalerts@sonymusic.com'
-        Subject     = 'ME Stale User Account Cleanup Report'
+        From        = 'PwSh Alerts poshalerts@sonymusic.com'
+        Subject     = "ME Stale $($AccountType) Account Cleanup Report"
         SmtpServer  = 'cmailsony.servicemail24.de'
         Body        = ($HTML | Out-String)
         BodyAsHTML  = $true
@@ -159,10 +154,12 @@ function Disable-ADStaleAccounts {
 $disableADStaleAccountsSplat = @{
   Domain         = 'me.sonymusic.com'
   StaleThreshold = 90
-  AccountType    = 'User'
-  Disable        = $true
+  AccountType    = 'Computer'
   SourceOu       = "OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
+  TargetOu       = "OU=Workstations,OU=Deprovision,OU=STG,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
+  Disable        = $true
 }
+
 Disable-ADStaleAccounts @disableADStaleAccountsSplat
 
 #test logon
