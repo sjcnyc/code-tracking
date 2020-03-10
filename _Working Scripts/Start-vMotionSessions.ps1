@@ -54,10 +54,7 @@ function Start-vMotionSessions {
     Write-Host ""
   }
 }
-
 $Vms = @"
-usculvwnmd011
-usculvwpsh405
 usculvwscm011
 "@ -split [environment]::NewLine
 
