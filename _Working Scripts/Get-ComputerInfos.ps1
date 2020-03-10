@@ -1,16 +1,21 @@
-function Get-ComputerInfos() {
+function Get-ComputerInfos {
+  param (
+    [string]$ComputerName
+  )
 
   $DiskOutput = Get-SMBMapping | Sort-Object | Select-Object LocalPath, RemotePath
 
   return @"
-Computer name:          $($env:COMPUTERNAME)
+ComputerName:           $($env:COMPUTERNAME)
 Domain:                 $($env:USERDOMAIN)
-Username:               $($env:USERNAME)
+IPAddress:              $(Resolve-DnsName -Type A -Name $env:computername | Select-Object -ExpandProperty IPAddress)
+UserName:               $($env:USERNAME)
 Version:                $([Environment]::OSVersion.VersionString)
 PSVersion:              $($PSVersionTable.PSVersion)
 $($DiskOutput | Out-String)
-IPAddress:              $(Resolve-DnsName -Type A -Name $env:computername | select -ExpandProperty IPAddress)
+
 "@
 }
 
-Get-ComputerInfos
+Get-ComputerInfos -ComputerName $env:COMPUTERNAME
+
