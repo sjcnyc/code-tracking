@@ -55,8 +55,6 @@ function Start-vMotionSessions {
   }
 }
 $Vms = @"
-gblusanavd8383
-gblusanavd8384
 gblusanavd8385
 gblusanavd8386
 usculvlbas203
