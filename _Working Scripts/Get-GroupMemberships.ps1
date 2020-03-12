@@ -51,9 +51,8 @@ function Get-ADGroupMemberships {
 }
 
 $Groups = @"
-USA-GBL ISI-Data MUSIC
-USA-GBL ISI-Data Music_RCA
-USA-GBL ISI-Data RMG_Masters
+USA-GBL ISI Music$ Rani
+USA-GBL ISI-Data RMG_Promotions
 "@ -split [System.Environment]::NewLine
 
 Get-ADGroupMemberships -Groups $Groups -Domain me -Export -Extension csv
