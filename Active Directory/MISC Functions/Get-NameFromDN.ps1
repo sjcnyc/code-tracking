@@ -4,8 +4,8 @@
     [System.String]
     $DN
   )
-  
-  return ($DN.replace('\','') -split ',*..=')[2]
-} 
 
-Get-NameFromDN  'CN=Group\, Name I Want,OU=Group Container,DC=corp,DC=test,DC=local'
+  return ($DN.replace('\','') -split ',*..=')[6]
+}
+
+Get-NameFromDN  'CN=Connealy\, Sean,OU=Employees,OU=Users,OU=GBL,OU=USA,OU=NA,OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com'
