@@ -55,19 +55,18 @@ function Start-vMotionSessions {
   }
 }
 $Vms = @"
-gblusanavd9101
-gblusanavd9102
-gblusanavd9103
-gblusanavd9104
-gblusanavd9105
-gblusanavd9106
-usculvwrdh201
-usculvwrdh202
-usculvwrdh203
-usculvwrdh204
-usculvwrdh205
-usculvwrds200
-usculvwsec209
+Usculvwjmp306
+Usculvwjmp307
+Usculvwjmp308
+Usculvwjmp309
+Usculvwsom011
+Usculvwsus010
+Usculvwsus011
+Usculvwutl011
+Usculvwutl012
+Usculvwweb013
+Usculvwweb014
+Usculvwwef010
 "@ -split [environment]::NewLine
 
-Start-vMotionSessions -VIServer "usculpwvctr101.me.sonymusic.com" -TargetDS "IsilonNewDR22" -VMs $Vms
+Start-vMotionSessions -VIServer "usculpwvctr101.me.sonymusic.com" -TargetDS "IsilonNewDR32" -VMs $Vms
