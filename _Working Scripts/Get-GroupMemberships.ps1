@@ -19,7 +19,7 @@ function Get-ADGroupMemberships {
     [System.String]$ReportName = "Report",
 
     [parameter(Position = 5)]
-    [System.String]$ReportDate = "_$(get-date -F 'MM-dd-yyy')",
+    [System.String]$ReportDate = "_$(get-date -F 'MM-dd-yyy')_1",
 
     [parameter(Position = 6)]
     [ValidateSet("csv", "pdf")]
@@ -31,7 +31,7 @@ function Get-ADGroupMemberships {
       BMG {"bmg.bagint.com"};
       ME  {"me.sonymusic.com"}
     }
-    $obj = $Groups | Get-ADGroup -Server $Domain -PipelineVariable Grp -Properties Name | Get-ADGroupMember |
+    $obj = $Groups | Get-ADGroup -Server bmg.bagint.com -PipelineVariable Grp -Properties Name | Get-ADGroupMember |
       Get-ADUser -Properties GivenName, SurName, SamaccountName, DistinguishedName |
       Select-Object -Property GivenName, SurName, SamaccountName, DistinguishedName, @{N = 'GroupName'; E = {$Grp.SamAccountName}}
     if ($Export) {
@@ -51,7 +51,7 @@ function Get-ADGroupMemberships {
 }
 
 $Groups = @"
-USA-GBL ISI-Data DROYALTY
+SME-WWI OU Administration
 "@ -split [System.Environment]::NewLine
 
-Get-ADGroupMemberships -Groups $Groups -Domain me -Export -Extension csv
+Get-ADGroupMemberships -Groups $Groups -Domain bmg -Export -Extension csv
