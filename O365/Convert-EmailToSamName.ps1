@@ -55,4 +55,4 @@ foreach ($user in $users) {
     Get-SamFromEmail -username $user  | select * # Export-Csv D:\Temp\users_for_mike2.csv -NoTypeInformation -Append
 }
 
-#skhfksdhfkhsdkfhssdfsdfsdfs
+#skhfksdhfkhsdkfhssdfs
