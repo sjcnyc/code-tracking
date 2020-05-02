@@ -5,9 +5,9 @@ function Get-ADGroupMemberships {
     [parameter(ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, Mandatory = $true, Position = 0)]
     [System.Array]$Groups,
 
-    [parameter(Mandatory = $true, Position = 1)]
-    [ValidateSet("BMG", "ME")]
-    [System.String]$Domain,
+    #[parameter(Mandatory = $true, Position = 1)]
+    #[ValidateSet("BMG", "ME")]
+    #[System.String]$Domain,
 
     [parameter(Position = 2)]
     [System.Management.Automation.SwitchParameter]$Export,
@@ -19,7 +19,7 @@ function Get-ADGroupMemberships {
     [System.String]$ReportName = "Report",
 
     [parameter(Position = 5)]
-    [System.String]$ReportDate = "_$(get-date -F 'MM-dd-yyy')_1",
+    [System.String]$ReportDate = "_$(get-date -format 'MM-dd-yyy')_1",
 
     [parameter(Position = 6)]
     [ValidateSet("csv", "pdf")]
@@ -27,11 +27,11 @@ function Get-ADGroupMemberships {
   )
 
   try {
-    switch ($Domain) {
-      BMG {"bmg.bagint.com"};
-      ME  {"me.sonymusic.com"}
-    }
-    $obj = $Groups | Get-ADGroup -Server bmg.bagint.com -PipelineVariable Grp -Properties Name | Get-ADGroupMember |
+  #  switch ($Domain) {
+  #    BMG {"bmg.bagint.com"};
+  #    ME  {"me.sonymusic.com"}
+  #  }
+    $obj = $Groups | Get-ADGroup -Server "me.sonymusic.com" -PipelineVariable Grp -Properties Name | Get-ADGroupMember |
       Get-ADUser -Properties GivenName, SurName, SamaccountName, DistinguishedName |
       Select-Object -Property GivenName, SurName, SamaccountName, DistinguishedName, @{N = 'GroupName'; E = {$Grp.SamAccountName}}
     if ($Export) {
@@ -51,7 +51,7 @@ function Get-ADGroupMemberships {
 }
 
 $Groups = @"
-SME-WWI OU Administration
+NYC-BW1540 App SBME Sales Forecasting Legacy Users
 "@ -split [System.Environment]::NewLine
 
-Get-ADGroupMemberships -Groups $Groups -Domain bmg -Export -Extension csv
+Get-ADGroupMemberships -Groups $Groups -Export -Extension pdf

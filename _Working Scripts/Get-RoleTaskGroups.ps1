@@ -17,4 +17,4 @@ function Get-RoleTaskGroups {
   }
 }
 
-Get-RoleTaskGroups -RoleGroups "T1_G_Country_AP_TWN_Local-IST-Role"
+Get-RoleTaskGroups -RoleGroups "T1_SRV_EU_ITA_MIL_L_Read_Server_LAPS"
