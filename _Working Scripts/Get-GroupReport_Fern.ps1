@@ -1,4 +1,5 @@
 using namespace System.Collections.Generic
+
 $groupList = [List[PSObject]]::new()
 
 $Splat = @{
@@ -11,7 +12,7 @@ $Groups = Get-ADGroup @Splat
 foreach ($Group in $Groups) {
   $PSobject = [pscustomobject]@{
     Name                    = $Group.Name
-    HasMembers              = if ($group.Members -gt 1) { 'True' }else { 'False'}
+    HasMembers              = $group.Members -ge 1 ? $true : $false # pwsh-7 ternary operator test
     WhenCreated             = $Group.whenCreated
     Modified                = $Group.Modified
     Protected               = $Group.ProtectedFromAccidentalDeletion
