@@ -16,7 +16,7 @@
   #loop 1.. whatever's in your round-robin
   ForEach ($null in 1..$Range) {
     try {
-      [Net.Dns]::GetHostEntry($Server) | Select-Object -Property Hostname, @{N = 'AddressList'; E = { $_.AddressList } }
+    $Results= [Net.Dns]::GetHostEntry($Server) | Select-Object -Property Hostname, @{N = 'AddressList'; E = { $_.AddressList } }
     }
     catch {
       Write-Verbose -Message "No DNS Name $Server"
@@ -26,4 +26,4 @@
 
 }
 
-Test-SmartConnect -server usstorage01.me.sonymusic.com -range 26
+Test-SmartConnect -server usstorage01.me.sonymusic.com -range 30

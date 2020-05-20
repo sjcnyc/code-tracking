@@ -34,13 +34,15 @@ function Get-NTFSPermissions {
                         'RulesProtected'   = $ACL.AreAccessRulesProtected
                     }
                 }
-                if ($GroupsOnly -eq $true) { $ObjectGroup } else {
+                if ($GroupsOnly -eq $true) {
+                    $ObjectGroup
+                } else {
                     $Groups = $ObjectGroup | Select-Object -ExpandProperty 'Identity' -ea 0
                     foreach ($Group in $Groups) {
                         if ($Group -like "$($Domain)\*") {
                             $grp = $Group.tostring()
                             $gp = $grp.replace("$($Domain)\", '')
-                            $Users = Get-ADGroupMember -Server "$($Domain).sonymusic.com" -Identity $gp  -Recursive -ea 0
+                            $Users = Get-QADGroupMember -Identity $gp -Indirect -ea 0 -SizeLimit 0
                             foreach ($User in $Users) {
                                 $Usr = $User | Select-Object -ExpandProperty 'sAMAccountName'
                                 $fname = $User | Select-Object -ExpandProperty 'Name'
@@ -65,15 +67,18 @@ function Get-NTFSPermissions {
     }
 }
 
-@"
-\\Storage.me.sonymusic.com\data$\RMG_Masters
-"@ -split [environment]::NewLine |
+#@"
+#\\Storage.me.sonymusic.com\data$\ACCT
+#"@ -split [environment]::NewLine |
 
-ForEach-Object -Process {
+$Folders = (Get-ChildItem -Directory \\storage.me.sonymusic.com\data$).Fullname
 
-    Get-NTFSPermissions -ShareName $_ -DomainName me |
+foreach ($Folder in $Folders) {
 
-    Export-Csv -Path d:\temp\SecurityReport_NTFS4.csv -NoTypeInformation -Append
+    Get-NTFSPermissions -ShareName $Folder -DomainName me |
+    Select-Object DirectoryPath, Group, Username |
+    Export-Csv D:\Temp\ShareReport_Data_users_full4.csv -Append
 }
 
-# Export-Csv -Path 'C:\temp\_poshReports\$Name.csv' -NoTypeInformation
+
+Get-NTFSPermissions -ShareName "\\storage.me.sonymusic.com\data$\ACCT" -DomainName me -GroupsOnly
