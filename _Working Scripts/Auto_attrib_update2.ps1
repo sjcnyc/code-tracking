@@ -1,11 +1,11 @@
-$path = "D:\Dropbox\Development\AzureDevOps\POWERSHELL\Projects\ADUAttributeUpdater"
-#$path = "C:\Users\sjcny\Dropbox\Development\AzureDevOps\POWERSHELL\Projects\ADUAttributeUpdater"
+#$path = "D:\Dropbox\Development\AzureDevOps\POWERSHELL\Projects\ADUAttributeUpdater"
+$path = "C:\Users\sjcny\Dropbox\Development\AzureDevOps\POWERSHELL\Projects\ADUAttributeUpdater"
 $Data = Import-Csv -Path $path\Config\user.csv
 $CountryJson = Get-Content -Path $path\Config\CountryCodes.json -Encoding Default | ConvertFrom-Json
 
 try {
   foreach ($User in $Data) {
-    $UserExists = (Get-ADUser -Identity $User.sAMAccountName -ErrorAction Stop).sAMAccountName
+    $UserExists = $true  #(Get-ADUser -Identity $User.sAMAccountName -ErrorAction Stop).sAMAccountName
     if ($UserExists) {
       $Attributes = @{ }
       $User.psobject.properties.Where{ ![String]::IsNullOrWhiteSpace($_.Value) } |
