@@ -1,3 +1,4 @@
+
 class BackgroundJob {
   # Properties
   hidden $PowerShell = [powershell]::Create()
@@ -76,12 +77,13 @@ class BackgroundJob {
   }
 }
 
-$ComputerName = "usnaspwfs01", "usbvhpwfs01", "usmiapwfs02"
+$ComputerName = "usnycplsyn001", "usnasplsyn001", "usclvplsyn001", "usculplsyn001"
 $Count = 2
 
 $Code = {
   Param($ComputerName, $Count)
-  Ping-Computers -ComputerName $ComputerName -Count $Count
+  Ping-Computers -ComputerName $ComputerName -Count $Count |
+    Select-Object Destination, Address, Ping, Latency, BufferSize, Status
 }
 
 $Job = [BackgroundJob]::New($Code, @($ComputerName, $Count), "Function:\Ping-Computers")
@@ -92,19 +94,22 @@ $Job.Remove() #>
 
 # Create multiple jobs
 $Jobs = @{
-  Job1 = [BackgroundJob]::New( {Test-Connection -ComputerName usnaspwfs01 -Count 1})
-  Job2 = [BackgroundJob]::New( {Test-Connection -ComputerName usbvhpwfs01 -Count 1})
-  Job3 = [BackgroundJob]::New( {Test-Connection -ComputerName usmiapwfs02 -Count 1})
+  Job1 = [BackgroundJob]::New( {Test-Connection -ComputerName usnycplsyn001 -Count 2})
+  Job2 = [BackgroundJob]::New( {Test-Connection -ComputerName usnasplsyn001 -Count 2})
+  Job3 = [BackgroundJob]::New( {Test-Connection -ComputerName usclvplsyn001 -Count 2})
+  Job4 = [BackgroundJob]::New( {Test-Connection -ComputerName usculplsyn001 -Count 2})
 }
 
 # Start each job
-$Jobs.GetEnumerator() | ForEach-Object {
-  $_.Value.Start()
+$Jobs.GetEnumerator() |
+  ForEach-Object {
+    $_.Value.Start()
 }
 
-# Wait for the results
+#  Wait for the results
 Do {}
-Until (($Jobs.GetEnumerator() | ForEach-Object {$_.Value.GetStatus().State}) -notcontains "Running")
+Until (($Jobs.GetEnumerator() |
+  ForEach-Object {$_.Value.GetStatus().State}) -notcontains "Running")
 
 # Output the results
 $Jobs.GetEnumerator() | ForEach-Object {$_.Value.Receive()}

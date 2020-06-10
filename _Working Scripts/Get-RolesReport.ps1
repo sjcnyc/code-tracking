@@ -38,7 +38,7 @@ function Get-RolesReport {
       UserName           = "$($User.Name)"
       RoleAssignments    = "$((@($Groups | Where-Object {$_ -like "*-Role"}) | Out-String).trim())"
       NonRoleAssignments = "$((@($Groups | Where-Object {$_ -notlike "*-Role" -and $_ -notlike "Admin_Tier-*_Users" -and $_ -notlike "tier-0_Users"}) | Out-String).trim())"
-      InTierGroup        = "$(if($Groups | Where-Object {$_ -like "Admin_Tier-*_Users" -or $_ -like "Tier-0_Users"}){$true}else{$false})"
+      InTierGroup        = ($Groups | Where-Object {$_ -like "Admin_Tier-*_Users" -or $_ -like "Tier-0_Users"}) ? $true : $false
       LastLogonTimeStamp = ([datetime]::FromFileTime($User.LastLogonTimestamp))
       Enabled            = "$($User.enabled)"
     }
