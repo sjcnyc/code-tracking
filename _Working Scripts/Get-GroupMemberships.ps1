@@ -5,10 +5,6 @@ function Get-ADGroupMemberships {
     [parameter(ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, Mandatory = $true, Position = 0)]
     [System.Array]$Groups,
 
-    #[parameter(Mandatory = $true, Position = 1)]
-    #[ValidateSet("BMG", "ME")]
-    #[System.String]$Domain,
-
     [parameter(Position = 2)]
     [System.Management.Automation.SwitchParameter]$Export,
 
@@ -27,11 +23,7 @@ function Get-ADGroupMemberships {
   )
 
   try {
-  #  switch ($Domain) {
-  #    BMG {"bmg.bagint.com"};
-  #    ME  {"me.sonymusic.com"}
-  #  }
-    $obj = $Groups | Get-ADGroup -Server "me.sonymusic.com" -PipelineVariable Grp -Properties Name | Get-ADGroupMember |
+    $obj = $Groups | Get-ADGroup -PipelineVariable Grp -Properties Name | Get-ADGroupMember |
       Get-ADUser -Properties GivenName, SurName, SamaccountName, DistinguishedName |
       Select-Object -Property GivenName, SurName, SamaccountName, DistinguishedName, @{N = 'GroupName'; E = {$Grp.SamAccountName}}
     if ($Export) {
@@ -51,7 +43,11 @@ function Get-ADGroupMemberships {
 }
 
 $Groups = @"
-NYC-BW1540 App SBME Sales Forecasting Legacy Users
+T1_App_Global_G_Jamf_Admin
+T1_App_Global_G_Jamf_Admin_FullAccess
+T1_App_Global_G_Jamf_Auditor_ReadOnly
+T1_App_Global_G_Jamf_DesktopTechnicians
+T1_App_Global_G_Jamf_ServiceDesk
 "@ -split [System.Environment]::NewLine
 
-Get-ADGroupMemberships -Groups $Groups -Export -Extension pdf
+Get-ADGroupMemberships -Groups $Groups -Export -Extension csv

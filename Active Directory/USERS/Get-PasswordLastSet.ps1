@@ -51,10 +51,10 @@
 				pagesize  = '2000'
 				dontusedefaultincludedproperties = $true
 				includedproperties = $QADprops
-				searchroot = $ou -split',' | ForEach-Object { "bmg.bagint.com/$($ou)" }	
+        searchroot         = "OU=Users,OU=GBL,OU=USA,OU=NA,OU=ADM,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
 			}
       
-      $results = Get-QADUser @QADparams |  
+      $results = Get-QADUser @QADparams |
       Where-Object {
         $_.pwdLastSet -lt $pwdDate
       } | 
@@ -69,7 +69,7 @@
 				}
 			}
       if ($export) {  
-        $results | Export-Csv (Get-RandomName -drive c:\temp -Filename PasswortLastSetReport) -NoTypeInformation -Append
+        $results | Export-Csv (Get-RandomName -drive d:\temp -Filename PasswortLastSetReport) -NoTypeInformation -Append
       }
       else {
         $results

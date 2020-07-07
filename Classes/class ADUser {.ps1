@@ -43,8 +43,8 @@ class ADUser {
       'Title'
     )
     try {
-      $P = Get-ADUser $Username -Properties $Properties | Select $Properties
-      $Properties | foreach {
+      $P = Get-ADUser $Username -Properties $Properties | Select-Object $Properties
+      $Properties | ForEach-Object {
         $this.$_ = $P.$_
       }
     }
