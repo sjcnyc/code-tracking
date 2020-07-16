@@ -30,23 +30,12 @@ function Get-SamFromEmail {
 }
 
 $users = @"
-amy.ceitinn@sonymusic.com
-bella.alias@sonymusic.com
-billiebonita.schmidt@sonymusic.com
-Carla.vasquez@sonymusic.com
-hannah.marsh@sonymusic.com
-helena.hewitt@sonymusic.com
-james.marcus@sonymusic.com
-jasmine.aguilar@sonymusic.com
-laura.cruciani@sonymusic.com
-manny.vallarino@sonymusic.com
-matheus.baez@sonymusic.com
-melissa.robson@sonymusic.com
-pedro.costa@sonymusic.com
-rahul.joseph@sonymusic.com
-ruwan.kodikara@sonymusic.com
-steven.wang@sonymusic.com
-timaj.sukker@sonymusic.com
+amy.song@sonymusic.com
+esther.park@sonymusic.com
+laura.hand@sonymusic.com
+laura.wynne@sonymusic.com
+natalie.davis@sonymusic.com
+stephen.jang@sonymusic.com
 "@ -split [environment]::NewLine
 
 $users = foreach ($user in $users) {

@@ -35,4 +35,4 @@ foreach ($user in $users) {
 $userList | Select-Object username
 
 
-# ? Get-ADUser -filter "employeeNumber -eq ""$Currentid"""
+# ? Get-ADUser -filter "employeeNumber -eq ""$Currentid""" dsdsd
