@@ -49,3 +49,5 @@ ALBE060
 
   Test-IsUserInAD $_ -Domain me.sonymusic.com | Export-Csv D:\Temp\Nash_home_shares_InAD.csv -NoTypeInformation -Append
 }
+
+# test sync
