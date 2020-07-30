@@ -10,3 +10,8 @@ while ($true) {
 }
 
 # sync
+
+
+$user = "sconnea"
+
+$user
