@@ -24,3 +24,9 @@ $mbxUser | Get-MailboxPermission |
 $result | Export-Csv C:\Temp\mbxPermsWNS3.csv -NoTypeInformation
 
 Get-Mailbox -ResultSize Unlimited | Where-Object {$true} -PipelineVariable mb | Get-MailboxPermission | Select-Object User, @{N = 'Displayname'; E = {$mb.DisplayName}}, Identity, @{N = 'UserPrincipalName'; E = {$mb.UserPrincipalName}}, @{N = 'AccessRights'; E = {($_.AccessRights | Out-String).Trim()}}
+
+
+Get-Mailbox -ResultSize Unlimited | Where-Object { $true } -PipelineVariable mb |
+    Get-MailboxPermission -PipelineVariable mbs | Where-Object { $true } -PipelineVariable mbs
+    Get-ADUser -Identity $mb.DistinguishedName |
+    Select-Object DisplayName, DistinguishedName, Title, @{N='UserPrincipalName';E={$mb.UserPrincipalName}}, @{N='TotalItemSize';E={$mbs.TotalItemSize}}

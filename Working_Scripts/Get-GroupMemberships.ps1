@@ -43,11 +43,7 @@ function Get-ADGroupMemberships {
 }
 
 $Groups = @"
-T1_App_Global_G_Jamf_Admin
-T1_App_Global_G_Jamf_Admin_FullAccess
-T1_App_Global_G_Jamf_Auditor_ReadOnly
-T1_App_Global_G_Jamf_DesktopTechnicians
-T1_App_Global_G_Jamf_ServiceDesk
+NYC-BW1540 App SBME Sales Forecasting Legacy Users
 "@ -split [System.Environment]::NewLine
 
-Get-ADGroupMemberships -Groups $Groups -Export -Extension csv
+Get-ADGroupMemberships -Groups $Groups -Export -Extension pdf

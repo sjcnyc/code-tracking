@@ -13,3 +13,14 @@ function Test-ADCredential {
 }
 
 Test-ADCredential
+
+
+function Test-Password {
+  param (
+    [string]$userName,
+    [string]$password,
+    [string]$Domain = "CORP"
+  )
+  $principalContext = New-Object System.DirectoryServices.AccountManagement.PrincipalContext([System.DirectoryServices.AccountManagement.ContextType]::Domain, $Domain)
+  $principalContext.ValidateCredentials($userName, $password)
+}

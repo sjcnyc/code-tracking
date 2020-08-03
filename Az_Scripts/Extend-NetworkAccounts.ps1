@@ -41,3 +41,22 @@ $getAzStorageBlobSplat = @{
 }
 
 Get-AzStorageBlob @getAzStorageBlobSplat
+
+
+
+
+
+$startCopyAzureStorageBlobSplat = @{
+    Context       = $SourceStorageContext
+    SrcContainer  = $containerName
+    SrcBlob       = $Blob.Name
+    DestContext   = $DestStorageContext
+    DestContainer = $containerName
+    DestBlob      = $Blob.Name
+}
+
+Start-CopyAzureStorageBlob @startCopyAzureStorageBlobSplat
+
+
+$invoice = '2020-10-26 00:00:00'
+[datetime]::parseexact($invoice, 'yyyy-MM-dd HH:mm:ss', $null)
