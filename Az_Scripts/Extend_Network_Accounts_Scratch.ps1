@@ -2,21 +2,9 @@ Import-Module Az
 $ConnectionString = "DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=sa01sftx3406815508;AccountKey=2u6z1WymVz3kYLZZa+xHsLdZSvDYQLXVMN/V27TMUgQe6XKE2bUYyVySBjvC5ps0XHo/nsqSRjufyScGVg7f4Q=="
 $SourceStorageContext = New-AzStorageContext -ConnectionString $ConnectionString
 
-$ContainerName = "con01-sf-dropoff"
+$ContainerName = "con01-sf-archive"
 
-$archiveContainer = "con01-sf-archive"
-
-#Uploading File
-$BlobName = "Comps.csv"
-$localFile = "D:\temp\" + $BlobName
-
-#Note the Force switch will overwrite if the file already exists in the Azure container
-Set-AzStorageBlobContent -File $localFile -Container $archiveContainer -Blob $BlobName -Context $SourceStorageContext -Force
-
-
-#Download File
-#$BlobName = "00283924_07282020_1459.xml"
-#$localTargetDirectory = "D:\temp"
+#$archiveContainer = "con01-sf-archive"
 
 
 $Blobs = (Get-AzStorageBlob -Container $containerName -Context $SourceStorageContext).Where{ $_.ContentType -eq "application/xml" -and $_.name -like "00*"} #| Select-Object Name
@@ -59,10 +47,11 @@ foreach ($XMLFile in $LocalBlobs) {
 
 $tickets
 
+$archiveContanier = "con01-sf-archive"
 
 #Get-AzStorageBlobContent -Blob $BlobName -Container $ContainerName -Destination $localTargetDirectory -Context $SourceStorageContext
 
-#$Blobs = Get-AzStorageBlob -Container $ContainerName -Context $SourceStorageContext -Blob $BlobName | Select-Object Name, BlobType, Length, ContentType, LastModified
+Get-AzStorageBlob -Container $archiveContanier -Context $SourceStorageContext -Blob $BlobName | Select-Object Name, BlobType, Length, ContentType, LastModified
 
 #Write-Output $Blobs
 
@@ -115,3 +104,12 @@ $EmailParams = @{
 }
 
   Send-MailMessage @EmailParams
+
+
+
+#Uploading File
+#$BlobName = "Comps.csv"
+#$localFile = "D:\temp\" + $BlobName
+
+#Note the Force switch will overwrite if the file already exists in the Azure container
+#Set-AzStorageBlobContent -File $localFile -Container $archiveContainer -Blob $BlobName -Context $SourceStorageContext -Force

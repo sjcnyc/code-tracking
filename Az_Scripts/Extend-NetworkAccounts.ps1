@@ -6,8 +6,8 @@ $Ctx = New-AzStorageContext -ConnectionString $ConnectionString
 $ContainerName = "con01-sf-dropoff"
 
 #Uploading File
-$BlobName = "Comps.csv"
-$localFile = "D:\temp\" + $BlobName
+$BlobName = "00283930_08032020_1413.xml"
+$localFile = "D:\" + $BlobName
 
 #Note the Force switch will overwrite if the file already exists in the Azure container
 $setAzStorageBlobContentSplat = @{
