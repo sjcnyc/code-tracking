@@ -25,13 +25,14 @@ elseif (($computername -ne $env:computername) -and (Test-Connection -ComputerNam
 
 $versionMinimum = [Version]'5.1.99999.999'
 
-if ($versionMinimum -lt $PSVersionTable.PSVersion)
-{ throw "This script requires PowerShell $versionMinimum" }
+if ($versionMinimum -lt $PSVersionTable.PSVersion) {
+  "This script cannot be run on PS v6 or greater."
+  "Running PowerShell $($PSVersionTable.PSVersion)."
 
-"Requires version $versionMinimum"
-"Running PowerShell $($PSVersionTable.PSVersion)."
+  break
+}
 
-break
+
 
 if ($OK) {
   try {
