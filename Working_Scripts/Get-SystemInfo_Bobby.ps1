@@ -23,6 +23,16 @@ elseif (($computername -ne $env:computername) -and (Test-Connection -ComputerNam
   $OK = $True
 }
 
+$versionMinimum = [Version]'5.1.99999.999'
+
+if ($versionMinimum -lt $PSVersionTable.PSVersion)
+{ throw "This script requires PowerShell $versionMinimum" }
+
+"Requires version $versionMinimum"
+"Running PowerShell $($PSVersionTable.PSVersion)."
+
+break
+
 if ($OK) {
   try {
     $os = Get-WmiObject Win32_operatingSystem -ComputerName $computername -ErrorAction Stop
@@ -30,6 +40,7 @@ if ($OK) {
   }
   catch {
     Write-Warning "WMI failed to connect to $($computername.ToUpper())"
+    break
   }
  
   if ($wmi) {
