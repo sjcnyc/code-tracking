@@ -8,7 +8,7 @@ $remotecode =
 {
     param($Code)
     $job = Start-Job ([ScriptBlock]::Create($Code)) -Name Job1
-    $null = Wait-Job $job 
+    $null = Wait-Job $job
     Receive-Job -Name Job1
     Remove-Job -Name Job1
 }

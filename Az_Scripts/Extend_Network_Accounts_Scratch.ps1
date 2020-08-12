@@ -2,12 +2,11 @@ Import-Module Az
 $ConnectionString = "DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=sa01sftx3406815508;AccountKey=2u6z1WymVz3kYLZZa+xHsLdZSvDYQLXVMN/V27TMUgQe6XKE2bUYyVySBjvC5ps0XHo/nsqSRjufyScGVg7f4Q=="
 $SourceStorageContext = New-AzStorageContext -ConnectionString $ConnectionString
 
-$ContainerName = "con01-sf-archive"
-
+$ContainerName = "con01-sf-dropoff"
 #$archiveContainer = "con01-sf-archive"
 
 
-$Blobs = (Get-AzStorageBlob -Container $containerName -Context $SourceStorageContext).Where{ $_.ContentType -eq "application/xml" -and $_.name -like "00*"} #| Select-Object Name
+$Blobs = (Get-AzStorageBlob -Container $containerName -Context $SourceStorageContext) #.Where{ $_.ContentType -eq "application/xml" -and $_.name -like "00*"} #| Select-Object Name
 
 
 foreach ($Blob in $Blobs) {

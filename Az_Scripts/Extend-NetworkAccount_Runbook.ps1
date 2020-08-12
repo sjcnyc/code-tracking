@@ -1,15 +1,15 @@
 Import-Module Az
 $ErrorActionPreference = "Continue"
-$ADUser                = $null
-$LocalXMLPath          = "D:\ExtNetAcctLogs"
-$TicketPath            = "$($LocalXMLPath)\Tickets"
-$LogPath               = "$($LocalXMLPath)\Logs"
-$LogName               = "UpdatedAccountsLog.csv"
-$ConnectionString      = "DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=sa01sftx3406815508;AccountKey=2u6z1WymVz3kYLZZa+xHsLdZSvDYQLXVMN/V27TMUgQe6XKE2bUYyVySBjvC5ps0XHo/nsqSRjufyScGVg7f4Q=="
-$SourceStorageContext  = New-AzStorageContext -ConnectionString $ConnectionString
-$SrcContainer          = "con01-sf-dropoff"
+$ADUser = $null
+$LocalXMLPath = "D:\ExtNetAcctLogs"
+$TicketPath = "$($LocalXMLPath)\Tickets"
+$LogPath = "$($LocalXMLPath)\Logs"
+$LogName = "UpdatedAccountsLog.csv"
+$ConnectionString = "DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=sa01sftx3406815508;AccountKey=2u6z1WymVz3kYLZZa+xHsLdZSvDYQLXVMN/V27TMUgQe6XKE2bUYyVySBjvC5ps0XHo/nsqSRjufyScGVg7f4Q=="
+$SourceStorageContext = New-AzStorageContext -ConnectionString $ConnectionString
+$SrcContainer = "con01-sf-dropoff"
 #$DestContainer         = "con01-sf-archive"
-$Cred                  = Get-AutomationPSCredential -Name 'T2_Cred'
+$Cred = Get-AutomationPSCredential -Name 'T2_Cred'
 
 $Blobs = Get-AzStorageBlob -Container $SrcContainer -Context $SourceStorageContext | Where-Object { $_.name -like "00*" }
 
@@ -28,7 +28,7 @@ if ($Blobs) {
 
     Get-AzStorageBlobContent @getAzStorageBlobContentSplat -Force
 
-<#     $startAzStorageBlobCopySplat = @{
+    <#     $startAzStorageBlobCopySplat = @{
       SrcBlob       = $Blob.Name
       Context       = $SourceStorageContext
       SrcContainer  = $SrcContainer
@@ -114,7 +114,7 @@ ExpiresDate: $($ExpiresDate)
           Scriptexecution   = (Get-Date).ToString('MM/dd/yyyy HH:mm:ss tt')
         }
 
-        $UserObject | Export-CSV "$($LogPath)\$($LogName)" -NoType -Append
+        $UserObject | Export-Csv "$($LogPath)\$($LogName)" -NoType -Append
 
         $ADUser = $null
       }

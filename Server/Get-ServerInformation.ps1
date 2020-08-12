@@ -28,20 +28,17 @@ function script:Get-SystemInfo {
     [String[]]$ComputerName = ($Env:COMPUTERNAME),
     [Parameter(Position = 1)]
     [PSCredential]$Credential,
-    [ValidateScript({Test-Path -Path $_})]
+    [ValidateScript( { Test-Path -Path $_ })]
     [String]$LogDir = "$Home\Documents"
   )
-  Begin
-  {
+  Begin {
     Write-Verbose -Message 'Retrieving Computer Info . . .'
-    if ($Credential)
-    {
+    if ($Credential) {
       $PSDefaultParameterValues = $Global:PSDefaultParameterValues.Clone()
       $PSDefaultParameterValues['Get-WmiObject:Credential'] = $Credential  
     }
   }
-  Process
-  {
+  Process {
 
     $result = New-Object System.Collections.ArrayList
 
@@ -64,25 +61,24 @@ function script:Get-SystemInfo {
       Out-String
       $Network = (Get-WmiObject -Class win32_NetworkAdapterConfiguration -ComputerName $_  |
         ForEach-Object -Process { $_.DefaultIPGateway } |
-      Out-String).Split("`n")[0]
+        Out-String).Split("`n")[0]
       $CPU = @(Get-WmiObject -Class Win32_Processor -ComputerName $_ )[0]
 
       if (($os -eq $Null) -and ($sys -eq $Null) -and ($bios -eq $Null))
-      {$_ | Out-File -FilePath $LogDir\nowmiHosts.txt -NoClobber -Append}
-      if ($os.LastBootupTime){$LastBoot = $os.ConvertToDateTime($os.LastBootupTime)}
-      if ($os.InstallDate){$InstallDate = $os.ConvertToDateTime($os.InstallDate)}
-      if ($sys.Name){$CompName = $sys.Name.toUpper()}
-      if ($sys.TotalPhysicalMemory){$Memory = ($sys.TotalPhysicalMemory)/1MB -as [int]}
-      if ($Volume){$Volume = $Volume.Substring(2,$Volume.length-9)}
-      else
-      {
+      { $_ | Out-File -FilePath $LogDir\nowmiHosts.txt -NoClobber -Append }
+      if ($os.LastBootupTime) { $LastBoot = $os.ConvertToDateTime($os.LastBootupTime) }
+      if ($os.InstallDate) { $InstallDate = $os.ConvertToDateTime($os.InstallDate) }
+      if ($sys.Name) { $CompName = $sys.Name.toUpper() }
+      if ($sys.TotalPhysicalMemory) { $Memory = ($sys.TotalPhysicalMemory) / 1MB -as [int] }
+      if ($Volume) { $Volume = $Volume.Substring(2, $Volume.length - 9) }
+      else {
         $Volume = @"
 Get-VolumeWin32
 "@
       }
 
-      if ($PageFile){$PageFile = $PageFile.Substring(1,$PageFile.length-5)}
-      else {$PageFile = 'Automatic'}
+      if ($PageFile) { $PageFile = $PageFile.Substring(1, $PageFile.length - 5) }
+      else { $PageFile = 'Automatic' }
 
       #$info=
       [PSCustomObject][Ordered]@{
@@ -110,7 +106,7 @@ Get-VolumeWin32
       #$result.Add($info) | Out-Null
     }
 
-   # $result | Out-File -FilePath c:\temp\wusDiskSpace.txt -Append -Force
+    # $result | Out-File -FilePath c:\temp\wusDiskSpace.txt -Append -Force
   }
 }
 
@@ -134,33 +130,33 @@ function script:Get-VolumeWin32 {
       $Computer = $_
       Write-Verbose -Message "Connecting to:--> $Computer"
       Get-WmiObject -Query $Query -Namespace $NameSpace -ComputerName $Computer |
-      Where-Object -FilterScript {$_.name -notmatch '\\\\' -and $_.DriveType -eq '3'} |
-      ForEach-Object -Process {$RAW = $_ |
+      Where-Object -FilterScript { $_.name -notmatch '\\\\' -and $_.DriveType -eq '3' } |
+      ForEach-Object -Process { $RAW = $_ |
         Select-Object -Property SystemName, Name, DriveType, VolumeName, Size, FreeSpace 
         Write-Verbose -Message $RAW 
         $_
       } |
       Select-Object -Property SystemName, Name, VolumeName, DriveType, `
       @{
-        name       = 'CapacityGB'
-        Expression = {'{0:N2}'  -f ($_.size / 1gb)}
+        name       = 'Capacity(GB)'
+        Expression = { '{0:N2}' -f ($_.size / 1gb) }
       }, `
       @{
-        name       = 'UsedGB'
-        Expression = {'{0:N2}'  -f ($($_.size-$_.freespace) / 1gb)}
+        name       = 'Used(GB)'
+        Expression = { '{0:N2}' -f ($($_.size - $_.freespace) / 1gb) }
       }, `
       @{
-        name       = 'FreeGB'
-        Expression = {'{0:N2}'  -f ($_.freespace / 1gb)}
+        name       = 'Free(GB)'
+        Expression = { '{0:N2}' -f ($_.freespace / 1gb) }
       }, `
       @{
-        name       = 'FreePC'
-        Expression = {'{0:N2}'  -f ($_.freespace / $_.size * 100)}
-    }} | 
+        name       = 'Free(%)'
+        Expression = { '{0:N2}' -f ($_.freespace / $_.size * 100) }
+      } } | 
     Sort-Object -Property SystemName, Name
   } 
   End {}
 }
 
 
-get-systeminfo -ComputerName usnaspwfs01 -Verbose
+get-systeminfo -ComputerName "kohi-tiny" -Verbose

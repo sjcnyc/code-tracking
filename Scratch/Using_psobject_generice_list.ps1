@@ -1,6 +1,22 @@
 using namespace System.Collections.Generic
-$Users = [List[PSObject]]::new()
 
-$Users = 1
+$List = [List[PSObject]]::new()
 
-$Users
+foreach ($item in $items) {
+  $Obj = [pscustomobject]@{
+    foo = $foo
+    bar = $bar
+  }
+  [void]$List.Add($Obj)
+}
+
+
+
+
+
+$result = foreach ($item in $array) {
+  [pscustomobject][ordered]@{
+    foo = $foo
+    bar = $item.bar
+  }
+}
