@@ -98,7 +98,7 @@ if ($OK) {
     $pctFree = [math]::Round(($os.FreePhysicalMemory / $os.TotalVisibleMemorySize) * 100, 2)
     # Top 10 Memory Utilization
     Write-Host "...Memory TOP 10" -ForegroundColor Cyan
-    $memTop10 = (Get-WmiObject -ComputerName $Computername Win32_Process | Sort-Object WorkingSetSize -Descending | Select-Object Name, CommandLine, @{n = "Private Memory(mb)"; Expression = { [math]::round(($_.WorkingSetSize / 1mb), 2) } } | Select-Object -First 10 | Format-Table -AutoSize | Out-String) + [environment]::NewLine
+    $memTop10 = (Get-WmiObject -ComputerName $Computername Win32_Process | Sort-Object WorkingSetSize -Descending | Select-Object Name, @{n = "Private Memory(mb)"; Expression = { [math]::round(($_.WorkingSetSize / 1mb), 2) } } | Select-Object -First 10 | Format-Table -AutoSize | Out-String) + [environment]::NewLine
 
     if ($pctFree -ge 45) {
       $Status = "OK"
@@ -155,7 +155,7 @@ if ($OK) {
     $applog = Get-WinEvent -ComputerName $Computername -FilterHashtable @{
       logname = "application"; level = 2, 3; starttime = $last
     } -ErrorAction 0 
-    $applogdata = ($applog | Select-Object id, timecreated, message  | Format-List | Out-String) + [environment]::NewLine
+    $applogdata = ($applog | Select-Object id, timecreated, message | Format-List | Out-String) + [environment]::NewLine
   }
 
   $SysInfoProps.Add("System Summary" + [environment]::NewLine)
@@ -195,6 +195,5 @@ if ($OK) {
   & notepad.exe "$($LogPath)\$($LogName)"
 }
 else {
-  #can't ping computer so fail
   Write-Warning "Failed to ping $computername"
 }
