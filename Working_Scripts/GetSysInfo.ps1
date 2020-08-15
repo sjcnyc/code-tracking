@@ -1,4 +1,57 @@
-﻿[cmdletbinding(DefaultParameterSetName = "object")]
+﻿<#PSScriptInfo
+
+.NAME GetSysInfo.ps1
+
+.VERSION 1.3.0
+
+.GUID d5033d8e-237f-42dc-84b7-6d2d20605e9f
+
+.AUTHOR Sean Connealy. https://dev.azure.com/sjcnyc
+
+.COMPANYNAME Sony Music
+
+.COPYRIGHT 2020
+
+.DATE 8/12/2020
+
+.RELEASENOTES
+Change Log:
+1.0.0 - Initial Version
+1.1.0 - Construct WMI calls
+1.2.0 - Added System.Collections.Generic.List
+1.3.0 - Export object to formatted list
+#>
+ 
+<#
+.SYNOPSIS
+Create System Report for the local computer to aid in trouble shooting issues.
+.DESCRIPTION
+Create a system status report with information gathered from WMI.
+.PARAMETER Computername
+The name of the computer to query. The default is the localhost.
+.PARAMETER Hours
+The number of hours to search for errors and warnings.
+The default is 24.
+.PARAMETER LogPath
+The path for the log file output E.g. $env:Temp
+.PARAMETER LogName
+The name of the log file
+.EXAMPLE
+PS C:\Scripts\> .\GetSysInfo.ps1
+Run a system report for the local computer, and export log file to $env:TEMP (C:\Users\<user>\AppData\Local\Temp).
+.Example
+PS C:\Scripts\> .\GetSysInfo.ps1 -LogPath c:\Temp
+Run a system report for the local computer, and export log file to C:\Temp.
+.Example
+PS C:\Scripts\> .\GetSysInfo.ps1 -hours 24
+Run a system report for the local computer and get last 24 hours of event log information..
+.INPUTS
+String
+.OUTPUTS
+Custom object
+#>
+
+[cmdletbinding(DefaultParameterSetName = "object")]
 
 param(
 
@@ -57,7 +110,9 @@ if ($OK) {
       @{Name = "ServicePack"; Expression = { $_.CSDVersion } },
       free*memory, totalv*, NumberOfProcesses,
       @{Name = "LastBoot"; Expression = { $_.ConvertToDateTime($_.LastBootupTime) } },
-      @{Name = "Uptime"; Expression = { (Get-Date) - ($_.ConvertToDateTime($_.LastBootupTime)) } } | Out-String).Trim()
+      @{Name = "Uptime"; Expression = { (Get-Date) - ($_.ConvertToDateTime($_.LastBootupTime)) } } |
+      Out-String
+    ).Trim()
 
     # Computer system
     Write-Host "...Computer System" -ForegroundColor Cyan
@@ -71,7 +126,8 @@ if ($OK) {
 
     # Get services set to auto start that are not running
     $failedAutoStart = $wmiservices | Where-Object { ($_.startmode -eq "Auto") -AND ($_.state -ne "Running") } |
-    Select-Object Name, Displayname, StartMode, State | Format-Table -AutoSize | Out-String
+    Select-Object Name, Displayname, StartMode, State | 
+    Format-Table -AutoSize | Out-String
 
     # Disk Utilization
     Write-Host "...Logical Disks" -ForegroundColor Cyan
@@ -79,26 +135,46 @@ if ($OK) {
     $diskData = ($disks | Select-Object DeviceID,
       @{Name = "SizeGB"; Expression = { $_.size / 1GB -as [int] } },
       @{Name = "FreeGB"; Expression = { "{0:N2}" -f ($_.Freespace / 1GB) } },
-      @{Name = "PercentFree"; Expression = { "{0:P2}" -f ($_.Freespace / $_.Size) } } | Format-Table -AutoSize | Out-String)
+      @{Name = "PercentFree"; Expression = { "{0:P2}" -f ($_.Freespace / $_.Size) } } | 
+      Format-Table -AutoSize | 
+      Out-String
+    )
 
     # CPU Utilization
     Write-Host "...CPU" -ForegroundColor Cyan
     $totalRam = (Get-CimInstance Win32_PhysicalMemory | Measure-Object -Property capacity -Sum).Sum
     $cpuTime = (Get-Counter '\Processor(_Total)\% Processor Time').CounterSamples.CookedValue
     $availMem = (Get-Counter '\Memory\Available MBytes').CounterSamples.CookedValue
-    $cpuUtil = ($cpuTime.ToString("#,0.000") + '%, Avail. Mem.: ' + $availMem.ToString("N0") + 'MB (' + (104857600 * $availMem / $totalRam).ToString("#,0.0") + '%)' | Out-String) + [environment]::NewLine
+    $cpuUtil = (
+      $cpuTime.ToString("#,0.000") + '%, Avail. Mem.: ' + $availMem.ToString("N0") + 'MB (' + (104857600 * $availMem / $totalRam).ToString("#,0.0") + '%)' | 
+      Out-String
+    ) + [environment]::NewLine
 
     # Top 10 CPU Utilization
     Write-Host "...CPU TOP 10" -ForegroundColor Cyan
-    $cputop10 = (Get-WmiObject -ComputerName $Computername Win32_PerfFormattedData_PerfProc_Process | Sort-Object PercentProcessorTime -desc | Select-Object Name, PercentProcessorTime | Select-Object -First 10 | Format-Table -auto | Out-String) + [environment]::NewLine
+    $cputop10 = (
+      Get-WmiObject -ComputerName $Computername Win32_PerfFormattedData_PerfProc_Process | 
+      Sort-Object PercentProcessorTime -desc | 
+      Select-Object Name, PercentProcessorTime | 
+      Select-Object -First 10 | 
+      Format-Table -auto | 
+      Out-String
+    ) + [environment]::NewLine
 
     # Memory Utilization
     Write-Host "...Memory" -ForegroundColor Cyan
     $os = Get-CimInstance Win32_OperatingSystem
     $pctFree = [math]::Round(($os.FreePhysicalMemory / $os.TotalVisibleMemorySize) * 100, 2)
+    
     # Top 10 Memory Utilization
     Write-Host "...Memory TOP 10" -ForegroundColor Cyan
-    $memTop10 = (Get-WmiObject -ComputerName $Computername Win32_Process | Sort-Object WorkingSetSize -Descending | Select-Object Name, @{n = "Private Memory(mb)"; Expression = { [math]::round(($_.WorkingSetSize / 1mb), 2) } } | Select-Object -First 10 | Format-Table -AutoSize | Out-String) + [environment]::NewLine
+    $memTop10 = (
+      Get-WmiObject -ComputerName $Computername Win32_Process | 
+      Sort-Object WorkingSetSize -Descending | 
+      Select-Object Name, @{n = "Private Memory(mb)"; Expression = { [math]::round(($_.WorkingSetSize / 1mb), 2) } } | 
+      Select-Object -First 10 | Format-Table -AutoSize | 
+      Out-String
+    ) + [environment]::NewLine
 
     if ($pctFree -ge 45) {
       $Status = "OK"
@@ -117,8 +193,12 @@ if ($OK) {
 
     # Running Applications
     Write-Host "...Running Applications" -ForegroundColor Cyan
-    $runningApps = (Get-Process | Group-Object -Property ProcessName |
-      Format-Table Name, @{n = 'Mem(KB)'; e = { '{0:N0}' -f (($_.Group | Measure-Object WorkingSet -Sum).Sum / 1KB) }; a = 'right' } -AutoSize | Out-String)
+    $runningApps = (
+      Get-Process | 
+      Group-Object -Property ProcessName |
+      Format-Table Name, @{n = 'Mem(KB)'; e = { '{0:N0}' -f (($_.Group | Measure-Object WorkingSet -Sum).Sum / 1KB) }; a = 'right' } -AutoSize | 
+      Out-String
+    )
 
     # NetworkAdapters
     Write-Host "...Network Adapters" -ForegroundColor Cyan
@@ -126,7 +206,7 @@ if ($OK) {
     $nics = Get-WmiObject -Class Win32_NetworkAdapter -Filter "MACAddress Like '%'" -ComputerName $Computername
     $nicdata = $nics | ForEach-Object {
       $tempHash = @{Name = $_.Name; DeviceID = $_.DeviceID; AdapterType = $_.AdapterType; MACAddress = $_.MACAddress }
-      # Get related configuation information
+      # Get related configuration information
       $config = $_.GetRelated() | Where-Object { $_.__CLASS -eq "Win32_NetworkadapterConfiguration" }
       # Add to temporary hash
       $tempHash.Add("IPAddress", $config.IPAddress)
