@@ -4,7 +4,7 @@
 
 .VERSION 1.3.0
 
-.GUID d5033d8e-237f-42dc-84b7-6d2d20605e9f
+.GUID cde4648e-a6a4-40e9-820e-61deefd1458c
 
 .AUTHOR Sean Connealy. https://dev.azure.com/sjcnyc
 
