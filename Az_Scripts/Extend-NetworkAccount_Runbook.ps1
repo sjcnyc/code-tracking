@@ -10,7 +10,7 @@ $LogName = "UpdatedAccountsLog.csv"
 $ConnectionString = "DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=sa01sftx3406815508;AccountKey=2u6z1WymVz3kYLZZa+xHsLdZSvDYQLXVMN/V27TMUgQe6XKE2bUYyVySBjvC5ps0XHo/nsqSRjufyScGVg7f4Q=="
 $SourceStorageContext = New-AzStorageContext -ConnectionString $ConnectionString
 $SrcContainer = "con01-sf-dropoff"
-$DestContainer = "con01-sf-archive"
+#$DestContainer = "con01-sf-archive"
 $Cred = Get-AutomationPSCredential -Name 'T2_Cred'
 
 Write-Output "Getting XML Files..."
@@ -32,13 +32,13 @@ if ($Blobs) {
     Get-AzStorageBlobContent @getAzStorageBlobContentSplat -Force
     Write-Output "Copying: $($Blob.Name) to: $($LocalXMLPath)"
 
-    $startAzStorageBlobCopySplat = @{
+    <#     $startAzStorageBlobCopySplat = @{
       SrcBlob       = $Blob.Name
       Context       = $SourceStorageContext
       SrcContainer  = $SrcContainer
       DestContainer = $DestContainer
       DestBlob      = $Blob.Name
-    }
+    } #>
 
     #Start-AzStorageBlobCopy @startAzStorageBlobCopySplat -Force
 
