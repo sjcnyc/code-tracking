@@ -1,19 +1,18 @@
-
-  $getQADUserSplat = @{
-      SizeLimit                        = 0
-      DontUseDefaultIncludedProperties = $true
-      IncludedProperties               = 'FirstName', 'LastName', 'SamAccountName', 'ParentContainer', 'Mail', 'Department', 'Company', 'AccountIsDisabled'
-      Enabled                          = $true
-  }
-
-  Get-QADUser @getQADUserSplat | Select-Object $getQADUserSplat.IncludedProperties| Export-Csv D:\Temp\ME_Users_$(get-date -f {MMdyyyyhhmm}).csv -NoTypeInformation
-
-
-$getADUserSplat = @{
-  Filter     = {(Enabled -eq $True)}
+$ADUserSplat = @{
+  Filter     = { (Enabled -eq $True) }
   Properties = 'sAMAccountName', 'givenName', 'sn', 'enabled', 'CanonicalName', 'Mail', 'Department', 'Company'
 }
 
-Get-ADUser @getADUserSplat |
-  Select-Object $getADUserSplat.Properties |
-  Export-Csv -Path "D:\Temp\ME_Users_Enabled2.csv" -NoTypeInformation
+$Users =@()
+
+$ous =
+"OU=Employees,OU=Users,OU=GBL,OU=USA,OU=NA,OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com",
+"OU=Non-Employees,OU=Users,OU=GBL,OU=USA,OU=NA,OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com",
+"OU=LOH,OU=Users,OU=GBL,OU=USA,OU=NA,OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
+
+foreach ($ou in $ous) {
+  $Users += Get-ADUser -searchbase $ou @ADUserSplat | Select-Object $ADUserSplat.Properties
+}
+
+$Users | Export-Csv -Path D:\Temp\ME_Users1_$(Get-Date -f {MMdyyyyhhmm}).csv -NoTypeInformation
+Write-Output "Total User Count: $($Users.Count)"
