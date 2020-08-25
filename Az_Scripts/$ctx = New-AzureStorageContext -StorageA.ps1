@@ -1,6 +1,6 @@
 $ctx = New-AzureStorageContext -StorageAccountName "sa01sftx3406815508" -StorageAccountKey "2u6z1WymVz3kYLZZa+xHsLdZSvDYQLXVMN/V27TMUgQe6XKE2bUYyVySBjvC5ps0XHo/nsqSRjufyScGVg7f4Q=="
 
-Get-AzureStorageContainer -Context $ctx
+Get-AzureStorageContainer -Context $Ctx
 
 
 

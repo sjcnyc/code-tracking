@@ -3,7 +3,9 @@ $Ctx = New-AzStorageContext -ConnectionString $ConnectionString
 
 
 
-$ContainerName = "con01-sf-dropoff"
+$ContainerName = "con01-sf-archive"
+
+
 
 #Uploading File
 $BlobName = "00283930_08032020_1413.xml"
@@ -18,7 +20,7 @@ $setAzStorageBlobContentSplat = @{
     Force = $true
 }
 
-Set-AzStorageBlobContent @setAzStorageBlobContentSplat
+Set-AzStorageBlobContent @setAzStorageBlobContentSplat -BlobType
 
 
 #Download File
@@ -37,12 +39,13 @@ Get-AzStorageBlobContent @getAzStorageBlobContentSplat
 $getAzStorageBlobSplat = @{
     Container = $ContainerName
     Context = $Ctx
-    IncludeDeleted = $true
+    IncludeDeleted = $false
 }
 
-Get-AzStorageBlob @getAzStorageBlobSplat
+$newblob = Get-AzStorageBlob @getAzStorageBlobSplat
 
-
+#$newBlob.ICloudBlob.UploadText($filecontent)
+$newBlob.ICloudBlob.DownloadText()
 
 
 
