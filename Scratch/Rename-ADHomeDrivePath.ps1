@@ -1,22 +1,25 @@
-$getADUserSplat = @{
-    Filter     = { homedirectory -like "\\usnaspwfs01*" }
-    Properties = 'SamAccountName', 'HomeDirectory', 'HomeDrive', 'DistinguishedName'
-    Server     = 'me.sonymusic.com'
+# Grab user in AD.  Please test this before production
+$ADUserSplat = @{
+  Filter     = { homedirectory -like "\\SMEFR1FLS3P001\PAR-Users*" }
+  Properties = 'sAMAccountName', 'HomeDirectory', 'HomeDrive', 'DistinguishedName'
+  Server     = 'me.sonymusic.com'
 }
-$Users = Get-ADUser @getADUserSplat | select-object $getADUserSplat.Properties
+$Users = Get-ADUser @ADUserSplat | Select-Object $ADUserSplat.Properties
 
+# Or you can add sAMAccountName manually below
 <# $Users =
 @"
 sconnea
+john001
 "@ #>
 
 foreach ($User in $Users) {
-  $setADUserSplat = @{
-      HomeDrive     = 'H:'
-      HomeDirectory = "\\USNASPLSYN001.me.sonymusic.com\home$\$($User.SamAccountName)"
-      Server        = 'me.sonymusic.com'
-      WhatIf        = $true
-      Identity      = $User
+  $ADUserSplat = @{
+    HomeDrive     = 'U:'
+    HomeDirectory = "\\FRAPARPHQFLS001\PAR-Users\$($User.sAMAccountName)"
+    Server        = 'me.sonymusic.com'
+    WhatIf        = $true # set to $false for production
+    Identity      = $User
   }
-  Set-ADUser @setADUserSplat
+  Set-ADUser @ADUserSplat
 }
