@@ -1,21 +1,16 @@
-$Users = @"
-bali.zheng@sonymusic.com
-bo.plantinga@sonymusic.com
-johnny.richards@sonymusic.com
-melinda.shopsin@sonymusic.com
-ninad.kawale@sonymusic.com
-"@ -split [environment]::NewLine
+@"
+ana.garcia@sonymusic.com
+alexandre.nzeza@sonymusic.com
+brodrick.williams@sonymusic.com
+elie.hakim@sonymusic.com
+hunnit.lee@sonymusic.com
+jessica.barlow@sonymusic.com
+lauren.soloway@sonymusic.com
+moa.egonson@sonymusic.com
+ngoc-phuc.huynh@sonymusic.com
+tavis.chaguay@sonymusic.com
+till.rentschler@sonymusic.com
+"@ -split [environment]::NewLine | ForEach-Object {
 
-foreach ($user in $users) {
-
-  Get-QADUser $user -IncludedProperties samaccountname | Select-Object samaccountname #, @{N='UPN'; E={$user}} | Export-Csv d:\temp\linkedinUsers1.csv -NoTypeInformation -Append
-
+  Get-ADUser -Filter "userPrincipalName -eq '$($User)'" -Properties sAMAccountName | Add-ADGroupMember -Identity ""
 }
-
-
-
-ZHEN003;
-PLAN002;
-RICH001;
-SHOP001;
-kawa001;
