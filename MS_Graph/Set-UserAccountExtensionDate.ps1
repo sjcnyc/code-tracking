@@ -3,7 +3,7 @@ $userList = [List[PSObject]]::new()
 
 $connectGraphSplat = @{
   ClientId              = "91152ce4-ea23-4c83-852e-05e564545fb9"
-  TenantId              = "f0aff3b7-91a5-4aae-af71-c63e1dda2049"
+  Tenant              = "f0aff3b7-91a5-4aae-af71-c63e1dda2049"
   CertificateThumbprint = "7A7B75A0FF030BBC6CACCF3928C3079B72FCB2A8"
 }
 Connect-Graph @connectGraphSplat
