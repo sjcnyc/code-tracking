@@ -7,11 +7,11 @@ $ADUserSplat = @{
 $Users = Get-ADUser @ADUserSplat | Select-Object $ADUserSplat.Properties
 
 # Or you can add sAMAccountName manually below
-<# $Users =
+$Users =
 @"
 sconnea
 john001
-"@ #>
+"@ -split [environment]::NewLine
 
 foreach ($User in $Users) {
   $ADUserSplat = @{

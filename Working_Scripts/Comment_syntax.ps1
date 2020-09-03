@@ -3,3 +3,14 @@
 # todo: <=
 # * Information <=
 # @param
+
+
+
+# !
+# ?
+# *
+# ^
+# &
+# ~
+# todo
+# //

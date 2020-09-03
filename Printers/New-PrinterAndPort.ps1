@@ -24,16 +24,16 @@ function script:CreatePrinter
     [Parameter(Mandatory)][string]$Location, 
     [Parameter(Mandatory)][string]$Comment 
   ) 
-  $print = (Get-WmiObject -List -Class Win32_Printer)
-  $newprinter = $print.createInstance() 
-  $newprinter.PortName = "$Portname" 
-  $newprinter.Drivername = $DriverName 
-  $newprinter.DeviceID = $PrinterName 
-  $newprinter.Shared = $true 
-  $newprinter.Published = $true 
-  $newprinter.Sharename = $PrinterName 
-  $newprinter.Location = $Location 
-  $newprinter.Comment = $Comment 
+  $print                 = (Get-WmiObject -List -Class Win32_Printer)
+  $newprinter            = $print.createInstance()
+  $newprinter.PortName   = "$Portname"
+  $newprinter.Drivername = $DriverName
+  $newprinter.DeviceID   = $PrinterName
+  $newprinter.Shared     = $true
+  $newprinter.Published  = $true
+  $newprinter.Sharename  = $PrinterName
+  $newprinter.Location   = $Location
+  $newprinter.Comment    = $Comment
   Write-Host -Object "Creating Printer $PrinterName" -ForegroundColor 'green' 
   $newprinter.Put() 
 } 
