@@ -30,19 +30,26 @@ function Get-RolesReport {
 
     $Groups = @()
 
-    foreach ($Group in $User.MemberOf) { $Groups += (Get-ADGroup -Identity $Group).Name }
+    foreach ($Group in $User.MemberOf) {
+      $Groups += (Get-ADGroup -Identity $Group -Properties Name, ManagedBy |
+        Select-Object Name, @{N = 'Manager'; E = { (Get-ADUser -Identity $_.managedBy -Properties Name).Name } })
+    }
 
     $Output += [PSCustomObject]@{
       ADMTier            = "$admtier"
       Name               = "$($User.GivenName) $($User.SurName)"
       UserName           = "$($User.Name)"
-      RoleAssignments    = "$((@($Groups | Where-Object {$_ -like "*-Role"}) | Out-String).trim())"
-      NonRoleAssignments = "$((@($Groups | Where-Object {$_ -notlike "*-Role" -and $_ -notlike "Admin_Tier-*_Users" -and $_ -notlike "tier-0_Users"}) | Out-String).trim())"
-      InTierGroup        = ($Groups | Where-Object {$_ -like "Admin_Tier-*_Users" -or $_ -like "Tier-0_Users"}) ? $true : $false
+      RoleAssignments    = "$((@(($Groups | Where-Object {$_.Name -like "*-Role"}).Name) | Out-String).trim())"
+      ManagedBy          = "$((@(($Groups | Where-Object {$_.Name -like "*-Role"}).Manager) | Out-String).Trim())"
+      NonRoleAssignments = "$((@(($Groups | Where-Object {$_.Name -notlike "*-Role" -and $_.Name -notlike "Admin_Tier-*_Users" -and $_.Name -notlike "tier-0_Users"}).Name) | Out-String).trim())"
+      InTierGroup        = ($Groups | Where-Object { $_.Name -like "Admin_Tier-*_Users" -or $_.Name -like "Tier-0_Users" }) ? $true : $false
       LastLogonTimeStamp = ([datetime]::FromFileTime($User.LastLogonTimestamp))
       Enabled            = "$($User.enabled)"
     }
   }
+
+
+
 
   $Output | Export-Csv "$($OutDir)\$($OutFile)" -NoTypeInformation
   Invoke-Item $OutDir
