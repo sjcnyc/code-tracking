@@ -1,5 +1,4 @@
 using namespace System.Collections.Generic
-
 function Get-RolesReport {
   Param (
     [int]$Tier = 3,
