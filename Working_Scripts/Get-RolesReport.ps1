@@ -29,30 +29,28 @@ function Get-RolesReport {
     }
 
     $Groups = @()
-
+    # $Groups +=
     foreach ($Group in $User.MemberOf) {
-      $Groups += (Get-ADGroup -Identity $Group -Properties Name, ManagedBy |
+      $Groups = (Get-ADGroup -Identity $Group -Properties Name, ManagedBy |
         Select-Object Name, @{N = 'Manager'; E = { (Get-ADUser -Identity $_.managedBy -Properties Name).Name } })
-    }
+      # }
 
-    $Output += [PSCustomObject]@{
-      ADMTier            = "$admtier"
-      Name               = "$($User.GivenName) $($User.SurName)"
-      UserName           = "$($User.Name)"
-      RoleAssignments    = "$((@(($Groups | Where-Object {$_.Name -like "*-Role"}).Name) | Out-String).trim())"
-      ManagedBy          = "$((@(($Groups | Where-Object {$_.Name -like "*-Role"}).Manager) | Out-String).Trim())"
-      NonRoleAssignments = "$((@(($Groups | Where-Object {$_.Name -notlike "*-Role" -and $_.Name -notlike "Admin_Tier-*_Users" -and $_.Name -notlike "tier-0_Users"}).Name) | Out-String).trim())"
-      InTierGroup        = ($Groups | Where-Object { $_.Name -like "Admin_Tier-*_Users" -or $_.Name -like "Tier-0_Users" }) ? $true : $false
-      LastLogonTimeStamp = ([datetime]::FromFileTime($User.LastLogonTimestamp))
-      Enabled            = "$($User.enabled)"
-    }
+      $Output += [PSCustomObject]@{
+        ADMTier            = "$admtier"
+        Name               = "$($User.GivenName) $($User.SurName)"
+        UserName           = "$($User.Name)"
+        RoleAssignments    = "$((@(($Groups | Where-Object {$_.Name -like "*-Role"}).Name) | Out-String).trim())"
+        ManagedBy          = "$((@(($Groups | Where-Object {$_.Name -like "*-Role"}).Manager) | Out-String).Trim())"
+        NonRoleAssignments = "$((@(($Groups | Where-Object {$_.Name -notlike "*-Role" -and $_.Name -notlike "Admin_Tier-*_Users" -and $_.Name -notlike "tier-0_Users"}).Name) | Out-String).trim())"
+        InTierGroup        = ($Groups | Where-Object { $_.Name -like "Admin_Tier-*_Users" -or $_.Name -like "Tier-0_Users" }) ? $true : $false
+        LastLogonTimeStamp = ([datetime]::FromFileTime($User.LastLogonTimestamp))
+        Enabled            = "$($User.enabled)"
+      }
+    } #
   }
 
-
-
-
   $Output | Export-Csv "$($OutDir)\$($OutFile)" -NoTypeInformation
-  Invoke-Item $OutDir
+  #Invoke-Item $OutDir
 }
 
-Get-RolesReport -Tier '3' -OutDir 'D:\Temp'
+Get-RolesReport -Tier '2' -OutDir 'D:\Temp'
