@@ -1,25 +1,22 @@
+using namespace System.Collections.Generic
+
 function Get-RolesReport {
   Param (
     [int]$Tier = 3,
     [string]$OutDir = "d:\temp",
-    [string]$OutFile = "RolesReport-$((Get-Date).ToString("MM.dd.yy-HHmmss")).csv"
+    [string]$OutFile = "RolesReport-Tier-$($Tier)-$((Get-Date).ToString("MM.dd.yy-HHmmss")).csv"
   )
 
-  if ($Tier -eq 3) {
-    $Filter = "adm*-*"
-  }
-  else {
-    $Filter = "adm*-$($Tier)"
-  }
+  $List = [List[PSObject]]::new()
 
-  $getADUserSplat = @{
+  $Filter = ($Tier -eq 3) ? "adm*-*" : "adm*-$($Tier)" # Ternary Conditional Operator only works in v7.0
+
+  $ADUserSplat = @{
     Properties = 'MemberOf', 'Lastlogontimestamp', 'Enabled'
     Filter     = { sAMAccountName -like $Filter -and Enabled -eq $true }
   }
 
-  $Users = Get-ADUser @getADUserSplat
-
-  $Output = @()
+  $Users = Get-ADUser @ADUserSplat
 
   foreach ($User in $Users) {
     switch -Wildcard ($User.Name) {
@@ -28,29 +25,30 @@ function Get-RolesReport {
       "adm*-0" { $admtier = "Tier-0" }
     }
 
-    $Groups = @()
-    # $Groups +=
     foreach ($Group in $User.MemberOf) {
       $Groups = (Get-ADGroup -Identity $Group -Properties Name, ManagedBy |
         Select-Object Name, @{N = 'Manager'; E = { (Get-ADUser -Identity $_.managedBy -Properties Name).Name } })
-      # }
 
-      $Output += [PSCustomObject]@{
-        ADMTier            = "$admtier"
+      $RoleAssignment      = (($Groups).Where{ $_.Name -like "*-Role" }).Name
+      $Manager             = (($Groups).Where{ $_.Name -like "*-Role" }).Manager
+      $NonRoleAssignaments = (($Groups).Where{ $_.Name -notlike "*-Role" -and $_.Name -notlike "Admin_Tier-*_Users" -and $_.Name -notlike "tier-0_Users" }).Name
+      $InTierGroup         = (($Groups).Where{ $_.Name -like "Admin_Tier-*_Users" -or $_.Name -like "Tier-0_Users" }) ? $true : $false
+
+      $PsObj = [PSCustomObject]@{
+        ADMTier            = $admtier
         Name               = "$($User.GivenName) $($User.SurName)"
-        UserName           = "$($User.Name)"
-        RoleAssignments    = "$((@(($Groups | Where-Object {$_.Name -like "*-Role"}).Name) | Out-String).trim())"
-        ManagedBy          = "$((@(($Groups | Where-Object {$_.Name -like "*-Role"}).Manager) | Out-String).Trim())"
-        NonRoleAssignments = "$((@(($Groups | Where-Object {$_.Name -notlike "*-Role" -and $_.Name -notlike "Admin_Tier-*_Users" -and $_.Name -notlike "tier-0_Users"}).Name) | Out-String).trim())"
-        InTierGroup        = ($Groups | Where-Object { $_.Name -like "Admin_Tier-*_Users" -or $_.Name -like "Tier-0_Users" }) ? $true : $false
+        UserName           = $User.Name
+        RoleAssignments    = $RoleAssignment
+        ManagedBy          = $Manager
+        NonRoleAssignments = $NonRoleAssignaments
+        InTierGroup        = $InTierGroup
         LastLogonTimeStamp = ([datetime]::FromFileTime($User.LastLogonTimestamp))
-        Enabled            = "$($User.enabled)"
+        Enabled            = $User.enabled
       }
-    } #
+      [void]$List.Add($PsObj)
+    }
   }
-
-  $Output | Export-Csv "$($OutDir)\$($OutFile)" -NoTypeInformation
-  #Invoke-Item $OutDir
+  $List | Export-Csv "$($OutDir)\$($OutFile)" -NoTypeInformation
 }
 
-Get-RolesReport -Tier '2' -OutDir 'D:\Temp'
+Get-RolesReport -Tier '3' -OutDir 'D:\Temp'
