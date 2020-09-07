@@ -33,7 +33,7 @@ function Get-RolesReport {
       $NonRoleAssignaments = (($Groups).Where{ $_.Name -notlike "*-Role" -and $_.Name -notlike "Admin_Tier-*_Users" -and $_.Name -notlike "tier-0_Users" }).Name
       $InTierGroup         = (($Groups).Where{ $_.Name -like "Admin_Tier-*_Users" -or $_.Name -like "Tier-0_Users" }) ? $true : $false
 
-      $PsObj = [PSCustomObject]@{
+      $PsObj = [pscustomobject]@{
         ADMTier            = $admtier
         Name               = "$($User.GivenName) $($User.SurName)"
         UserName           = $User.Name
