@@ -1,6 +1,6 @@
 using namespace System.Collections.Generic
 function Get-RolesReport {
-  Param (
+  param (
     [int]$Tier = 3,
     [string]$OutDir = [Environment]::GetFolderPath("MyDocuments"),
     [string]$OutFile = "RolesReport-Tier-$($Tier)-$((Get-Date).ToString("MM.dd.yy-HHmmss")).csv"
