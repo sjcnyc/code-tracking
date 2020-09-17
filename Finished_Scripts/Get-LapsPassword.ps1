@@ -1,12 +1,22 @@
 function Get-LapsPassword {
   [CmdletBinding()]
   param (
-    [parameter(ValueFromPipeline = $true,
-      ValueFromPipelineByPropertyName = $true)]
-    [string[]]$ComputerName = $env:COMPUTERNAME,
-    [switch]$AsSecureString,
-    [switch]$IncludeLocalAdministratorAccountName,
-    [System.Management.Automation.PSCredential]$Credential = [System.Management.Automation.PSCredential]::Empty
+    [parameter(
+      ValueFromPipeline = $true,
+      ValueFromPipelineByPropertyName = $true
+    )]
+    
+    [string[]]
+    $ComputerName = $env:COMPUTERNAME,
+
+    [switch]
+    $AsSecureString,
+
+    [switch]
+    $IncludeLocalAdministratorAccountName,
+
+    [System.Management.Automation.PSCredential]
+    $Credential = [System.Management.Automation.PSCredential]::Empty
   )
 
   begin {
@@ -22,10 +32,10 @@ function Get-LapsPassword {
           Write-Verbose -Message "Getting local administrator account information from $Computer"
           try {
             $getWmiObjectSplat = @{
-                ComputerName = $Computer
-                Class        = 'Win32_UserAccount'
-                Filter       = "LocalAccount='True' And Sid like '%-500'"
-                Credential   = $Credential
+              ComputerName = $Computer
+              Class        = 'Win32_UserAccount'
+              Filter       = "LocalAccount='True' And Sid like '%-500'"
+              Credential   = $Credential
             }
             $LocalAdministratorAccount = $LocalAdministratorAccount = Get-WmiObject @getWmiObjectSplat
             $LocalAdministratorAccountName = $LocalAdministratorAccount.Name
