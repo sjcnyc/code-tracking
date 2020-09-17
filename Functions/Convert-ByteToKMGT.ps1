@@ -1,4 +1,4 @@
-﻿function to_kmgt {
+﻿function Convert-ByteToKMGT {
   param (
     [System.Object] $bytes
   )
@@ -8,6 +8,6 @@
       $bytes = ($bytes).tostring('F0' + '1')
       return $bytes + " $i"
     }
-    else {$bytes /= 1KB}
+    else { $bytes /= 1KB }
   }
 }
