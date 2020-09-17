@@ -1,9 +1,14 @@
 using namespace System.Collections.Generic
 function Get-RolesReport {
   param (
-    [int]$Tier = 3,
-    [string]$OutDir = [Environment]::GetFolderPath("MyDocuments"),
-    [string]$OutFile = "RolesReport-Tier-$($Tier)-$((Get-Date).ToString("MM.dd.yy-HHmmss")).csv"
+    [int]
+    $Tier = 3,
+
+    [string]
+    $OutDir = [Environment]::GetFolderPath("MyDocuments"),
+
+    [string]
+    $OutFile = "RolesReport-Tier-$($Tier)-$((Get-Date).ToString("MM.dd.yy-HHmmss")).csv"
   )
 
   $List = [List[PSObject]]::new()
@@ -28,10 +33,10 @@ function Get-RolesReport {
       $Groups = (Get-ADGroup -Identity $Group -Properties Name, ManagedBy |
         Select-Object Name, @{N = 'Manager'; E = { (Get-ADUser -Identity $_.managedBy -Properties Name).Name } })
 
-      $RoleAssignment      = (($Groups).Where{ $_.Name -like "*-Role" }).Name
-      $Manager             = (($Groups).Where{ $_.Name -like "*-Role" }).Manager
+      $RoleAssignment = (($Groups).Where{ $_.Name -like "*-Role" }).Name
+      $Manager = (($Groups).Where{ $_.Name -like "*-Role" }).Manager
       $NonRoleAssignaments = (($Groups).Where{ $_.Name -notlike "*-Role" -and $_.Name -notlike "Admin_Tier-*_Users" -and $_.Name -notlike "tier-0_Users" }).Name
-      $InTierGroup         = (($Groups).Where{ $_.Name -like "Admin_Tier-*_Users" -or $_.Name -like "Tier-0_Users" }) ? $true : $false
+      $InTierGroup = (($Groups).Where{ $_.Name -like "Admin_Tier-*_Users" -or $_.Name -like "Tier-0_Users" }) ? $true : $false
 
       $PsObj = [pscustomobject]@{
         ADMTier            = $admtier
