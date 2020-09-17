@@ -26,7 +26,7 @@
     Format-Table -AutoSize -Wrap |
     Out-String -Width $Width
  
-    $process = Start-Process "notepad2" -PassThru
+    $process = Start-Process "notepad" -PassThru
     $notepad = $process.Handle
     [void] $process.WaitForInputIdle()
  
