@@ -49,4 +49,4 @@ function Get-HomeDirectory {
 
 } #>
 
-Get-HomeDirectory -ous 'Tier-2/STD/NA/USA/FRK' -Domain 'me.sonymusic.com' -Export -Path C:\Temp\FRK.csv
+Get-HomeDirectory -ous 'Tier-2/STD/NA/USA/GBL' -Domain 'me.sonymusic.com' -Export -Path d:\temp\usa_home.csv
