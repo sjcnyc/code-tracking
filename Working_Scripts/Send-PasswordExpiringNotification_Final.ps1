@@ -81,5 +81,3 @@ foreach ($user in $users) {
     }
   }
 }
-
-$PSArrayList
