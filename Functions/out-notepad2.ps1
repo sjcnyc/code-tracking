@@ -1,8 +1,7 @@
-﻿function Out-Notepad
-{
+﻿function Out-Notepad {
   param
   (
-    [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
+    [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
     [Object]
     [AllowEmptyString()]
     $Object,
@@ -11,17 +10,14 @@
     $Width = 150
   )
  
-  begin
-  {
+  begin {
     $al = New-Object System.Collections.ArrayList
   }
  
-  process
-  {
+  process {
     [void] $al.Add($Object)
   }
-  end
-  {
+  end {
     $text = $al |
     Format-Table -AutoSize -Wrap |
     Out-String -Width $Width
@@ -42,7 +38,5 @@
     [void]$type::SendMessage($child, 0x000C, 0, $text)
   }
 }
-
-
 
 Get-Process | Out-Notepad

@@ -57,7 +57,7 @@ if ($Blobs) {
 
       $UserId = $TicketXML.userAction.userId
 
-      $ADUser = Get-ADUser -Identity $UserId -Properties DistinguishedName, sAMAccountName, accountExpires, Name | 
+      $ADUser = Get-ADUser -Identity $UserId -Properties DistinguishedName, sAMAccountName, accountExpires, Name |
       Select-Object DistinguishedName, sAMAccountName, Name, @{N = "ExpiryDate"; E = { [datetime]::FromFileTime($_.accountExpires) } }
       Write-Output "Getting properties for: $($ADUser.samaccountname)"
     }
