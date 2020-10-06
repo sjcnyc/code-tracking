@@ -15,7 +15,7 @@ function Get-ADGroupMemberships {
     [System.String]$ReportName = "Report",
 
     [parameter(Position = 5)]
-    [System.String]$ReportDate = "_$(get-date -format 'MM-dd-yyy')_1",
+    [System.String]$ReportDate = "_$(Get-Date -format 'MM-dd-yyy')_1",
 
     [parameter(Position = 6)]
     [ValidateSet("csv", "pdf")]
@@ -24,11 +24,11 @@ function Get-ADGroupMemberships {
 
   try {
     $obj = $Groups | Get-ADGroup -PipelineVariable Grp -Properties Name | Get-ADGroupMember |
-      Get-ADUser -Properties GivenName, SurName, SamaccountName, DistinguishedName |
-      Select-Object -Property GivenName, SurName, SamaccountName, DistinguishedName, @{N = 'GroupName'; E = {$Grp.SamAccountName}}
+    Get-ADUser -Properties GivenName, SurName, SamaccountName, DistinguishedName |
+    Select-Object -Property GivenName, SurName, SamaccountName, DistinguishedName, @{N = 'GroupName'; E = { $Grp.SamAccountName } }
     if ($Export) {
       switch ($Extension) {
-        csv { $obj | Export-CSV -Path "$($ReportPath)$($ReportName)$($ReportDate).$($Extension)" -NoTypeInformation }
+        csv { $obj | Export-Csv -Path "$($ReportPath)$($ReportName)$($ReportDate).$($Extension)" -NoTypeInformation }
         pdf { $obj | Out-PTSPDF -Path "$($ReportPath)$($ReportName)$($ReportDate).$($Extension)" -FontSize 8 -AutoSize }
       }
     }
@@ -43,7 +43,11 @@ function Get-ADGroupMemberships {
 }
 
 $Groups = @"
-NYC-BW1540 App SBME Sales Forecasting Legacy Users
+T1_App_Global_G_Jamf_ServiceDesk
+T1_App_Global_G_Jamf_DesktopTechnicians
+T1_App_Global_G_Jamf_Auditor_ReadOnly
+T1_App_Global_G_Jamf_Admin
+T1_App_Global_G_Jamf_Admin_FullAccess
 "@ -split [System.Environment]::NewLine
 
-Get-ADGroupMemberships -Groups $Groups -Export -Extension pdf
+Get-ADGroupMemberships -Groups $Groups -Export -Extension csv
