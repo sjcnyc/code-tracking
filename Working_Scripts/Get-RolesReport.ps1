@@ -5,7 +5,7 @@ function Get-RolesReport {
     $Tier = 3,
 
     [string]
-    $OutDir = [Environment]::GetFolderPath("MyDocuments"),
+    $OutDir,
 
     [string]
     $OutFile = "RolesReport-Tier-$($Tier)-$((Get-Date).ToString("MM.dd.yy-HHmmss")).csv"
@@ -13,7 +13,7 @@ function Get-RolesReport {
 
   $List = [List[PSObject]]::new()
 
-  $Filter = ($Tier -eq 3) ? "adm*-*" : "adm*-$($Tier)" # Ternary Conditional Operator only works in v7.0
+  $Filter = if ($Tier -eq 3) { "adm*-*" } else { "adm*-$($Tier)" }
 
   $ADUserSplat = @{
     Properties = 'MemberOf', 'Lastlogontimestamp', 'Enabled'
@@ -33,10 +33,10 @@ function Get-RolesReport {
       $Groups = (Get-ADGroup -Identity $Group -Properties Name, ManagedBy |
         Select-Object Name, @{N = 'Manager'; E = { (Get-ADUser -Identity $_.managedBy -Properties Name).Name } })
 
-      $RoleAssignment      = (($Groups).Where{ $_.Name -like "*-Role" }).Name
-      $Manager             = (($Groups).Where{ $_.Name -like "*-Role" }).Manager
-      $NonRoleAssignaments = (($Groups).Where{ $_.Name -notlike "*-Role" -and $_.Name -notlike "Admin_Tier-*_Users" -and $_.Name -notlike "tier-0_Users" }).Name
-      $InTierGroup         = (($Groups).Where{ $_.Name -like "Admin_Tier-*_Users" -or $_.Name -like "Tier-0_Users" }) ? $true : $false
+      $RoleAssignment      = (($Groups) | Where-Object { $_.Name -like "*-Role" }).Name
+      $Manager             = (($Groups) | Where-Object { $_.Name -like "*-Role" }).Manager
+      $NonRoleAssignaments = (($Groups) | Where-Object { $_.Name -notlike "*-Role" -and $_.Name -notlike "Admin_Tier-*_Users" -and $_.Name -notlike "tier-0_Users" }).Name
+      $InTierGroup         = if (($Groups) | Where-Object { $_.Name -like "Admin_Tier-*_Users" -or $_.Name -like "Tier-0_Users" }) { $true } else { $false }
 
       $PsObj = [pscustomobject]@{
         ADMTier            = $admtier
@@ -55,4 +55,4 @@ function Get-RolesReport {
   $List | Export-Csv "$($OutDir)\$($OutFile)" -NoTypeInformation
 }
 
-Get-RolesReport -Tier '3'
+Get-RolesReport -Tier '3' -OutDir D:\temp\
