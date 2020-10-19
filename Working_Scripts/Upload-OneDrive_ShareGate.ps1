@@ -1,4 +1,4 @@
-$remoteSite = "Sean"
+$remoteSite = "Miami"
 $migrationFilePath = "D:\Temp\OneDrive_Migration"
 $regionHomeDrives = "$($remoteSite)_Home_drives.csv"
 $ODUsersFile = "OD_Users_Main.csv"
@@ -6,7 +6,8 @@ $ODUsersFile = "OD_Users_Main.csv"
 $results = @()
 
 $users = @"
-sconnea
+Coro006
+Jabreu1
 "@ -split [environment]::NewLine
 
 foreach ($user in $users) {
@@ -26,9 +27,9 @@ $HomeUsers = Import-Csv "$($migrationFilePath)\$($remotesite)\$($regionHomeDrive
 Join-Object -Left $AllUsers -Right $HomeUsers -LeftJoinProperty DisplayName1 -RightJoinProperty DisplayName |
 Export-Csv D:\Temp\OneDrive_Migration\OD_Migration_Joined.csv -Append
 
-<# Import-Module Sharegate
-$csvFile = "C:\MigrationPlanning\onedrivemigration.csv"
-$table = Import-Csv $csvFile -Delimiter ","
+Import-Module Sharegate
+$csvFile    = "C:\MigrationPlanning\onedrivemigration.csv"
+$table      = Import-Csv $csvFile -Delimiter ","
 $mypassword = ConvertTo-SecureString "mypassword" -AsPlainText -Force
 Set-Variable dstSite, dstList
 foreach ($row in $table) {
@@ -40,4 +41,4 @@ foreach ($row in $table) {
   Import-Document -SourceFolder $row.DIRECTORY -DestinationList $dstList
   Remove-SiteCollectionAdministrator -Site $dstSite
   Export-Report "$($migrationFilePath)\$($remotesite)"
-} #>
+}
