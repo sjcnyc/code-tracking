@@ -3,7 +3,7 @@ $QADParams = @{
     SizeLimit = '0'
     PageSize = '2000'
     DontUseDefaultIncludedProperties = $true
-    IncludedProperties = @('SamAccountName', 'DisplayName', 'EmailAddress', 'msDS-UserPasswordExpiryTimeComputed', 'AccountIsDisabled', 'PasswordLastSet', 'PasswordNeverExpires')
+    IncludedProperties = @('SamAccountName', 'DisplayName', 'EmailAddress', '', 'AccountIsDisabled', 'PasswordLastSet', 'PasswordNeverExpires')
     Service = 'NYCSMEADS0012:389'
 } 
  
