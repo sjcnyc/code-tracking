@@ -30,13 +30,26 @@ function Get-RolesReport {
     }
 
     foreach ($Group in $User.MemberOf) {
-      $Groups = (Get-ADGroup -Identity $Group -Properties Name, ManagedBy |
-        Select-Object Name, @{N = 'Manager'; E = { (Get-ADUser -Identity $_.managedBy -Properties Name).Name } })
+      $Groups = (Get-ADGroup -Identity $Group -Properties Name, ManagedBy, DistinguishedName |
+        Select-Object Name, DistinguishedName, @{N = 'Manager'; E = { (Get-ADUser -Identity $_.managedBy -Properties Name).Name } })
 
-      $RoleAssignment      = (($Groups) | Where-Object { $_.Name -like "*-Role" }).Name
-      $Manager             = (($Groups) | Where-Object { $_.Name -like "*-Role" }).Manager
-      $NonRoleAssignaments = (($Groups) | Where-Object { $_.Name -notlike "*-Role" -and $_.Name -notlike "Admin_Tier-*_Users" -and $_.Name -notlike "tier-0_Users" }).Name
-      $InTierGroup         = if (($Groups) | Where-Object { $_.Name -like "Admin_Tier-*_Users" -or $_.Name -like "Tier-0_Users" }) { $true } else { $false }
+      $RoleAssignment = (($Groups) | Where-Object { $_.Name -like "*-Role" }).Name
+      $Manager = (($Groups) | Where-Object { $_.Name -like "*-Role" }).Manager
+      $NonRoleAssignaments = $Groups | Where-Object { $_.Name -notlike "*-Role" -and $_.Name -notlike "Admin_Tier-*_Users" -and $_.Name -notlike "tier-0_Users" } | Select-Object Name, DistinguishedName
+      $InTierGroup = if (($Groups) | Where-Object { $_.Name -like "Admin_Tier-*_Users" -or $_.Name -like "Tier-0_Users" }) { $true } else { $false }
+
+      if ($null -ne $NonRoleAssignaments) {
+        switch -wildcard ($NonRoleAssignaments.DistinguishedName) {
+          "*OU=NA*" { $owner = "Moldoveanu, Alex" }
+          "*OU=EU*" { $owner = "Elgar, Pete" }
+          "*OU=LA*" { $owner = "Scherer, Pablo" }
+          "*OU=AP*" { if ($NonRoleAssignaments.DistinguishedName -like "*AUS*" -or $NonRoleAssignaments.DistinguishedName -like "NZL") { $owner = "McClung, Dustin" } else { $owner = "Kwan, Ether" } }
+          Default {}
+        }
+      }
+      else {
+        $owner = ""
+      }
 
       $PsObj = [pscustomobject]@{
         ADMTier            = $admtier
@@ -44,7 +57,8 @@ function Get-RolesReport {
         UserName           = $User.Name
         RoleAssignments    = $RoleAssignment
         ManagedBy          = $Manager
-        NonRoleAssignments = $NonRoleAssignaments
+        NonRoleAssignments = $NonRoleAssignaments.Name
+        ManagedBy2         = $owner
         InTierGroup        = $InTierGroup
         LastLogonTimeStamp = ([datetime]::FromFileTime($User.LastLogonTimestamp))
         Enabled            = $User.enabled
