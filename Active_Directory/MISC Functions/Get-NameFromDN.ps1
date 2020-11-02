@@ -1,11 +1,15 @@
-﻿function Get-NameFromDN{
+﻿function Get-NameFromDN {
   param
   (
     [System.String]
     $DN
   )
 
-  return ($DN.replace('\','') -split ',*..=')[6]
+  return ($DN.replace('\', '') -split ',*..=')[2]
 }
 
-Get-NameFromDN  'CN=Connealy\, Sean,OU=Employees,OU=Users,OU=GBL,OU=USA,OU=NA,OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com'
+Get-ADUser -Filter * | Select-Object Name, SamAccountName,
+@{Name = "OU"; Expression = { Get-NameFromDN $_.distinguishedname } }, distinguishedname -First 100 |
+Where-Object OU |
+Group-Object -Property OU -NoElement |
+Sort-Object Count -Descending
