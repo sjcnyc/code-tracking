@@ -66,7 +66,7 @@ function Get-RolesReport {
       [void]$List.Add($PsObj)
     }
   }
-  $List | Export-Csv "$($OutDir)\$($OutFile)" -NoTypeInformation
+  $List | Group-Object -Property UserName -AsHashTable | Select-Object * -First 10 # | Export-Csv "$($OutDir)\$($OutFile)" -NoTypeInformation
 }
 
 Get-RolesReport -Tier '3' -OutDir D:\temp\
