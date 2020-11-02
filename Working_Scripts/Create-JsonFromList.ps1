@@ -1,17 +1,23 @@
-$users = @"
+
+$users = @'
 sean
 bill
 dean
 ted
 billy
 john
-"@-split [environment]::NewLine
+'@-split [environment]::NewLine
 
-$root = @{ records = New-Object 'System.Collections.Generic.List[object]' }
+$root = @{
+  records = New-Object -TypeName 'System.Collections.Generic.List[object]'
+}
 
-foreach ($user in $users) {
+foreach ($user in $users) 
+{
   $root.records.Add(
-    @{ key = $user }
+    @{
+      key = $user
+    }
   )
 }
 $root | ConvertTo-Json

@@ -6,14 +6,21 @@ $ODUsersFile = "OD_Users_Main.csv"
 $results = @()
 
 $users = @"
-Coro006
-Jabreu1
+Rcottec
+POMB002
+MDIAZ2
+SCADENA
 "@ -split [environment]::NewLine
 
 foreach ($user in $users) {
   try {
-    $results += Get-ADUser $user -Properties DisplayName, sAMAccountName, HomeDirectory |
-    Select-Object DisplayName, sAMAccountName, HomeDirectory
+    $getuser = Get-ADUser $user -Properties DisplayName, sAMAccountName | Select-Object DisplayName, sAMAccountName
+
+    $results += [pscustomobject]@{
+      DisplayName = $getuser.DisplayName
+      HomeDirectory = "D:\production_shares\Users\$($user)"
+      SamAccountName = $getuser.sAMAccountName
+    }
   }
   catch {
     $_.Exception.Message
@@ -25,7 +32,9 @@ $AllUsers = Import-Csv "$($migrationFilePath)\$($ODUsersFile)"
 $HomeUsers = Import-Csv "$($migrationFilePath)\$($remotesite)\$($regionHomeDrives)"
 
 Join-Object -Left $AllUsers -Right $HomeUsers -LeftJoinProperty DisplayName1 -RightJoinProperty DisplayName |
-Export-Csv D:\Temp\OneDrive_Migration\OD_Migration_Joined.csv -Append
+Export-Csv D:\Temp\OneDrive_Migration\Miami\OD_Migration_Joined.csv
+
+
 
 Import-Module Sharegate
 $csvFile    = "C:\MigrationPlanning\onedrivemigration.csv"

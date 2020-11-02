@@ -37,7 +37,7 @@ function Copy-SecurityGroupMembership {
     )
 
     begin {
-        $logpath = "\\server\share\folder\logs"
+        $logpath = "\\storage.me.sonymusic.com\logs$"
         $date = Get-Date -Format yyyy-MM-dd_HHmmss
         $logfile = "Copy-SecurityGroupMembership - $($SourceName) to $($TargetName) - $($date).txt"
 

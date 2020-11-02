@@ -46,7 +46,7 @@ Blog: http://www.jaapbrasser.com
 .LINK
 http://www.jaapbrasser.com
     
-.EXAMPLE   
+.EXAMPLE
 .\Get-OrphanHomeFolder.ps1 -HomeFolderPath \\Server01\Home -FolderSize
 
 Description:
