@@ -1,0 +1,1 @@
+"admSomeAdminAccount-1" -replace '.*?adm(.*)-.*', '$1'
