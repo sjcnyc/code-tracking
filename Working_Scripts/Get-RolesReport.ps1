@@ -43,7 +43,14 @@ function Get-RolesReport {
           "*OU=NA*" { $owner = "Moldoveanu, Alex" }
           "*OU=EU*" { $owner = "Elgar, Pete" }
           "*OU=LA*" { $owner = "Scherer, Pablo" }
-          "*OU=AP*" { if ($NonRoleAssignaments.DistinguishedName -like "*AUS*" -or $NonRoleAssignaments.DistinguishedName -like "NZL") { $owner = "McClung, Dustin" } else { $owner = "Kwan, Ether" } }
+          "*OU=AP*" {
+            if ($NonRoleAssignaments.DistinguishedName -like "*AUS*" -or $NonRoleAssignaments.DistinguishedName -like "NZL") {
+              $owner = "McClung, Dustin"
+            }
+            else {
+              $owner = "Kwan, Ether"
+            }
+          }
           Default {}
         }
       }
@@ -66,7 +73,7 @@ function Get-RolesReport {
       [void]$List.Add($PsObj)
     }
   }
-  $List | Group-Object -Property UserName -AsHashTable | Select-Object * -First 10 # | Export-Csv "$($OutDir)\$($OutFile)" -NoTypeInformation
+  $List | Export-Csv "$($OutDir)\$($OutFile)" -NoTypeInformation
 }
 
 Get-RolesReport -Tier '3' -OutDir D:\temp\
