@@ -6,11 +6,7 @@ $ODUsersFile       = "OD_Users_Main.csv"
 $results = @()
 
 $users = @"
-avila04
-ARANO01
-ANGE056
-AANE001
-sanch03
+BECER01
 "@ -split [environment]::NewLine
 
 foreach ($user in $users) {
