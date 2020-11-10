@@ -44,7 +44,7 @@ function Get-RolesReport {
           "*OU=EU*" { $owner = "Elgar, Pete" }
           "*OU=LA*" { $owner = "Scherer, Pablo" }
           "*OU=AP*" {
-            if ($NonRoleAssignaments.DistinguishedName -like "*AUS*" -or $NonRoleAssignaments.DistinguishedName -like "NZL") {
+            if ($NonRoleAssignaments.DistinguishedName -like "*AUS*" -or $NonRoleAssignaments.DistinguishedName -like "*NZL*") {
               $owner = "McClung, Dustin"
             }
             else {
@@ -57,6 +57,8 @@ function Get-RolesReport {
       else {
         $owner = ""
       }
+
+      $PsObj = $PsObj | Where-Object {$NonRoleAssignaments.Name -ne "" -and $RoleAssignments -ne ""}
 
       $PsObj = [pscustomobject]@{
         ADMTier            = $admtier
