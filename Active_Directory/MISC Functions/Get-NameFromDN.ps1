@@ -13,3 +13,10 @@ Get-ADUser -Filter * | Select-Object Name, SamAccountName,
 Where-Object OU |
 Group-Object -Property OU -NoElement |
 Sort-Object Count -Descending
+
+
+
+
+#$Dn = "OU=Laptops - Tablets,OU=Workstations,OU=Computers,OU=CHC Servers and Computers,dc=domain,dc=local"
+
+#$DN -replace '^cn=|,(OU|CN)=.+|\\'
