@@ -20,3 +20,5 @@ $result = foreach ($item in $array) {
     bar = $item.bar
   }
 }
+
+$result

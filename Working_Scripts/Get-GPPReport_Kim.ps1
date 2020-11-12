@@ -33,6 +33,7 @@ function Get-GPPReport {
       }
     }
     $output | Export-Csv "$($path)\$($fileName)" -NoTypeInformation -Append
+    Write-Verbose $output.message
   }
   end {
   }
@@ -43,5 +44,5 @@ T2_STD_NA_USA_GBL_RDP-Access_Computer
 T2_STD_LA_RDP-Access_Computer
 T2_STD_EU_RDP-Access_Computer
 T2_STD_AP_AUS_RDP-Access_Computer
-"@ -split [environment]::NewLine | Get-GPPReport -path 'D:\Temp' -fileName 'GPPReport_14'
+"@ -split [environment]::NewLine | Get-GPPReport -path 'D:\Temp' -fileName 'GPPReport_14' -Verbose
 
