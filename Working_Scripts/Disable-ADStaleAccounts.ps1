@@ -56,7 +56,6 @@ function Disable-ADStaleAccounts {
 
     [switch]
     $Disable
-
   )
 
   $Style1 =
@@ -73,16 +72,16 @@ function Disable-ADStaleAccounts {
 </style>'
 
   $DaysAgo = (Get-Date).AddDays(-$StaleThreshold)
-  $Date = (get-date -f yyyy-MM-dd)
+  $Date = (Get-Date -f yyyy-MM-dd)
   $CSVFile = "C:\temp\$($AccountType)_$($StaleThreshold)_Days_$($Date).csv"
   $PSList = [List[psobject]]::new()
 
   # Exclude below ous
-  $Filter = [RegEx]'^*OU=LOH*|^*OU=Service*|^*OU=LOA*|^*OU=Test'
+  $Filter = [RegEx]'^*OU=LOH*|^*OU=Service*|^*OU=LOA*|^*OU=Test*|^*CN=Users*'
 
   $ADObjectSplat = @{
-    Filter     = { (LastLogonTimeSTamp -lt $DaysAgo) }
-    Properties = 'PwdLastSet', 'LastLogonTimeStamp', 'Description', 'distinguishedName', 'SamAccountName', 'CanonicalName', 'Name'
+    Filter     = { (LastLogonTimeSTamp -lt $DaysAgo) -and (enabled -eq $true) }
+    Properties = 'PwdLastSet', 'LastLogonTimeStamp', 'Description', 'distinguishedName', 'SamAccountName', 'CanonicalName', 'Name', 'enabled'
     Server     = $Domain
   }
 
@@ -106,6 +105,7 @@ function Disable-ADStaleAccounts {
           LastLogonTimeStamp = [datetime]::FromFileTime($StaleAccount.LastLogonTimeSTamp)
           PwdLastSet         = [datetime]::FromFileTime($StaleAccount.PwdLastSet)
           SourceOU           = $StaleAccount.CanonicalName -replace "me.sonymusic.com/", ""
+          Enabled            = $StaleAccount.Enabled
         }
         [void]$PSList.Add($PSUserObj)
       }
@@ -114,21 +114,21 @@ function Disable-ADStaleAccounts {
         'Task'                   = "Azure Hybrid Runbook Worker - Tier-2"
         'Action'                 = "Disable Stale ME AD $($AccountType) Objects"
         'Threshold'              = "$($StaleThreshold) Days"
-        'Source Ou'              = (ConvertFrom-DN -DN $SourceOu) -replace "me.sonymusic.com/", ""
-        'Target Ou'              = (ConvertFrom-DN -DN $TargetOu) -replace "me.sonymusic.com", ""
+        #'Source Ou'              = (ConvertFrom-DN -DN $SourceOu) -replace "me.sonymusic.com/", ""
+        #'Target Ou'              = (ConvertFrom-DN -DN $TargetOu) -replace "me.sonymusic.com", ""
         "Total $($AccountType)s" = $StaleAccounts.Count
       }
 
       $PSList | Export-Csv $CSVFile -NoTypeInformation
 
       $HTML = New-HTMLHead -title "ME Stale $($AccountType) Account Cleanup Report" -style $Style1
-      $HTML += New-HTMLTable -inputObject $(ConvertTo-PropertyValue -inputObject $InfoBody)
+      $HTML += New-HTMLTable -InputObject $(ConvertTo-PropertyValue -InputObject $InfoBody)
       $HTML += "<h4>See Attached CSV Report</h4>"
       $HTML += "<h4>Script Completed: $(Get-Date -Format G)</h4>" | Close-HTML
 
       $EmailParams = @{
         To          = "sean.connealy@sonymusic.com"
-        From        = 'PwSh Alerts poshalerts@sonymusic.com'
+        From        = 'PwSh Alerts pwshalerts@sonymusic.com'
         Subject     = "ME Stale $($AccountType) Account Cleanup Report"
         SmtpServer  = 'cmailsony.servicemail24.de'
         Body        = ($HTML | Out-String)
@@ -136,7 +136,7 @@ function Disable-ADStaleAccounts {
         Attachments = $CSVFile
       }
 
-      Send-MailMessage @EmailParams
+      Send-MailMessage @EmailParams 3>$null
       Start-Sleep -Seconds 5
       Remove-Item $CSVFile
     }
@@ -154,9 +154,9 @@ function Disable-ADStaleAccounts {
 $disableADStaleAccountsSplat = @{
   Domain         = 'me.sonymusic.com'
   StaleThreshold = 90
-  AccountType    = 'Computer'
-  SourceOu       = "OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
-  TargetOu       = "OU=Workstations,OU=Deprovision,OU=STG,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
+  AccountType    = 'User'
+  #  SourceOu       = "OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
+  #  TargetOu       = "OU=Workstations,OU=Deprovision,OU=STG,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
   Disable        = $true
 }
 
