@@ -41,17 +41,18 @@
   param
   (
     [parameter(ValueFromPipeline = $true, Mandatory = $true, Position = 0)]
-    [string[]]
+    [string]
     $PrintServer,
 
-    [Parameter(Mandatory)][ValidateSet('Backup', 'Restore')]
+    [Parameter(Mandatory = $true, Position = 1)]
+    [ValidateSet('Backup', 'Restore')]
     [string]
     $Operation,
 
-    [Parameter(Mandatory)]
+    [Parameter(Mandatory = $true, Position = 2)]
     $SavePath,
 
-    [Parameter(Mandatory)]
+    [Parameter(Mandatory = $true, Position = 3)]
     $File
   )
 
@@ -77,21 +78,7 @@
 
 # Print servers 
 @"
-usnaspwfs01
-"@ -split [environment]::NewLine |
-Sync-PrintServers -PrintServer $_ -Operation Backup -SavePath '\\storage\infradev$\PrintServer_Backups\' -File $_
-
-
-
-#Sync-PrintServers -PrintServer "USDF48E38ABF907" -Operation Backup -SavePath '\\USDF48E38ABF907\c$\Temp' -File 'printer_bak'
-
-#Sync-PrintServers -PrintServer 'USCULVWPRT005' -Operation Restore -SavePath '\\storage\infradev$\PrintServer_Backups\' -File 'usnycvwprt306_04-04-2017'
-#Sync-PrintServers -PrintServer 'USCULVWPRT006' -Operation Restore -SavePath '\\storage\infradev$\PrintServer_Backups\' -File 'usnycvwprt001_04-04-2017' #>
-
-<#
-usnycvwprt306
-usbvhpwfs01
-usnaspwfs01
-usnycvwprt002
-usnycvwprt001
-#>
+usculvwprt403
+"@ -split [environment]::NewLine | ForEach-Object {
+  Sync-PrintServers -PrintServer $_ -Operation Backup -SavePath '\\storage.me.sonymusic.com\data$\infra_dev\PrintServer_Backups' -File $_
+}
