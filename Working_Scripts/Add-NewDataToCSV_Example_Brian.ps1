@@ -22,4 +22,4 @@ foreach ($User in $Users | ConvertFrom-Csv) {
   }
 }
 
-$Results # cccc
+$Results
