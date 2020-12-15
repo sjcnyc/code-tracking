@@ -1,4 +1,4 @@
-﻿#requires -Version 2 
+﻿#requires -Version 2
 NETSTAT.EXE -anop tcp|
 Select-Object -Skip  4|
 ForEach-Object -Process {
