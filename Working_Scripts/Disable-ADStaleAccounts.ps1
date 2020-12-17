@@ -161,5 +161,3 @@ $disableADStaleAccountsSplat = @{
 }
 
 Disable-ADStaleAccounts @disableADStaleAccountsSplat
-
-#test logon
