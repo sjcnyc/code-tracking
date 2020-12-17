@@ -1,0 +1,16 @@
+#Create a new repository on GitHub. You'll import your external Git repository to this new repository.
+#On the command line, make a "bare" clone of the repository using the external clone URL. This creates a full copy of the data, but without a working directory #for editing files, and ensures a clean, fresh export of all the old data.
+
+$ git clone --bare https://external-host.com/extuser/repo.git
+
+# Makes a bare clone of the external repository in a local directory
+#Push the locally cloned repository to GitHub using the "mirror" option, which ensures that all references, such as branches and tags, are copied to the #imported repository.
+
+$ cd repo.git
+$ git push --mirror https://github.com/ghuser/repo.git
+
+# Pushes the mirror to the new GitHub repository
+#Remove the temporary local repository.
+
+$ cd ..
+$ rm -rf repo.git

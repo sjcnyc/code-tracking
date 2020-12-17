@@ -62,7 +62,7 @@ function Get-RolesReport {
 
       $PsObj = [pscustomobject]@{
         ADMTier            = $admtier
-        Name               = "$($User.SurName), $($User.GivenName)"
+        Name               = "$($User.GivenName) $($User.SurName)"
         UserName           = $User.Name
         RoleAssignments    = $RoleAssignment
         ManagedBy          = $Manager

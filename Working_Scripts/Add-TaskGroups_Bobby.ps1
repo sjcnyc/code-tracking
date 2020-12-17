@@ -26,4 +26,4 @@ try {
 }
 catch [Microsoft.ActiveDirectory.Management.ADException] {
   $_.Exception.Message
-}
+} # .....
