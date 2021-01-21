@@ -33,10 +33,5 @@ $fileName = Get-ChildItem -Path "D:\Temp\$($blobName)"
 
 $ctx = New-AzStorageContext -StorageAccountName $strgAccountName -StorageAccountKey $strgAccountKey
 Set-AzStorageBlobContent -Container $strgContainer -Context $ctx -File $filename -Blob $blobName -Force
-<<<<<<< HEAD
 Remove-Item "D:\Temp\$($blobName)"
-
 #hope this commits lol
-=======
-Remove-Item "D:\Temp\$($blobName)"
->>>>>>> 2e9c5acbf7c549b72f24c699f86c29e2b2d71fde
