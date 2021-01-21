@@ -1,9 +1,9 @@
 $ADUserSplat = @{
   Filter     = { (Enabled -eq $True) }
-  Properties = 'sAMAccountName', 'givenName', 'sn', 'enabled', 'CanonicalName', 'Mail', 'Department', 'Company'
+  Properties = 'sAMAccountName', 'givenName', 'sn', 'enabled', 'CanonicalName', 'whenCreated', 'whenChanged', 'LastLogonTimeStamp'
 }
 
-$Users =@()
+$Users = @()
 
 $ous =
 "OU=Employees,OU=Users,OU=GBL,OU=USA,OU=NA,OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com",
@@ -11,7 +11,8 @@ $ous =
 "OU=LOH,OU=Users,OU=GBL,OU=USA,OU=NA,OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
 
 foreach ($ou in $ous) {
-  $Users += Get-ADUser -searchbase $ou @ADUserSplat | Select-Object $ADUserSplat.Properties
+  $Users += Get-ADUser -SearchBase $ou @ADUserSplat |
+  Select-Object 'sAMAccountName', 'givenName', 'sn', 'enabled', 'CanonicalName', 'whenCreated', 'whenChanged', @{n = 'LastLogon'; e = { [DateTime]::FromFileTime($_.LastLogonTimeStamp) } }
 }
 
 $Users | Export-Csv -Path D:\Temp\ME_Users1_$(Get-Date -f {MMdyyyyhhmm}).csv -NoTypeInformation
