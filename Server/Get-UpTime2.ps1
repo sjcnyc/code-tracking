@@ -11,6 +11,6 @@
 
     $uptimeobj | Select-Object server,uptime
   }
-} 
+}
 
 Get-uptime USDF48E38ABF907
