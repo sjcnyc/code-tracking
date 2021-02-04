@@ -10,7 +10,10 @@ $body = "grant_type=client_credentials&client_id=$clientId&client_secret=$client
 
 $token = Invoke-RestMethod -Method Post -Uri $requestAccessTokenUri -Body $body -ContentType 'application/x-www-form-urlencoded'
 
+Write-Host $token.access_token
+
 $ATPApiUri = "https://api.securitycenter.windows.com/api/machines"
+#$ATPApiUri = "https://api.securitycenter.windows.com/api/users"
 
 $headers = @{}
 
@@ -33,10 +36,5 @@ $fileName = Get-ChildItem -Path "D:\Temp\$($blobName)"
 
 $ctx = New-AzStorageContext -StorageAccountName $strgAccountName -StorageAccountKey $strgAccountKey
 Set-AzStorageBlobContent -Container $strgContainer -Context $ctx -File $filename -Blob $blobName -Force
-<<<<<<< HEAD
 Remove-Item "D:\Temp\$($blobName)"
-
 #hope this commits lol
-=======
-Remove-Item "D:\Temp\$($blobName)"
->>>>>>> 2e9c5acbf7c549b72f24c699f86c29e2b2d71fde
