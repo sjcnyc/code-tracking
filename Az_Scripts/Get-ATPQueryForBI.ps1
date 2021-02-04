@@ -10,7 +10,10 @@ $body = "grant_type=client_credentials&client_id=$clientId&client_secret=$client
 
 $token = Invoke-RestMethod -Method Post -Uri $requestAccessTokenUri -Body $body -ContentType 'application/x-www-form-urlencoded'
 
+Write-Host $token.access_token
+
 $ATPApiUri = "https://api.securitycenter.windows.com/api/machines"
+#$ATPApiUri = "https://api.securitycenter.windows.com/api/users"
 
 $headers = @{}
 
