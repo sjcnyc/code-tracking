@@ -1,5 +1,5 @@
-$Date            = (get-date -f yyyy-MM-dd)
-$CSVFile         = "C:\Temp\AllUserMeReport_$($Date).csv"
+$Date = (Get-Date -f yyyy-MM-dd)
+$CSVFile = "C:\Temp\AllUserMeReport_$($Date).csv"
 function Convert-LLTS ($LLTS) { $LLTS = [DateTime]::FromFileTime($LLTS) }
 
 $getADUserSplat = @{
@@ -10,4 +10,4 @@ $getADUserSplat = @{
 }
 
 
-Get-ADUser @getADUserSplat | Select-Object 'UserPrincipalname', 'SamAccountName', 'CanonicalName', 'PasswordNeverExpires', 'PasswordNotRequired', 'Enabled', 'PasswordLastSet', 'PasswordExpired', '@{N = 'LastLogonTimeStamp'; E = { [DateTime]::FromFileTime($_.LastLogonTimeStamp) } }' | Export-Csv $CSVFile -NoTypeInformation
+Get-ADUser @getADUserSplat | Select-Object UserPrincipalname, SamAccountName, CanonicalName, PasswordNeverExpires, PasswordNotRequired, Enabled, PasswordLastSet, PasswordExpired, @{N = 'LastLogonTimeStamp'; E = { [DateTime]::FromFileTime($_.LastLogonTimeStamp) } } | Export-Csv $CSVFile -NoTypeInformation
