@@ -9,7 +9,7 @@ function Write-EventLogX {
     [string]$Message,
 
     [parameter()]
-    [string]$LogSource = 'ApplicationX'
+    [string]$LogSource = 'Application'
   )
   begin {
 
