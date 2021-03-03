@@ -43,9 +43,9 @@ function Get-ADGroupMemberships {
 }
 
 $Groups = @"
-NYC-BW1540 App SBME Sales Forecasting Legacy Users
+GTL-ADA-G Xenapp 7x WNS StagingDesktop
 "@ -split [System.Environment]::NewLine
 
-Get-ADGroupMemberships -Groups $Groups -Export -Extension pdf
+Get-ADGroupMemberships -Groups $Groups -Export -Extension csv
 
 
