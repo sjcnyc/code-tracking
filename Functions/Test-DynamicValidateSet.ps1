@@ -3,17 +3,17 @@
     Param(
         # Any other parameters can go here
     )
- 
+
     DynamicParam {
             # Set the dynamic parameters' name
             $ParameterName = 'Path'
             
-            # Create the dictionary 
+            # Create the dictionary
             $RuntimeParameterDictionary = New-Object System.Management.Automation.RuntimeDefinedParameterDictionary
 
             # Create the collection of attributes
             $AttributeCollection = New-Object System.Collections.ObjectModel.Collection[System.Attribute]
-            
+
             # Create and set the parameters' attributes
             $ParameterAttribute = New-Object System.Management.Automation.ParameterAttribute
             $ParameterAttribute.Mandatory = $true
