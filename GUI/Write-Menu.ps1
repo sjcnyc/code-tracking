@@ -156,10 +156,10 @@ function Write-Menu {
     }
 
     # Check if host is console
-    if ($host.Name -ne 'ConsoleHost') {
-        Write-Error "[$($host.Name)] Cannot run inside current host, please use a console window instead!"
-        return
-    }
+##    if ($host.Name -ne 'ConsoleHost') {
+#        Write-Error "[$($host.Name)] Cannot run inside current host, please use a console window instead!"
+#        return
+#    }
 
     <#
         Set-Color

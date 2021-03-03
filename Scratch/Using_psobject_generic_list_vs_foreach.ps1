@@ -10,10 +10,6 @@ foreach ($item in $items) {
   [void]$List.Add($Obj)
 }
 
-
-
-
-
 $result = foreach ($item in $array) {
   [pscustomobject][ordered]@{
     foo = $foo
