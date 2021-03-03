@@ -24,4 +24,4 @@ $ADUserSplat = @{
               "Enabled"
 }
 
-Get-ADUser @ADUserSplat | Select-Object $ADUserSplat.Properties | Export-Csv D:\Temp\Tier2_Users_5.csv -NoTypeInformation
+Get-ADUser @ADUserSplat | Select-Object $ADUserSplat.Properties | Export-Csv D:\Temp\Tier2_Users_$(Get-Date -Format 'MM-dd-yyy').csv -NoTypeInformation
