@@ -1,30 +1,30 @@
 ﻿Function Convert-Video {
     [CmdletBinding()]
-    Param(  [Parameter(Mandatory=$True,Position=1)] 
+    Param(  [Parameter(Mandatory = $True, Position = 1)] 
         [string]$path,
         [string]$Source = '.avi',
         $DeleteOriginal = $true
-        )
+    )
 
-$results = @()
+    $results = @()
 
-Get-ChildItem -Path:$path -Include:"*$Source" -Recurse |  ForEach-Object  {
-        $file = $_.Name.Replace($_.Extension,'.mp4')
+    Get-ChildItem -Path:$path -Include:"*$Source" -Recurse |  ForEach-Object {
+        $file = $_.Name.Replace($_.Extension, '.mp4')
         $input = $_.FullName
         $output = $_.DirectoryName
         $output = "$output\$file"
 
-        write-host $input
+        Write-Host $input
         $arguments = "-i `"$input`" -c:v copy -c:a copy `"$output`" -y"
         $ffmpeg = ". 'C:\Program Files\ffmpeg\bin\ffmpeg.exe'"
        
         $Status = Invoke-Expression "$ffmpeg $arguments 2>&1"
 
-        $t = $Status[$Status.Length-2].ToString() + " " + $Status[$Status.Length-1].ToString()
-        $results += $t.Replace("`n","")
+        $t = $Status[$Status.Length - 2].ToString() + " " + $Status[$Status.Length - 1].ToString()
+        $results += $t.Replace("`n", "")
        
-        if($DeleteOriginal -and $t.Replace("`n","").contains("%")) {
-           # Remove-Item -Path $_.FullName 
+        if ($DeleteOriginal -and $t.Replace("`n", "").contains("%")) {
+            # Remove-Item -Path $_.FullName 
             Remove-Item -Path $_.FullName -Force
         }
     }

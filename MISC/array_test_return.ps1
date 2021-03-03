@@ -6,3 +6,12 @@
 }
 
 (Test).GetType().FullName
+
+
+ @(1,2,3,4).gettype()
+
+
+
+$list = Write-Output banana apple green orange
+
+$list.gettype()
