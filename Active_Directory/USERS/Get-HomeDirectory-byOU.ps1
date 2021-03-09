@@ -19,13 +19,15 @@ function Get-HomeDirectory {
     $PSArray = New-Object System.Collections.ArrayList
     (
       ($Ous).ForEach{
-        Get-QADUser -SearchRoot "$($Domain)/$($_)" -SizeLimit 0 -Service 'me.sonymusic.com' | Select-Object ParentContainer, SamAccountName, HomeDirectory, HomeDrive, ScriptPath
+        Get-QADUser -SearchRoot "$($Domain)/$($_)" -SizeLimit 0 -Service 'me.sonymusic.com' | Select-Object ParentContainer, SamAccountName, HomeDirectory, HomeDrive, ScriptPath, Mail, UserPrincipalName
       }
     ).ForEach{
 
       $PSObj = [PSCustomObject]@{
         ParentContainer = $_.ParentContainer
         SamAccountName  = $_.SamAccountName
+        Email           = $_.mail
+        UPN             = $_.UserPrincipalName
         HomeDirectory   = $_.HomeDirectory
         HomeDrive       = $_.HomeDrive
         ScriptPath      = $_.ScriptPath
