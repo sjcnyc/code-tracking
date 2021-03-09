@@ -1,4 +1,4 @@
-$remoteSite        = "Miami"
+$remoteSite        = "Nashville"
 $migrationFilePath = "D:\OneDrive_Migration"
 $regionHomeDrives  = "$($remoteSite)_Home_drives.csv"
 $ODUsersFile       = "OD_Users_Main.csv"
@@ -11,12 +11,13 @@ BECER01
 
 foreach ($user in $users) {
   try {
-    $getuser = Get-ADUser $user -Properties DisplayName, sAMAccountName | Select-Object DisplayName, sAMAccountName
+    $getuser = Get-ADUser $user -Properties DisplayName, sAMAccountName, Mail | Select-Object DisplayName, sAMAccountName, Mail
 
     $results += [pscustomobject]@{
       DisplayName    = $getuser.DisplayName
       HomeDirectory  = "D:\production_shares\Users\$($user)"
       SamAccountName = $getuser.sAMAccountName
+      Email          = $getuser.mail
     }
   }
   catch {
@@ -29,7 +30,7 @@ $AllUsers  = Import-Csv "$($migrationFilePath)\$($ODUsersFile)"
 $HomeUsers = Import-Csv "$($migrationFilePath)\$($remotesite)\$($regionHomeDrives)"
 
 Join-Object -Left $AllUsers -Right $HomeUsers -LeftJoinProperty DisplayName1 -RightJoinProperty DisplayName |
-Export-Csv D:\OneDrive_Migration\Miami\OD_Migration_Joined.csv
+Export-Csv D:\OneDrive_Migration\Nashville\OD_Migration_Joined.csv
 
 
 
