@@ -12,13 +12,13 @@ Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
 Import-Module -Name AzFilesHybrid
 
 #Login with an Azure AD credential that has either storage account owner or contributer Azure role assignment
-Connect-AzAccount 
+Connect-AzAccount -UseDeviceAuthentication
 
 #Define parameters
 $SubscriptionId = "bcda95b7-72ae-40ce-8967-f83a6597d40a"
-$ResourceGroupName = "WVD-ADMIN-P-EUS"
-$StorageAccountName = "stfxlogixwpf"
-$targetOu = "OU=Okta,OU=GBL,OU=USA,OU=NA,OU=SRV,OU=Tier-1,DC=me,DC=sonymusic,DC=com"
+$ResourceGroupName = "RG-WVD-ADMT1-P-EUS"
+$StorageAccountName = "stwvdfslxadmt1"
+$targetOu = "OU=JMP,OU=GBL,OU=USA,OU=NA,OU=SRV,OU=Tier-1,DC=me,DC=sonymusic,DC=com"
 
 #Select the target subscription for the current session
 Select-AzSubscription -SubscriptionId $SubscriptionId
@@ -33,13 +33,13 @@ Run Get-Help Join-AzStorageAccountForAuth for more details on this cmdlet.
 $JoinAzStorageAccoutnForAuth = @{
   ResourceGroupName                   = $ResourceGroupName
   StorageAccountName                  = $StorageAccountName
-  DomainAccountType                   = ComputerAccount
+  DomainAccountType                   = "ComputerAccount"
   OrganizationalUnitDistinguishedName = $targetOu
 }
 Join-AzStorageAccountForAuth @JoinAzStorageAccoutnForAuth
 
 # Run the command below if you want to enable AES 256 authentication. If you plan to use RC4, you can skip this step.
-Update-AzStorageAccountAuthForAES256 -ResourceGroupName $ResourceGroupName -StorageAccountName $StorageAccountName
+# Update-AzStorageAccountAuthForAES256 -ResourceGroupName $ResourceGroupName -StorageAccountName $StorageAccountName
 
 # Use Get-ADDomain to get domain information to manually enable domain services for storage account
 $ADDomainInfo = Get-ADDomain | Select-Object Name, NetBIOSname, DNSRoot, ObjectGUID, DomainSID
