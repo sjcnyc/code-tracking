@@ -7,7 +7,7 @@
                 continue
             }
             'OU=' {
-                $ou += , $item.replace('OU=', '')
+                $OU += , $item.replace('OU=', '')
                 $ou += '/'
                 continue
             }
@@ -27,9 +27,9 @@
     # return only OU path
     #return $canoincal.Substring($DC.length - 1)
 
-    # return full parten container path
+    # return full partent container path
      return $canoincal
 } # end
 
 
-ConvertFrom-DN -DN 'CN=abc,OU=def,OU=ghl,DC=mno'
+ConvertFrom-DN -DN 'CN=pshero010,CN=Users,DC=powershell,DC=local'
