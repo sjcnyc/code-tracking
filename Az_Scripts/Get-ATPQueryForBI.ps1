@@ -26,6 +26,9 @@ $headers.Add("Authorization", "$($token.token_type) " + " " + "$($token.access_t
 
 $ATPResults = Invoke-RestMethod -Method Get -Uri $ATPApiUri -Headers $headers
 
+# d682ebe51583f5ac0d15aa292f85ff979f1b572f
+$Logonusers = "https://api.securitycenter.windows.com/api/machines/d682ebe51583f5ac0d15aa292f85ff979f1b572f/logonusers"
+
 foreach ($atpresult in $ATPResults.value) {
   $Logonusers = "https://api.securitycenter.windows.com/api/machines/$($atpresult.Id)/logonusers"
   $User = Invoke-RestMethod -Method Get -Uri $Logonusers -Headers $headers

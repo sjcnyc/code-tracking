@@ -1,4 +1,5 @@
-
+# FIX for Illigal path in runbookworker config
+# https://github.com/Azure/azure-powershell/issues/8531
 Import-Module Az
 $ErrorActionPreference = "Continue"
 $ADUser = $null

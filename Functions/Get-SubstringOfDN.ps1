@@ -1,4 +1,4 @@
-$dn = "CN=iPhone§12VSNH98DT6F3C0D2RODSILDH8, CN=ExchangeActiveSyncDevices, CN=Ocampo\, Jorge, OU=SonyMusicEntertainment.onmicrosoft.com, OU=Microsoft Exchange Hosted Organizations, DC=EURPR02A003, DC=prod, DC=outlook, DC=com"
+$dn = "CN=pshero010,CN=Users,DC=powershell,DC=local"
 
 function Get-SubstringOfDN {
     param(
@@ -10,4 +10,4 @@ function Get-SubstringOfDN {
     return $return
 }
 
-Get-SubstringOfDN -DN $dn -splitfrom 4 -splitto 10
+Get-SubstringOfDN -DN $dn -splitfrom 3 -splitto 2
