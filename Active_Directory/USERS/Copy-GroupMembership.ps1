@@ -1,28 +1,3 @@
-<#
-.SYNOPSIS
-Clone group meberships
-
-.DESCRIPTION
-Clone group memberships
-
-.PARAMETER Source
-Source group to clone
-
-.PARAMETER Targets
-Target group to clone to
-
-.PARAMETER RemoveExisting
-Remove existing groups from target
-
-.PARAMETER credential
-Credentials
-
-.EXAMPLE
-Copy-GroupMembership -Source username1 -Target username2
-
-.NOTES
-General notes
-#>
 function Copy-GroupMembership {
     [CmdletBinding(SupportsShouldProcess = $true)]
     Param
@@ -38,7 +13,7 @@ function Copy-GroupMembership {
         $RemoveExisting,
 
         [System.Management.Automation.CredentialAttribute()]
-        $credential = (Get-Credential -UserName 'bmg\admsconnea' -Message 'Enter Credentials')
+        [SecureString] $credential
     )
     
     Write-Verbose 'Retrieving source group memberships.'
@@ -94,3 +69,5 @@ function Copy-GroupMembership {
         }
     }
 }
+
+Copy-GroupMembership -Source "T1_SRV_NA_USA_GBL_JMP_G_SrvRDU" -Targets "T1_SRV_NA_USA_GBL_AzureVDI_G_SrvRDU" -WhatIf
