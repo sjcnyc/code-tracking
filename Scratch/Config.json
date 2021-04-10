@@ -1,0 +1,57 @@
+[
+   {
+      "CustomGroups": [
+         {
+            "Name" : ""
+         },
+         {
+            "Name" : ""
+         }
+      ],
+      "VPNGroups": [
+         {
+            "ID": "AP",
+            "Name": "GlobalProtectVPN-AsiaPacificUsers"
+         },
+         {
+            "ID": "EU",
+            "Name": "GlobalProtectVPN-EuropeanUsers"
+         },
+         {
+            "ID": "LA",
+            "Name": "GlobalProtectVPN-LatinUsers"
+         },
+         {
+            "ID": "NA",
+            "Name": "GlobalProtectVPN-NorthAmericaUsers"
+         }
+      ],
+      "CustomUPNSuffixes": [
+         {
+            "UPN": "@sonymusic.com"
+         }
+      ],
+      "About": [
+         {
+            "Name": "AD User Creator"
+         },
+         {
+            "Version": "1.11.0"
+         },
+         {
+            "Company": "Sony Music Entertainment"
+         },
+         {
+            "Author": "Sean Connealy, IS&T Global Engineering - x4807"
+         },
+         {
+            "ProjectLink": "https://dev.azure.com/sjcnyc/ADUserCreator"
+         }
+      ],
+      "DomainDN": "DC=me,DC=sonymusic,DC=com",
+      "SubDomainDN": "OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com",
+      "DNSRoot": "me.sonymusic.com",
+      "IsilonPath": "\\\\\\\\\\storage.me.sonymusic.com",
+      "LogFolderpath": "\\\\\\\\\\storage.me.sonymusic.com\\\\logs$"
+   }
+]
