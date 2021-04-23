@@ -1,5 +1,5 @@
 Import-Module Az
-$ConnectionString = "DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=sa01sftx3406815508;AccountKey=2u6z1WymVz3kYLZZa+xHsLdZSvDYQLXVMN/V27TMUgQe6XKE2bUYyVySBjvC5ps0XHo/nsqSRjufyScGVg7f4Q=="
+$ConnectionString = "DefaultEndpointsProtocol=https;AccountName=sa01sftx3406815508;AccountKey=6+KFw6fcjw9mhmExSbXrixZMuYz9kOkCAburdJKpmxhuy+ZVmSyeLce9WY8yj6+6nKCwoLqZbbhkfbI4zPKrLg==;EndpointSuffix=core.windows.net"
 $SourceStorageContext = New-AzStorageContext -ConnectionString $ConnectionString
 
 $ContainerName = "con01-sf-dropoff"
@@ -7,6 +7,8 @@ $ContainerName = "con01-sf-dropoff"
 
 
 $Blobs = (Get-AzStorageBlob -Container $containerName -Context $SourceStorageContext) #.Where{ $_.ContentType -eq "application/xml" -and $_.name -like "00*"} #| Select-Object Name
+
+$Blobs
 
 
 foreach ($Blob in $Blobs) {
@@ -40,7 +42,7 @@ foreach ($XMLFile in $LocalBlobs) {
 
   $expiresdate = [datetime]::parseexact((($TicketXML.userAction).expdate), 'yyyy-MM-dd HH:mm:ss', $null).ToString('MM/dd/yyyy')
 
-  Set-ADAccountExpiration -Identity $($TicketXML.userAction.userId) -DateTime $expiresdate -WhatIf
+  #Set-ADAccountExpiration -Identity $($TicketXML.userAction.userId) -DateTime $expiresdate -WhatIf
 
 }
 
