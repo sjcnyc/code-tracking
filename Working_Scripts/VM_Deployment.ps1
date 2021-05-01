@@ -1,13 +1,13 @@
 param(
-    [parameter(Mandatory=$true)]
+    [parameter(Mandatory = $true)]
     [string[]]$hostnames  
 )
 
 #create objects via function because a few are the same format
 function build-object {
-    param($var,$count)
+    param($var, $count)
 
-    for($i = 0; $i -lt $count; $i++){
+    for ($i = 0; $i -lt $count; $i++) {
         [pscustomobject]@{
             Number = $i
             Name   = $var[$i]
@@ -16,17 +16,17 @@ function build-object {
 }
 
 $vcenterfolder = "Folder-group-v17"
-$vcenterip     = "192.168.1.1"
+$vcenterip = "192.168.1.1"
 
-import-module vmware.vimautomation.core -WarningAction SilentlyContinue -erroraction SilentlyContinue  | out-null
-set-PowerCliConfiguration -InvalidCertificateAction Ignore -Confirm:$false | out-null
+Import-Module vmware.vimautomation.core -WarningAction SilentlyContinue -ErrorAction SilentlyContinue  | Out-Null
+Set-PowerCLIConfiguration -InvalidCertificateAction Ignore -Confirm:$false | Out-Null
 
-Connect-VIServer $vcenterip -Credential (Get-Credential -message "Enter Password" -UserName administrator@vsphere.local -erroraction SilentlyContinue) -erroraction SilentlyContinue | out-null
+Connect-VIServer $vcenterip -Credential (Get-Credential -Message "Enter Password" -UserName administrator@vsphere.local -ErrorAction SilentlyContinue) -ErrorAction SilentlyContinue | Out-Null
 
 #set up a few menu choices
-$cluster = (get-cluster).name
-$folder  = (get-folder | where{$_.parentid -eq $vcenterfolder}).name
-$temp    = (get-template).name
+$cluster = (Get-Cluster).name
+$folder = (Get-Folder | Where-Object { $_.parentid -eq $vcenterfolder }).name
+$temp = (Get-Template).name
 
 #hastable to iterate through
 $list = @{
@@ -36,78 +36,80 @@ $list = @{
 }
 
 #build our menu options and select choices.
-foreach($l in $list.keys){
+foreach ($l in $list.keys) {
 
     #dynamic variable creation (2spooky4me)
-    Remove-Variable -name $str -ErrorAction SilentlyContinue | out-null
+    Remove-Variable -Name $str -ErrorAction SilentlyContinue | Out-Null
     
     $str = $l + "_built"
     New-Variable -Name $str -Value @(build-object -var @($list[$l]) -count $list[$l].count)
 
-    $a = get-variable -name $str -ValueOnly
+    $a = Get-Variable -Name $str -ValueOnly
 
     #menu and select
-    cls
-    write-host "Choose A " (Get-Culture).TextInfo.ToTitleCase($l)
-    write-output $a | ft -AutoSize
+    Clear-Host
+    Write-Host "Choose A " (Get-Culture).TextInfo.ToTitleCase($l)
+    Write-Output $a | Format-Table -AutoSize
     
-    $choice = Read-Host -prompt "Enter The Number You Want To Choose"
-    cls
+    $choice = Read-Host -Prompt "Enter The Number You Want To Choose"
+    Clear-Host
 
     $str2 = $str + "_choice"
-    Remove-Variable -name $str2 -ErrorAction SilentlyContinue | out-null
-    new-variable -name $str2 -value (((Get-Variable -Name $str).Value | where{$_.number -eq $choice}).name)
+    Remove-Variable -Name $str2 -ErrorAction SilentlyContinue | Out-Null
+    New-Variable -Name $str2 -Value (((Get-Variable -Name $str).Value | Where-Object { $_.number -eq $choice }).name)
 }
 
 #get hosts based on cluster and get the current usage.
-$host_built = $(foreach($c in (Get-Cluster $cluster_built_choice | Get-VMHost)){
-    [pscustomobject]@{
-        Name = $c.name
-        CPU  = ([math]::round(($c.CpuTotalMhz - $c.CpuUsageMhz),0))
-        RAM  = ([math]::round(($c.MemoryTotalGB - $c.MemoryUsageGB),0))
-    }
-}) | sort ram -Descending | ForEach-Object{$i = 0}{
-    [pscustomobject]@{
-        Number      = $i
-        Name        = $_.name
-        Free_CPU    = $_.cpu
-        Free_RAM    = $_.ram
+$host_built = $(foreach ($c in (Get-Cluster $cluster_built_choice | Get-VMHost)) {
+        [pscustomobject]@{
+            Name = $c.name
+            CPU  = ([math]::round(($c.CpuTotalMhz - $c.CpuUsageMhz), 0))
+            RAM  = ([math]::round(($c.MemoryTotalGB - $c.MemoryUsageGB), 0))
         }
+    }) | Sort-Object ram -Descending | ForEach-Object { $i = 0 } {
+    [pscustomobject]@{
+        Number   = $i
+        Name     = $_.name
+        Free_CPU = $_.cpu
+        Free_RAM = $_.ram
+    }
     ++$i
 }
 
-Write-host "Choose a Host"
-Write-Output $host_built | ft -AutoSize
-$host_built_choice = ($host_built[$(read-host -Prompt "Enter The Number You Want To Choose")].name)
-cls
+Write-Host "Choose a Host"
+Write-Output $host_built | Format-Table -AutoSize
+$host_built_choice = ($host_built[$(Read-Host -Prompt "Enter The Number You Want To Choose")].name)
+Clear-Host
 
 #system resources
 $memory = $null
-while(!($memory)){
-    try{
-        cls
-        [int]$memory = read-host -Prompt "Enter Amount Of RAM As Gigabyte, Number Only."
-    }catch{}
+while (!($memory)) {
+    try {
+        Clear-Host
+        [int]$memory = Read-Host -Prompt "Enter Amount Of RAM As Gigabyte, Number Only."
+    }
+    catch {}
 }
 
 $cpu = $null
-while(!($cpu)){
-    try{
-        cls
-        [int]$cpu = read-host -Prompt "Enter Amount Of CPU, Number Only."
-    }catch{}
+while (!($cpu)) {
+    try {
+        Clear-Host
+        [int]$cpu = Read-Host -Prompt "Enter Amount Of CPU, Number Only."
+    }
+    catch {}
 }
 
-$coreoptions = $(for($i = 1; $i -le $cpu; $i++){
-    if($cpu % $i -eq 0){
-        if($($cpu / $i) -le 4){
-            [pscustomobject]@{
-                Core   = $cpu / $i
-                Socket = $i
+$coreoptions = $(for ($i = 1; $i -le $cpu; $i++) {
+        if ($cpu % $i -eq 0) {
+            if ($($cpu / $i) -le 4) {
+                [pscustomobject]@{
+                    Core   = $cpu / $i
+                    Socket = $i
+                }
             }
         }
-    }
-}) | ForEach-Object{$i = 0}{
+    }) | ForEach-Object { $i = 0 } {
     [pscustomobject]@{
         Number = $i
         Core   = $_.core
@@ -116,59 +118,60 @@ $coreoptions = $(for($i = 1; $i -le $cpu; $i++){
     ++$i
 }
 
-cls
-write-host "Core And Socket Count"
-Write-output $coreoptions | ft -AutoSize
+Clear-Host
+Write-Host "Core And Socket Count"
+Write-Output $coreoptions | Format-Table -AutoSize
 $core_choice = Read-Host -Prompt "Choose The Core And Socket Count"
-cls
+Clear-Host
 
-write-host "Finding DataStores..."
-$datastore = Get-Datastore | where{$_.ExtensionData.host.key -eq (get-vmhost $host_built_choice).Id} | sort freespacegb -Descending | select -first 10
-cls
+Write-Host "Finding DataStores..."
+$datastore = Get-Datastore | Where-Object { $_.ExtensionData.host.key -eq (Get-VMHost $host_built_choice).Id } | Sort-Object freespacegb -Descending | Select-Object -First 10
+Clear-Host
 
-$datastore_built = for($i = 0; $i -lt $datastore.count; $i++){
+$datastore_built = for ($i = 0; $i -lt $datastore.count; $i++) {
     [pscustomobject]@{
         Number = $i
         Name   = $datastore[$i].name
-        Size   = [math]::round($datastore[$i].freespacegb,0)
+        Size   = [math]::round($datastore[$i].freespacegb, 0)
     }
 }
 
-write-host "Choose A Datastore"
-write-output $datastore_built | ft -AutoSize
+Write-Host "Choose A Datastore"
+Write-Output $datastore_built | Format-Table -AutoSize
 
-$choice = Read-Host -prompt "Enter The Number You Want To Choose"
-cls
-$datastore_built_choice = ($datastore_built | where{$_.number -eq $choice}).name
+$choice = Read-Host -Prompt "Enter The Number You Want To Choose"
+Clear-Host
+$datastore_built_choice = ($datastore_built | Where-Object { $_.number -eq $choice }).name
 
-foreach($h in $hostnames){
+foreach ($h in $hostnames) {
 
     $gobuild = ""
-    while("y" -notcontains $gobuild){
-    
-        cls
-        read-host -Prompt "Press Enter To Configure $h"
+    while ("y" -notcontains $gobuild) {
+
+        Clear-Host
+        Read-Host -Prompt "Press Enter To Configure $h"
 
         #disk count
         $diskcount = $null
-        while(!($diskcount)){
-            try{
-                cls
-                [int]$diskcount = read-host -Prompt "How Many Disks Do You Need In Addition To The C Drive?"
+        while (!($diskcount)) {
+            try {
+                Clear-Host
+                [int]$diskcount = Read-Host -Prompt "How Many Disks Do You Need In Addition To The C Drive?"
                 
-                if($diskcount -lt 1){
+                if ($diskcount -lt 1) {
                     break
                 }
-            }catch{}
+            }
+            catch {}
         }
 
-        Get-Variable -Name "disk_$($h)_*" -ErrorAction SilentlyContinue | %{remove-variable $_.name}
+        Get-Variable -Name "disk_$($h)_*" -ErrorAction SilentlyContinue | ForEach-Object { Remove-Variable $_.name }
 
         #create variables, use [char] to increment a letter so you see C, D drive.
-        for($i = 1; $i -le $diskcount; ++$i){
-            cls
-            New-Variable -Name "disk_$($h)_$i" -Value (read-host -Prompt "Enter The Size of Your $([char](67 + $i)) Drive")
-            cls
+        for ($i = 1; $i -le $diskcount; ++$i) {
+            Clear-Host
+            New-Variable -Name "disk_$($h)_$i" -Value (Read-Host -Prompt "Enter The Size of Your $([char](67 + $i)) Drive")
+            Clear-Host
         }
     
         #build an object so we can check out settings before we deploy.
@@ -185,73 +188,76 @@ foreach($h in $hostnames){
         }
     
         #add disks dynamically because there can be any number.
-        $diskvarcount = (get-variable "disk_$($h)_*").count
-        for($i = 1; $i -le $diskvarcount; $i++){
-            $buildspecs | add-member -MemberType NoteProperty -Name "Disk_$($h)_$i" -Value $((get-variable "disk_$($h)_$i").value)
+        $diskvarcount = (Get-Variable "disk_$($h)_*").count
+        for ($i = 1; $i -le $diskvarcount; $i++) {
+            $buildspecs | Add-Member -MemberType NoteProperty -Name "Disk_$($h)_$i" -Value $((Get-Variable "disk_$($h)_$i").value)
         }
     
-        write-output $buildspecs | ft -autosize -Property *
+        Write-Output $buildspecs | Format-Table -AutoSize -Property *
         $gobuild = ""
-        $gobuild = read-host -Prompt "Are The Build Spec's Correct? Y or N"
-        cls
+        $gobuild = Read-Host -Prompt "Are The Build Spec's Correct? Y or N"
+        Clear-Host
 
         #switch on check, restart the while if we see anything but y.
-        switch($gobuild){
-            Y      {break}
-            N      {continue}
-            Default{continue}
+        switch ($gobuild) {
+            Y { break }
+            N { continue }
+            Default { continue }
         }
     }
 
     #deploy VM based on the settings, run async for multiple deployments.
-    $newvm = new-vm -Template $temp_built_choice `
-        -VMHost $(get-vmhost $host_built_choice) `
+    $newvm = New-VM -Template $temp_built_choice `
+        -VMHost $(Get-VMHost $host_built_choice) `
         -Name $h `
-        -Location $(get-folder $folder_built_choice | where{$_.parentid -eq $vcenterfolder}) `
+        -Location $(Get-Folder $folder_built_choice | Where-Object { $_.parentid -eq $vcenterfolder }) `
         -Datastore $(Get-Datastore $datastore_built_choice) `
         -DiskStorageFormat Thin `
         -Confirm:$false `
         -RunAsync `
+
 }
 
 #wait for the deployment to finish all vms
-while(Get-Task | where {$_.name -eq "CloneVM_Task" -and $_.state -eq "Running"}){
-    start-sleep -Seconds 5
+while (Get-Task | Where-Object { $_.name -eq "CloneVM_Task" -and $_.state -eq "Running" }) {
+    Start-Sleep -Seconds 5
 }
 
-for($h = 0; $h -lt ($hostnames).Count; $h++){
+for ($h = 0; $h -lt ($hostnames).Count; $h++) {
     
-    write-host "Configuring " $hostnames[$h]
+    Write-Host "Configuring " $hostnames[$h]
     
     #get vm for config tasks
-    $vm = get-vm $hostnames[$h]
+    $vm = Get-VM $hostnames[$h]
 
     #create the disk start at index 1 as to not recreate the c drive sized disk
-    for($i = 1; $i -le (Get-Variable "disk_$($hostnames[$h])_*").count; $i++){
+    for ($i = 1; $i -le (Get-Variable "disk_$($hostnames[$h])_*").count; $i++) {
         
-        [void](New-HardDisk -VM $vm -DiskType Flat -CapacityGB (Get-Variable "disk_$($hostnames[$h])_$i").Value -StorageFormat Thin -Datastore $buildspecs.datastore -Confirm:$false -WarningAction SilentlyContinue | out-null)
+        [void](New-HardDisk -VM $vm -DiskType Flat -CapacityGB (Get-Variable "disk_$($hostnames[$h])_$i").Value -StorageFormat Thin -Datastore $buildspecs.datastore -Confirm:$false -WarningAction SilentlyContinue | Out-Null)
             
-        if($i -eq (Get-Variable "disk_$($hostnames[$h])_*").count){
+        if ($i -eq (Get-Variable "disk_$($hostnames[$h])_*").count) {
             continue
-        }else{
-            while(Get-Task | where {$_.name -eq "ReconfigVM_Task" -and $_.state -eq "Running" -and $_.ObjectId -eq $vm.Id}){
-                start-sleep -Seconds 5
+        }
+        else {
+            while (Get-Task | Where-Object { $_.name -eq "ReconfigVM_Task" -and $_.state -eq "Running" -and $_.ObjectId -eq $vm.Id }) {
+                Start-Sleep -Seconds 5
             }
         }
     }
     
     #set vm resources
-    set-vm -VM $vm -MemoryGB $buildspecs.ram -NumCpu $buildspecs.cpu -Confirm:$false -RunAsync | out-null
+    Set-VM -VM $vm -MemoryGB $buildspecs.ram -NumCpu $buildspecs.cpu -Confirm:$false -RunAsync | Out-Null
 
-    $spec = new-object -typename vmware.vim.virtualmachineconfigspec -Property @{"NumCoresPerSocket" = $buildspecs.core}
-    ($vm).extensiondata.reconfigvm_task($spec) | out-null
+    $spec = New-Object -TypeName vmware.vim.virtualmachineconfigspec -Property @{"NumCoresPerSocket" = $buildspecs.core }
+    ($vm).extensiondata.reconfigvm_task($spec) | Out-Null
 }
 
-while(Get-Task | where {$_.name -eq "ReconfigVM_Task" -and $_.state -eq "Running"}){
-    start-sleep -Seconds 5
+while (Get-Task | Where-Object { $_.name -eq "ReconfigVM_Task" -and $_.state -eq "Running" }) {
+    Start-Sleep -Seconds 5
 }
 
 #start the vm 
-try{
-    $start = $hostnames | %{ start-vm -VM $_ -Confirm:$false -RunAsync | out-null}
-}catch{}
+try {
+    $start = $hostnames | ForEach-Object { Start-VM -VM $_ -Confirm:$false -RunAsync | Out-Null }
+}
+catch {}
