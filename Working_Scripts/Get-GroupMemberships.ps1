@@ -43,30 +43,9 @@ function Get-ADGroupMemberships {
 }
 
 $Groups = @"
-AZ_WVD_T1_P_EUS_SMB_Contributor_Users
-AZ_WVD_T2_P_EUS_SMB_Contributor_Users
-AZ_WVD_T1_P_EUS_FullDesktop_AccessControl
-AZ_WVD_T1_P_EUS_FullDesktop_DesktopSupport
-AZ_WVD_T1_P_EUS_FullDesktop_GlobalOps
-AZ_WVD_T1_P_EUS_FullDesktop_HelpDesk
-AZ_WVD_T1_P_EUS_FullDesktop_Infra
-AZ_WVD_T1_P_EUS_RemoteApps_AccessControl
-AZ_WVD_T1_P_EUS_RemoteApps_DesktopSupport
-AZ_WVD_T1_P_EUS_RemoteApps_GlobalOps
-AZ_WVD_T1_P_EUS_RemoteApps_HelpDesk
-AZ_WVD_T1_P_EUS_RemoteApps_Infra
-AZ_WVD_T2_P_EUS_FullDesktop_AccessControl
-AZ_WVD_T2_P_EUS_FullDesktop_DesktopSupport
-AZ_WVD_T2_P_EUS_FullDesktop_GlobalOps
-AZ_WVD_T2_P_EUS_FullDesktop_HelpDesk
-AZ_WVD_T2_P_EUS_FullDesktop_Infra
-AZ_WVD_T2_P_EUS_RemoteApps_AccessControl
-AZ_WVD_T2_P_EUS_RemoteApps_DesktopSupport
-AZ_WVD_T2_P_EUS_RemoteApps_GlobalOps
-AZ_WVD_T2_P_EUS_RemoteApps_HelpDesk
-AZ_WVD_T2_P_EUS_RemoteApps_Infra
+NYC-BW1540 App SBME Sales Forecasting Legacy Users
 "@ -split [System.Environment]::NewLine
 
-Get-ADGroupMemberships -Groups $Groups -Export -Extension csv
+Get-ADGroupMemberships -Groups $Groups -Export -Extension pdf
 
 
