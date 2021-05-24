@@ -64,7 +64,7 @@
             # Password of 4 characters or longer
 		    IF ($Length -gt 4)
 		    {
-			
+
 			    DO
 			    {
 				    # Generate a Password of the length requested
