@@ -12,7 +12,7 @@ function Get-GPPReport {
     [string]$fileName
   )
 
-  begin { $fileName = "$($fileName)_$(Get-Date -Format {MM-d-yyyy}).csv" }
+  begin { $fileName = "$($fileName)_$(Get-Date -Format {MMddyyyy-HHmmss}).csv" }
 
   process {
     $output =
@@ -39,12 +39,12 @@ function Get-GPPReport {
   }
 }
 
-@"
-T2_STD_NA_USA_GBL_RDP-Access_Computer
+@'
+T2_STD_NA_RDP-Access_Computer
 T2_STD_LA_RDP-Access_Computer
 T2_STD_EU_RDP-Access_Computer
 T2_STD_AP_AUS_RDP-Access_Computer
 T2_STD_Computer
-"@ -split [environment]::NewLine | Get-GPPReport -path 'D:\Temp' -fileName 'GPPReport_15' -Verbose
+'@ -split [environment]::NewLine | Get-GPPReport -path 'D:\Temp' -fileName 'GPPReport' -Verbose
 
 
