@@ -33,10 +33,15 @@ function Get-RolesReport {
       $Groups = (Get-ADGroup -Identity $Group -Properties Name, ManagedBy, DistinguishedName |
         Select-Object Name, DistinguishedName, @{N = 'Manager'; E = { (Get-ADUser -Identity $_.managedBy -Properties Name).Name } })
 
-      $RoleAssignment = (($Groups) | Where-Object { $_.Name -like "*-Role" }).Name
-      $Manager = (($Groups) | Where-Object { $_.Name -like "*-Role" }).Manager
-      $NonRoleAssignaments = $Groups | Where-Object { $_.Name -notlike "*-Role" -and $_.Name -notlike "Admin_Tier-*_Users" -and $_.Name -notlike "tier-0_Users" } | Select-Object Name, DistinguishedName
-      $InTierGroup = if (($Groups) | Where-Object { $_.Name -like "Admin_Tier-*_Users" -or $_.Name -like "Tier-0_Users" }) { $true } else { $false }
+      $RoleAssignment = (($Groups) |
+        Where-Object { $_.Name -like "*-Role" }).Name
+      $Manager = (($Groups) |
+        Where-Object { $_.Name -like "*-Role" }).Manager
+      $NonRoleAssignaments = $Groups |
+        Where-Object { $_.Name -notlike "*-Role" -and $_.Name -notlike "Admin_Tier-*_Users" -and $_.Name -notlike "tier-0_Users" } |
+        Select-Object Name, DistinguishedName
+      $InTierGroup = if (($Groups) |
+        Where-Object { $_.Name -like "Admin_Tier-*_Users" -or $_.Name -like "Tier-0_Users" }) { $true } else { $false }
 
       if ($null -ne $NonRoleAssignaments) {
         switch -wildcard ($NonRoleAssignaments.DistinguishedName) {
@@ -58,7 +63,8 @@ function Get-RolesReport {
         $owner = ""
       }
 
-      $PsObj = $PsObj | Where-Object {$NonRoleAssignaments.Name -ne "" -and $RoleAssignments -ne ""}
+      $PsObj = $PsObj |
+        Where-Object {$NonRoleAssignaments.Name -ne "" -and $RoleAssignments -ne ""}
 
       $PsObj = [pscustomobject]@{
         ADMTier            = $admtier
