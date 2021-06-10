@@ -33,11 +33,9 @@ function Get-RolesReport {
       $Groups = (Get-ADGroup -Identity $Group -Properties Name, ManagedBy, DistinguishedName |
         Select-Object Name, DistinguishedName, @{N = 'Manager'; E = { (Get-ADUser -Identity $_.managedBy -Properties Name).Name } })
 
-      $RoleAssignment = (($Groups) |
-        Where-Object { $_.Name -like '*-Role' }).Name
+      $RoleAssignment = (($Groups) | Where-Object { $_.Name -like '*-Role' }).Name
 
-      $Manager = (($Groups) |
-        Where-Object { $_.Name -like '*-Role' }).Manager
+      $Manager = (($Groups) | Where-Object { $_.Name -like '*-Role' }).Manager
 
       $NonRoleAssignaments = $Groups |
       Where-Object { $_.Name -notlike '*-Role' -and $_.Name -notlike 'Admin_Tier-*_Users' -and $_.Name -notlike 'tier-0_Users' } |
