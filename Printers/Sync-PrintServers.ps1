@@ -62,23 +62,21 @@
 
   switch ($Operation) {
     Backup {
-      $PrintServer |
-      ForEach-Object -Process {
-        Start-Process 'printbrm.exe' -ArgumentList "-S \\$($PrintServer) -B -f $($SavePath)\$($File)_$($currentDate).printerExport" -Wait
-      }
+      Start-Process 'printbrm.exe' -ArgumentList "-S \\$($PrintServer) -B -f $($SavePath)\$($File)_$($currentDate).printerExport" -Wait
     }
     Restore {
-      $PrintServer |
-      ForEach-Object -Process {
-        Start-Process 'printbrm.exe' -ArgumentList "-S \\$($PrintServer) -R -f $($SavePath)\$($File).printerExport" -Wait
-      }
+      Start-Process 'printbrm.exe' -ArgumentList "-S \\$($PrintServer) -R -f $($SavePath)\$($File).printerExport" -Wait
     }
   }
 }
 
-# Print servers 
-@"
+# Print servers
+@'
+usculvwprt401
+usculvwprt402
 usculvwprt403
-"@ -split [environment]::NewLine | ForEach-Object {
+'@ -split [environment]::NewLine |
+
+ForEach-Object {
   Sync-PrintServers -PrintServer $_ -Operation Backup -SavePath '\\storage.me.sonymusic.com\data$\infra_dev\PrintServer_Backups' -File $_
 }
