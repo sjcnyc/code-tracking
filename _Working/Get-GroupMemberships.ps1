@@ -9,16 +9,16 @@ function Get-ADGroupMemberships {
     [System.Management.Automation.SwitchParameter]$Export,
 
     [parameter(Position = 3)]
-    [System.String]$ReportPath = "D:\Temp\",
+    [System.String]$ReportPath = 'D:\Temp\',
 
     [parameter(Position = 4)]
-    [System.String]$ReportName = "Report",
+    [System.String]$ReportName = 'Report',
 
     [parameter(Position = 5)]
-    [System.String]$ReportDate = "_$(Get-Date -format 'MM-dd-yyy')_1",
+    [System.String]$ReportDate = "_$(Get-Date -Format 'MM-dd-yyy')",
 
     [parameter(Position = 6)]
-    [ValidateSet("csv", "pdf")]
+    [ValidateSet('csv', 'pdf')]
     [System.String]$Extension
   )
 
@@ -42,10 +42,15 @@ function Get-ADGroupMemberships {
   }
 }
 
-$Groups = @"
-NYC-BW1540 App SBME Sales Forecasting Legacy Users
-"@ -split [System.Environment]::NewLine
+$Groups = @'
+USA-GBL ISI Music$
+USA-GBL ISI Music$ Rani
+USA-GBL ISI Music$ BlueDot
+USA-GBL ISI Music$ KRMusic
+USA-GBL ISI Music$ KRMUSICJIVE
+USA-GBL ISI Music$ ZombaBS
+'@ -split [System.Environment]::NewLine
 
-Get-ADGroupMemberships -Groups $Groups -Export -Extension pdf
+Get-ADGroupMemberships -Groups $Groups -Export -Extension csv
 
 
