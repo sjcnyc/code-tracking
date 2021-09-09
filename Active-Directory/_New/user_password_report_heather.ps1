@@ -23,7 +23,7 @@
 
 Get-ADUser -Server "me.sonymusic.com" -Properties GivenName, Surname, Samaccountname, DistinguishedName, PasswordNeverExpires, PasswordNotRequired, Enabled, PasswordLastSet, PasswordExpired -Filter { PasswordNotRequired -eq $true } |
     Select-Object GivenName, Surname, SamAccountName, DistinguishedName, PasswordNeverExpires, PasswordNotRequired, @{N = 'AccountStatus'; E = {if ($_.Enabled -eq 'True') {'Enabled'}else {'Disabled'}}}, PasswordLastSet, PasswordExpired |
-    Export-Csv D:\Temp\passNotRQ_103117_002240.csv -NoTypeInformation
+    Export-Csv C:\Temp\passNotRQ_103117_002240.csv -NoTypeInformation
 
 Get-ADUser -Server "me.sonymusic.com" -Properties GivenName, Surname, Samaccountname, DistinguishedName, PasswordNeverExpires, Enabled, PasswordLastSet, PasswordExpired -Filter *  |
     Select-Object GivenName, Surname, SamAccountName, DistinguishedName, PasswordNeverExpires, @{N = 'AccountStatus'; E = {if ($_.Enabled -eq 'True') {'Enabled'}else {'Disabled'}}}, PasswordLastSet, PasswordExpired |
