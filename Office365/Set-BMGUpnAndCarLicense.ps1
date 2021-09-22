@@ -8,7 +8,7 @@ function script:Set-bmgUPN {
     )
     try {
 
-        if ($user -EQ ((Get-QADUser -Identity $user).SamAccountName) -and ((Get-QADUser -Identity $user -IncludeAllProperties).carLicense -eq $null)) {
+        if ($user -EQ ((Get-QADUser -Identity $user).SamAccountName) -and ($null -eq (Get-QADUser -Identity $user -IncludeAllProperties).carLicense)) {
 
             Set-ADUser $user -replace @{carLicense = $UPN} #-Server 'GTLSMEADS0012'
             Write-Verbose -Message "Set ME user: $($user) UPN: $($UPN) to: BMG carLicense Attribute"

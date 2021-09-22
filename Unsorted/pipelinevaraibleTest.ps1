@@ -30,3 +30,10 @@ Get-Mailbox -ResultSize Unlimited | Where-Object { $true } -PipelineVariable mb 
     Get-MailboxPermission -PipelineVariable mbs | Where-Object { $true } -PipelineVariable mbs
     Get-ADUser -Identity $mb.DistinguishedName |
     Select-Object DisplayName, DistinguishedName, Title, @{N='UserPrincipalName';E={$mb.UserPrincipalName}}, @{N='TotalItemSize';E={$mbs.TotalItemSize}}
+
+
+
+Get-Msoluser -userprincipalname $mailbox |
+    Where-Object { $true } -PipelineVariable msol |
+    Add-MsolGroupMember -groupObjectId xxxxx -groupmembertype 'User' -groupmemberObjectId $msol.ObjectId
+
