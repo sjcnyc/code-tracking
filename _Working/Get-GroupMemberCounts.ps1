@@ -1,11 +1,13 @@
-$group = @"
+<# $allgroups = @'
 usa-gbl member server administrators
 domain admins
-"@ -split [environment]::NewLine
+'@ -split [environment]::NewLine #>
 
-foreach ($a_group in $group){
+$allgroups = Get-ADGroup -Filter * -SearchBase 'OU=this,OU=an,OU=example,DC=test,DC=test,DC=com' | Select-Object Name
+
+foreach ($group in $allgroups) {
     [pscustomobject]@{
-        Group         = $a_group
-        Membercount   = get-adgroupmember $a_group -recursive | measure-object | Select-Object -ExpandProperty count
+        Group       = $group.Name
+        Membercount = Get-ADGroupMember $group.Name | Where-Object { $_.ObjectClass -eq 'User' } | Measure-Object | Select-Object -ExpandProperty Count
     }
 }
