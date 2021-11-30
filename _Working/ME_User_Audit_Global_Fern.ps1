@@ -1,5 +1,5 @@
 $ADUserSplat = @{
-  Filter     = { (Enabled -eq $True) }
+  Filter     = '*' # { (Enabled -eq $True) }
   Properties = 'sAMAccountName', 'givenName', 'sn', 'enabled', 'CanonicalName', 'whenCreated', 'whenChanged', 'LastLogonTimeStamp'
 }
 
@@ -18,5 +18,5 @@ foreach ($ou in $ous) {
   Select-Object 'sAMAccountName', 'givenName', 'sn', 'enabled', 'CanonicalName', 'whenCreated', 'whenChanged', @{n = 'LastLogon'; e = { [DateTime]::FromFileTime($_.LastLogonTimeStamp) } }
 }
 
-$Users | Export-Csv -Path D:\Temp\ME_Users_Global_$(Get-Date -f {MMdyyyyhhmm}).csv -NoTypeInformation
+$Users | Export-Csv -Path C:\Temp\ME_Users_Global_$(Get-Date -f {MMdyyyyhhmm}).csv -NoTypeInformation
 Write-Output "Total User Count: $($Users.Count)"

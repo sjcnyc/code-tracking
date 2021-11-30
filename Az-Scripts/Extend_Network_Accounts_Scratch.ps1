@@ -1,5 +1,5 @@
-Import-Module Az
-$ConnectionString = "DefaultEndpointsProtocol=https;AccountName=sa01sftx3406815508;AccountKey=6+KFw6fcjw9mhmExSbXrixZMuYz9kOkCAburdJKpmxhuy+ZVmSyeLce9WY8yj6+6nKCwoLqZbbhkfbI4zPKrLg==;EndpointSuffix=core.windows.net"
+Import-Module Az -RequiredVersion
+$ConnectionString = "DefaultEndpointsProtocol=https;AccountName=sa01sftx3406815508;AccountKey=eMXdKI+AkS7c7Y1XJFmfs/EFJSWW8nhZKv4tnZs523ykC4Nn/iZug9yzlGhvLob6kPJKal5HZYC5CAMX9BYpKg==;EndpointSuffix=core.windows.net"
 $SourceStorageContext = New-AzStorageContext -ConnectionString $ConnectionString
 
 $ContainerName = "con01-sf-dropoff"

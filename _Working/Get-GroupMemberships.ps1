@@ -9,7 +9,7 @@ function Get-ADGroupMemberships {
     [System.Management.Automation.SwitchParameter]$Export,
 
     [parameter(Position = 3)]
-    [System.String]$ReportPath = 'D:\Temp\',
+    [System.String]$ReportPath = 'C:\Temp\',
 
     [parameter(Position = 4)]
     [System.String]$ReportName = 'Report',
@@ -24,8 +24,8 @@ function Get-ADGroupMemberships {
 
   try {
     $obj = $Groups | Get-ADGroup -PipelineVariable Grp -Properties Name | Get-ADGroupMember |
-    Get-ADUser -Properties GivenName, SurName, SamaccountName, DistinguishedName |
-    Select-Object -Property GivenName, SurName, SamaccountName, DistinguishedName, @{N = 'GroupName'; E = { $Grp.SamAccountName } }
+    Get-ADUser -Properties GivenName, SurName, SamaccountName, DistinguishedName, UserPrincipalName |
+    Select-Object -Property GivenName, SurName, SamaccountName, DistinguishedName, UserPrincipalName, @{N = 'GroupName'; E = { $Grp.SamAccountName } }
     if ($Export) {
       switch ($Extension) {
         csv { $obj | Export-Csv -Path "$($ReportPath)$($ReportName)$($ReportDate).$($Extension)" -NoTypeInformation }
@@ -43,14 +43,7 @@ function Get-ADGroupMemberships {
 }
 
 $Groups = @'
-USA-GBL ISI Music$
-USA-GBL ISI Music$ Rani
-USA-GBL ISI Music$ BlueDot
-USA-GBL ISI Music$ KRMusic
-USA-GBL ISI Music$ KRMUSICJIVE
-USA-GBL ISI Music$ ZombaBS
+USA-GBL ISI-Data US-INTL
 '@ -split [System.Environment]::NewLine
 
 Get-ADGroupMemberships -Groups $Groups -Export -Extension csv
-
-
