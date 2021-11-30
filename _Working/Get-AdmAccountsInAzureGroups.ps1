@@ -1,0 +1,2 @@
+Get-AzADGroupMember -GroupObjectId '4bd5fcbf-a80c-4880-bf82-8a7923bdeb67' | Where-Object { $_.UserPrincipalName -like 'adm*-*' } | Select-Object UserPrincipalName, Displayname |
+Export-Csv C:\Temp\3rdparty.csv
