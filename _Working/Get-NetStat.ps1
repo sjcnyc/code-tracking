@@ -1,11 +1,11 @@
 function Get-NetStat {
     param (
         [string]$ComputerName,
-        [string]$LogPath = "\\storage.bmg.bagint.com\wwinfra$\BmgDCLogs\"
+        [string]$LogPath = '\\storage.bmg.bagint.com\wwinfra$\BmgDCLogs\'
     )
     process {
-        $ScriptBlock = {netstat.exe -N | Where-Object {$_.Contains("389")}}
-        $Data = Invoke-Command -ScriptBlock $ScriptBlock -computername $ComputerName -errorAction Continue
+        $ScriptBlock = { netstat.exe -N | Where-Object { $_.Contains('389') } }
+        $Data = Invoke-Command -ScriptBlock $ScriptBlock -ComputerName $ComputerName -ErrorAction Continue
         $Data = $Data[4..$Data.count]
         foreach ($line in $Data) {
             $Line = $Line -replace '^\s+', ''
@@ -14,19 +14,19 @@ function Get-NetStat {
             $Props = [pscustomobject]@{
                 ComputerName       = $ComputerName
                 Protocol           = $Line[0]
-                LocalAddressIP     = ($Line[1] -split ":")[0]
-                LocalAddressPort   = ($Line[1] -split ":")[1]
-                ForeignAddressIP   = ($Line[2] -split ":")[0]
-                ForeignAddressPort = ($Line[2] -split ":")[1]
+                LocalAddressIP     = ($Line[1] -split ':')[0]
+                LocalAddressPort   = ($Line[1] -split ':')[1]
+                ForeignAddressIP   = ($Line[2] -split ':')[0]
+                ForeignAddressPort = ($Line[2] -split ':')[1]
                 State              = $Line[3]
                 Date               = Get-Date
             }
-            $Props | export-csv "$($LogPath)$($ComputerName)_NetStat_389.csv" -Append -NoTypeInformation
+            $Props | Export-Csv "$($LogPath)$($ComputerName)_NetStat_389.csv" -Append -NoTypeInformation
         }
     }
 }
 
-@"
+@'
 NYCSMEADS0011
 NYCSMEADS0012
 BERSMEADS0010
@@ -50,7 +50,7 @@ STOSMEADS0010
 SYDSMEADS0010
 PARSMEADS0010
 TORSMEADS0010
-"@ -split [environment]::NewLine | ForEach-Object {
+'@ -split [environment]::NewLine | ForEach-Object {
 
     Get-NetStat -ComputerName $_
 }
