@@ -27,5 +27,4 @@ Set-AzVMDiskEncryptionExtension -ResourceGroupName $rgName `
   -DiskEncryptionKeyVaultId $keyVaultResourceId `
   -KeyEncryptionKeyUrl $keyEncryptionKeyUrl `
   -KeyEncryptionKeyVaultId $keyVaultResourceId
-    
-Get-AzVmDiskEncryptionstatus -ResourceGroupName $rgName -VMName 'your Vm name'
+
