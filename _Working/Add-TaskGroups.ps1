@@ -1,5 +1,4 @@
-﻿function Add-TaskGroups
-{
+﻿function Add-TaskGroups {
   <#
       .SYNOPSIS
       Add taskgroups to roles
@@ -13,11 +12,11 @@
   [CmdletBinding()]
   param
   (
-    [Parameter(Mandatory=$true,HelpMessage='RoleGroups', Position=0)]
+    [Parameter(Mandatory = $true, HelpMessage = 'RoleGroups', Position = 0)]
     [string]
     $RGroups,
 
-    [Parameter(Mandatory=$true,HelpMessage='Task Groups', Position=1)]
+    [Parameter(Mandatory = $true, HelpMessage = 'Task Groups', Position = 1)]
     [string]
     $TGroups
   )
@@ -55,4 +54,4 @@ T2_ADM_NA_L_Rename_User_Objects
 
 Add-TaskGroups -RGroups 'T2_G_Global_AD_Operations-Role' -TGroups $TaskGroups
 
-Show-Command -Name "Add-TaskGroups" -PassThru Add-TaskGroups
+Show-Command -Name 'Add-TaskGroups' -PassThru Add-TaskGroups
