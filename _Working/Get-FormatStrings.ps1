@@ -10,15 +10,15 @@ function Get-FormatStrings {
         Get-FormatStrings (Get-Date)
         #Return common format strings for date objects
 
-        FormatString                          Output                          
-        ------------                          ------                          
-        '{0:d}'       -f 05/15/2018 15:33:46  5/15/2018                       
-        '{0:D}'       -f 05/15/2018 15:33:46  Tuesday, May 15, 2018           
-        '{0:f}'       -f 05/15/2018 15:33:46  Tuesday, May 15, 2018 3:33 PM   
+        FormatString                          Output
+        ------------                          ------
+        '{0:d}'       -f 05/15/2018 15:33:46  5/15/2018
+        '{0:D}'       -f 05/15/2018 15:33:46  Tuesday, May 15, 2018
+        '{0:f}'       -f 05/15/2018 15:33:46  Tuesday, May 15, 2018 3:33 PM
         '{0:F}'       -f 05/15/2018 15:33:46  Tuesday, May 15, 2018 3:33:46 PM
-        '{0:g}'       -f 05/15/2018 15:33:46  5/15/2018 3:33 PM               
-        '{0:G}'       -f 05/15/2018 15:33:46  5/15/2018 3:33:46 PM    
-        ...   
+        '{0:g}'       -f 05/15/2018 15:33:46  5/15/2018 3:33 PM
+        '{0:G}'       -f 05/15/2018 15:33:46  5/15/2018 3:33:46 PM
+        ...
     #>
   [CmdletBinding()]
   Param
@@ -31,11 +31,11 @@ function Get-FormatStrings {
         $true
       })]
     $ToBeFormatted
-  ) 
+  )
   process {
     foreach ($item in $ToBeFormatted) {
       if ($item -is [datetime]) {
-        $formats = 'd;D;f;F;g;G;m;r;s;t;T;u;U;y;dddd;MMMM;dd;yyyy;M/yy;dd-MM-yy;tt;zzz;R;Y' -split ';'  
+        $formats = 'd;D;f;F;g;G;m;r;s;t;T;u;U;y;dddd;MMMM;dd;yyyy;M/yy;dd-MM-yy;tt;zzz;R;Y' -split ';'
       }
       elseif ($item -is [int]) {
         $formats = @'
@@ -79,12 +79,12 @@ g
 '@  -split "`r`n"
       }
 
-      $output = $formats | ForEach-Object {  
+      $output = $formats | ForEach-Object {
         [PSCustomObject]@{
           FormatString = '{0,-14} {1}' -f "'{0:$_}'", "-f $item"
           Output       = "{0:$_}" -f $item
-        } 
-      } 
+        }
+      }
       $output | Out-Default
     }
   }
