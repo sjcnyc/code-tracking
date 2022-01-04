@@ -12,14 +12,16 @@ function Clear-UserLogonHours {
   [byte[]]$hoursFalse = @(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
   try {
-    Get-ADUser -Identity $User -Server $Domain |
-    Set-ADUser -Replace @{logonhours = $hoursFalse } -Server $Domain -ErrorAction Stop
+    if ($PSCmdlet.ShouldProcess($user) -and ($PSCmdlet.ShouldProcess($domain))) {
+      Get-ADUser -Identity $User -Server $Domain |
+      Set-ADUser -Replace @{logonhours = $hoursFalse } -Server $Domain -ErrorAction Stop
+    }
   }
   catch [Microsoft.ActiveDirectory.Management.ADException] {
     $Error[0].Exception
   }
   finally {
-    $ErrorActionPreference = "Continue"
+    $ErrorActionPreference = 'Continue'
   }
 }
 
@@ -30,6 +32,6 @@ function Clear-UserLogonHours {
 $Users = (Import-Csv -Path C:\Temp\<some_csv>.csv).SamAccountName
 
 foreach ($User in $Users) {
-  # Unomment -WhatIf for testing
-  Clear-UserLogonHours -User $User -Domain 'bmg.bagint.com' #-WhatIf
+  # Uncomment -WhatIf for testing
+  Clear-UserLogonHours -User $User -Domain 'me.sonymusic.com' -WhatIf
 }
