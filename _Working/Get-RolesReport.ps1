@@ -1,5 +1,19 @@
 using namespace System.Collections.Generic
 function Get-RolesReport {
+
+<# PSFunctionInfo
+
+Version 1.0.0
+Author Sean Connealy
+CompanyName colanderapi
+Copyright 2022
+Description Get AD roles for Tier accounts
+Guid dd05e801-4a14-4c97-a5fb-5e7a4df210f9
+Tags scripting,Active Directory,Reporting
+LastUpdate 1/18/2022 1:22 PM
+Source C:\PowerShell\_Working\Get-RolesReport.ps1
+
+#>
   param (
     [int]
     $Tier = 3,
