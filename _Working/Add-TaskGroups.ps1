@@ -22,7 +22,7 @@
   )
   
   try {
-    
+
     foreach ($TGroup in $TGroups) {
       Add-ADGroupMember -Identity $RGroups -Members $_ -ErrorAction Stop -WhatIf
     }

@@ -16,9 +16,9 @@ Connect-AzAccount -UseDeviceAuthentication
 
 #Define parameters
 $SubscriptionId = "bcda95b7-72ae-40ce-8967-f83a6597d40a"
-$ResourceGroupName = "RG-WVD-ADMT1-P-EUS"
-$StorageAccountName = "stadmintier2peus"
-$targetOu = "OU=JMP,OU=GBL,OU=USA,OU=NA,OU=SRV,OU=Tier-1,DC=me,DC=sonymusic,DC=com"
+$ResourceGroupName = "EUS-Global-Storage"
+$StorageAccountName = "azurefilesgsa"
+$targetOu = "OU=Admin,OU=AzureVDI,OU=GBL,OU=USA,OU=NA,OU=SRV,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
 
 #Select the target subscription for the current session
 Select-AzSubscription -SubscriptionId $SubscriptionId

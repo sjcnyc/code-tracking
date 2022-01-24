@@ -29,4 +29,4 @@
     OnPremisesSecurityIdentifier = $User.OnPremisesSecurityIdentifier
   }
 }
-$Results | Export-Csv D:\Temp\companyName.csv -NoTypeInformation
+$Results | Export-Csv -Path "D:\Temp\companyName.csv" -NoTypeInformation
