@@ -1,12 +1,12 @@
 #Define some input data.  This can also be from Import-CSV
 
-$Users = @"
+$Users = @'
 sAMAccountName,   DisplayName
 "sconnea",        "Connealy, Sean, Peak"
 "amoldove",       "Moldoveanu, Alex, Sony Music"
 "blynch",         "Lynch, Brian, IS&T"
 "klee123",        "Lee, Kim, Sony Music"
-"@ -split [environment]::NewLine
+'@ -split [environment]::NewLine
 
 
 #loop $users
