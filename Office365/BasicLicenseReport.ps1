@@ -20,16 +20,16 @@ function Get-o365License {
       Write-Host "$i. $($Skus[$i - 1].AccountSkuId)"
       $SkuMenu.Add($i, ($Skus[$i - 1].AccountSkuId))
     }
-    
+
     If (!($SkuValue)) {
       [int]$Skuselection = Read-Host 'Enter value for SKU to report on'
       $SkuValue = $SkuMenu.Item($Skuselection)
     }
-    
+
     Write-Host -NoNewline 'Select SKU is: '; Write-Host -ForegroundColor Green "$($SkuValue)"
-    
+
     $Choice = Read-Host 'Correct? [Y/N]'
-    
+
     while ($Choice -ne 'Y') {
       Exit
     }
@@ -55,7 +55,7 @@ function Get-o365License {
         $i++
       }
     }
-    
+
     PerSKU {
       foreach ($User in $Users) {
         Write-Progress -Activity "Processing user $($User.DisplayName) - $($i)/$TotalUsers" -PercentComplete (($i / $TotalUsers) * 100)
