@@ -15,8 +15,7 @@ foreach ($ou in $ous) {
     Property = 'sAMAccountName', 'givenName', 'sn', 'enabled', 'CanonicalName', 'whenCreated', 'whenChanged', @{n = 'LastLogon'; e = { [DateTime]::FromFileTime($_.LastLogonTimeStamp) } }
   }
 
-  $Users += Get-ADUser -SearchBase $ou @ADUserSplat |
-  Select-Object @selectObjectSplat
+  $Users += Get-ADUser -SearchBase $ou @ADUserSplat | Select-Object @selectObjectSplat
 }
 
 $Users | Export-Csv -Path D:\Temp\ME_Users1_$(Get-Date -f {MMdyyyyhhmm}).csv -NoTypeInformation
