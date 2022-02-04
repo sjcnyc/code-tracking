@@ -14,8 +14,11 @@ $ous = (Get-ADOrganizationalUnit @getADOrganizationalUnitSplat).DistinguishedNam
 
 $Users =
 foreach ($ou in $ous) {
-  Get-ADUser -SearchBase $ou @ADUserSplat |
-  Select-Object 'sAMAccountName', 'givenName', 'sn', 'enabled', 'CanonicalName', 'whenCreated', 'whenChanged', @{n = 'LastLogon'; e = { [DateTime]::FromFileTime($_.LastLogonTimeStamp) } }
+  $selectObjectSplat = @{
+    Property = 'sAMAccountName', 'givenName', 'sn', 'enabled', 'CanonicalName', 'whenCreated', 'whenChanged', @{n = 'LastLogon'; e = { [DateTime]::FromFileTime($_.LastLogonTimeStamp) } }
+  }
+
+  Get-ADUser -SearchBase $ou @ADUserSplat | Select-Object @selectObjectSplat
 }
 
 $Users | Export-Csv -Path C:\Temp\ME_Users_Global_$(Get-Date -f {MMdyyyyhhmm}).csv -NoTypeInformation
