@@ -1,4 +1,4 @@
-Function Get-MsGraphAuthenticationMethod {
+function Get-MsGraphAuthenticationMethod {
   <#
 .SYNOPSIS
     List MFA Authentication Methods for users using Graph API. A session using Connect-Graph must be open as a requirement.
