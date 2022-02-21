@@ -159,7 +159,5 @@ function Get-PIMRoleAssignment {
       }
     }
   }
-
   END {}
- 
 }
