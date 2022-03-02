@@ -43,7 +43,16 @@ function Get-ADGroupMemberships {
 }
 
 $Groups = @'
-USA-GBL ISI-Data US-INTL
+AZ_AVD_Cognizant_FullDesktop
+AZ_AVD_GSA_FullDesktop
+AZ_AVD_InfraPersonal_Win10_FullDesktop
+AZ_AVD_InfraPersonal_Win11_FullDesktop
+AZ_AVD_SAP_FullDesktop
+AZ_AVD_SME_FullDesktop
+AZ_AVD_SomLivre_FullDesktop
+AZ_AVD_TCS_FullDesktop
+AZ_AVD_UltraRecords_FullDesktop
+AZ_AVD_WNS_FullDesktop
 '@ -split [System.Environment]::NewLine
 
 Get-ADGroupMemberships -Groups $Groups -Export -Extension csv
