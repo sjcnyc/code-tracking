@@ -25,7 +25,7 @@ function Get-MsGraphAuthenticationMethod {
     [string[]]
     $MethodType
   )
- 
+
   BEGIN {
     $ConnectionGraph = Get-MgContext
     if (-not $ConnectionGraph) {
