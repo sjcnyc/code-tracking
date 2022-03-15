@@ -12,7 +12,7 @@ function Get-ADGroupMemberships {
     [System.String]$ReportPath = 'C:\Temp\',
 
     [parameter(Position = 4)]
-    [System.String]$ReportName = 'Report',
+    [System.String]$ReportName = 'AVD_Report',
 
     [parameter(Position = 5)]
     [System.String]$ReportDate = "_$(Get-Date -Format 'MM-dd-yyy')",
@@ -44,9 +44,9 @@ function Get-ADGroupMemberships {
 
 $Groups = @'
 AZ_AVD_Cognizant_FullDesktop
+AZ_AVD_DataMart_FullDesktop
 AZ_AVD_GSA_FullDesktop
-AZ_AVD_InfraPersonal_Win10_FullDesktop
-AZ_AVD_InfraPersonal_Win11_FullDesktop
+AZ_AVD_Itopia_FullDesktop
 AZ_AVD_SAP_FullDesktop
 AZ_AVD_SME_FullDesktop
 AZ_AVD_SomLivre_FullDesktop
