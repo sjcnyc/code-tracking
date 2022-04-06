@@ -44,10 +44,12 @@ function Get-ADGroupMemberships {
 
 $Groups = @'
 AZ_AVD_Cognizant_FullDesktop
+AZ_AVD_DAG_FullDesktop
 AZ_AVD_DataMart_FullDesktop
 AZ_AVD_GSA_FullDesktop
 AZ_AVD_Itopia_FullDesktop
 AZ_AVD_SAP_FullDesktop
+AZ_AVD_SCUBA_FullDesktop
 AZ_AVD_SME_FullDesktop
 AZ_AVD_SomLivre_FullDesktop
 AZ_AVD_TCS_FullDesktop
