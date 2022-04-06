@@ -1,8 +1,8 @@
 ﻿
 # import the input csv file
-$input_csv = Import-Csv .\attribute_mod_1.csv
+$input_csv = Import-Csv C:\temp\ME_User_Report.csv
 <#
->> $input_csv[0] : 
+>> $input_csv[0] :
 userID          : D.ADVMS.01
 displayName     : Wisdom Batts
 givenName       : Wisdom
@@ -13,7 +13,7 @@ telephoneNumber : +1 404 555 1212
 #>
 
 # get the headers
-$headers = $input_csv | Get-Member -MemberType NoteProperty | foreach {$_.name} 
+$headers = $input_csv | Get-Member -MemberType NoteProperty | ForEach-Object {$_.name}
 
 <#
 $headers>>
@@ -41,7 +41,7 @@ foreach ( $row in $input_csv)
         Once the Loop2 is exected, We will get a hashtable of this format.
         $hashTable >>
         Name                           Value                                                                                                                                                                                                    
-        ----                           -----                                                                                                                                                                                                    
+        ----                           -----
         displayName                    Franny Pitts                                                                                                                                                                                             
         mail                           Franny.Pitts@test.com                                                                                                                                                                                    
         telephoneNumber                +1 201 555 1212                                                                                                                                                                                          
@@ -57,7 +57,8 @@ foreach ( $row in $input_csv)
     
     try
         {
-        Set-ADUser -Identity $row.userID -Server $domain -Replace $hashTable
+            Write-Output $hashTable
+        #Set-ADUser -Identity $row.userID -Server $domain -Replace $hashTable
         }
     catch
         {
@@ -67,4 +68,4 @@ foreach ( $row in $input_csv)
     #$domain >> use the domain name where the user is located. If you don't know, we can use more sophisticated methods to first query the GC and then get the domain information.
 
     }
-        
+

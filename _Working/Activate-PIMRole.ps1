@@ -8,19 +8,7 @@ Required paramter. UserName for the acount with roles to activate.
 .PARAMETER GlobalAdmin
 Optional parameter. Using this parameter will skip the role picker and just activate the Global Admin role as quickly as possible.
 .NOTES
-1.0 - 
-2.0 - Added default answers
-3.0 - Now translates role activation time to the local time zone of the computer running the script
-3.1 - Cleaned up time translation. Cleaned up formating and output.
-3.2 - Changed display of multiple active roles.
-4.0 - Added -GlobalAdmin switch which activates Global Admin role
-4.1 - Added functions for a couple chucks of code that are used multiple times
-Activate-PIMRole.ps1
-v4.1
-5/14/2019
-By Nathan O'Bryan, MVP|MCSM
-nathan@mcsmlab.com
-Special thanks to Damian Scoles (https://www.practicalpowershell.com/) for an assist with the time translation in V3
+
 .EXAMPLE
 Activate-PIMRole -UserName nathan@mcsmlab.com
 .Example
