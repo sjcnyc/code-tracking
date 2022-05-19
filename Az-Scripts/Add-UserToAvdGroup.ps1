@@ -25,5 +25,9 @@ function Add-UserToAvdGroup {
 Register-ArgumentCompleter -CommandName 'Add-UserToAvdGroup' -ParameterName 'Groups' -ScriptBlock {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
 
-    (Get-ADGroup -Filter 'Name -like "az_avd_*FullDesktop"' -prop Name).Name | ForEach-Object { "'$_'" }
+$Parameters = @{
+	Filter = 'Name -like "az_avd_*FullDesktop" -and Name -notlike "*Tier*"'
+	prop   = 'Name'
+}
+    (Get-ADGroup @Parameters).Name | ForEach-Object { "'$_'" }
 }
