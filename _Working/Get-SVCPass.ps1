@@ -6,6 +6,9 @@ function Get-SVCPass {
         Properties = 'sAMAccountName', 'PasswordExpired', 'PasswordNeverExpires', 'msDS-UserPasswordExpiryTimeComputed'
     }
 
-    Get-ADUser @getADUserSplat | Select-Object sAMAccountName, PasswordExpired, PasswordNeverExpires, @{Name="ExpiryDate";Expression={[datetime]::FromFileTime($_."msDS-UserPasswordExpiryTimeComputed")}} | 
-    Sort-Object PasswordExpired
+    $selectObjectSplat = @{
+        Property = 'sAMAccountName', 'PasswordExpired', 'PasswordNeverExpires', @{Name="ExpiryDate";Expression={[datetime]::FromFileTime($_."msDS-UserPasswordExpiryTimeComputed")}}
+    }
+
+    Get-ADUser @getADUserSplat | Select-Object @selectObjectSplat | Sort-Object PasswordExpired
 }
