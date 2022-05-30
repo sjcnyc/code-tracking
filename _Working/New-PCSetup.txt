@@ -1,1 +1,0 @@
-Install-Module -Name oh-my-posh, posh-git, Terminal-Icons, Az.Tools.predictor, PSReadLine -Force -Scope CurrentUser
