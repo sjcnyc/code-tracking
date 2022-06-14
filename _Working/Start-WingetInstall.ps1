@@ -78,7 +78,7 @@ function Out-Menu {
             }
         }
     } while (!$ok)
-} # force git sync
+} # force git sync.  Twice
 
 $Choices = Out-Menu $Programs -AllowCancel -AllowMultiple
 
