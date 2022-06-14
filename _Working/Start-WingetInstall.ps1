@@ -42,10 +42,10 @@ function Out-Menu {
             Write-Host $Footer 
         }
 
-        Write-Host '' 
+        Write-Host ''
 
         if ($AllowMultiple) { 
-            $answers = @(Read-Host).Split(',').Trim() 
+            $answers = @(Read-Host).Split(',').Trim()
 
             if ($AllowCancel -and $answers -match 'c') { 
                 return
@@ -78,7 +78,7 @@ function Out-Menu {
             }
         }
     } while (!$ok)
-}
+} # force git sync
 
 $Choices = Out-Menu $Programs -AllowCancel -AllowMultiple
 
