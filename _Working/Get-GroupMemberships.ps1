@@ -9,10 +9,10 @@ function Get-ADGroupMemberships {
     [System.Management.Automation.SwitchParameter]$Export,
 
     [parameter(Position = 3)]
-    [System.String]$ReportPath = 'C:\Temp\',
+    [System.String]$ReportPath = 'D:\Temp\',
 
     [parameter(Position = 4)]
-    [System.String]$ReportName = 'AVD_Report',
+    [System.String]$ReportName = 'Columbia_Share_Report',
 
     [parameter(Position = 5)]
     [System.String]$ReportDate = "_$(Get-Date -Format 'MM-dd-yyy')",
@@ -43,18 +43,9 @@ function Get-ADGroupMemberships {
 }
 
 $Groups = @'
-AZ_AVD_Cognizant_FullDesktop
-AZ_AVD_DAG_FullDesktop
-AZ_AVD_DataMart_FullDesktop
-AZ_AVD_GSA_FullDesktop
-AZ_AVD_Itopia_FullDesktop
-AZ_AVD_SAP_FullDesktop
-AZ_AVD_SCUBA_FullDesktop
-AZ_AVD_SME_FullDesktop
-AZ_AVD_SomLivre_FullDesktop
-AZ_AVD_TCS_FullDesktop
-AZ_AVD_UltraRecords_FullDesktop
-AZ_AVD_WNS_FullDesktop
+USA-GBL ISI Columbia Admin
+USA-GBL ISI Columbia RW
+USA-GBL ISI Columbia RO
 '@ -split [System.Environment]::NewLine
 
 Get-ADGroupMemberships -Groups $Groups -Export -Extension csv
