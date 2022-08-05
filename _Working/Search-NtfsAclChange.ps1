@@ -34,7 +34,7 @@ function Search-NtfsAclChange {
   [OutputType([PSCustomObject])]
   [Alias('Report-NTFSPermissions')]
   param (
-    [Parameter(ValueFromPipeline = $true)]
+   # [Parameter(ValueFromPipeline = $true)]
     [ValidateNotNullOrEmpty()]
     # Path to start from
     $Path = '.',
