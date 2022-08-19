@@ -31,12 +31,24 @@ function Update-ADUsersAttributes {
             $Mail           = $_.Email
             $Manager        = $_.Manager
 
+            try {
+                if ($Manager) {
+                    $ManagerDN = (Get-ADUser -Identity $Manager).DistinguishedName
+                } else {
+                    $ManagerDN = $null
+                }
+            }
+            catch {
+                Add-Logs -Message "Manager not found: $Manager"
+            }
+
             #Check whether $SamAccountName exisits in AD.
             try {
                 $SamExists = (Get-ADUser -Identity $SamAccountName -ErrorAction SilentlyContinue).SamAccountName
             } catch {
                 Add-Logs -text $Error.Exception.Message
             }
+            try {
             # Set-ADUser below only if $SamAccountName is in AD and also is in the Csv file, else ignore
             if ($SamExists -eq $SamAccountName -and $null -ne $SamExists) {
 
@@ -88,6 +100,10 @@ function Update-ADUsersAttributes {
             } else {
                 Add-Logs -text "User $SamAccountName does not exist in Active Directory"
             }
+        }
+        catch {
+            Add-Logs -text $Error.Exception.Message
+        }
         }
     }
     End {
