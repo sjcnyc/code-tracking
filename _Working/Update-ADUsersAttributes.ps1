@@ -17,7 +17,7 @@ function Update-ADUsersAttributes {
             $GivenName      = $_.FirstName
             $Surname        = $_.LastName
             $StreetAddress  = $_.Address
-            $SamAccountName = $_.UserName
+            $SamAccountName = $_.SamAccountName
             $City           = $_.City
             $State          = $_.State
             $PostCode       = $_.PostCode
