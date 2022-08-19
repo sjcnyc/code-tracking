@@ -39,7 +39,7 @@ Foreach ($Module in $InstalledMicrosoftGraphModules | Sort-Object Name) {
         }
     }
 }
- 
+
 #retrieve all cmdlets together with the synopsis and add them to $total
 foreach ($module in $InstalledMicrosoftGraphModules) { 
     Write-Host "Processing $($module.Name)..." -ForegroundColor Green
