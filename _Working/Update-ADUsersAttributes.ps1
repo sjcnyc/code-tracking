@@ -64,14 +64,8 @@ function Update-ADUsersAttributes {
                 if ($City ) {
                     Set-ADUser -Identity $SamAccountName -Replace @{ l = $City }
                 }
-                if ($State) {
-                    Set-ADUser -Identity $SamAccountName -State $State
-                }
                 if ($PostCode) {
                     Set-ADUser -Identity $SamAccountName -Replace @{ postalCode = $PostCode }
-                }
-                if ($Country) {
-                    Set-ADUser -Identity $SamAccountName -Country $Country
                 }
                 if ($Title) {
                     Set-ADUser -Identity $SamAccountName -Replace @{ Title = $Title }
@@ -93,6 +87,12 @@ function Update-ADUsersAttributes {
                 }
                 if ($Mail) {
                     Set-ADUser -Identity $SamAccountName -Replace @{ mail = $Mail }
+                }
+                if ($Country) {
+                    Set-ADUser -Identity $SamAccountName -Country $Country
+                }
+                if ($State) {
+                    Set-ADUser -Identity $SamAccountName -State $State
                 }
                 if ($Manager -and $ManagerDN) {
                     Set-ADUser -Identity $SamAccountName -Manager $ManagerDN
