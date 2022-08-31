@@ -21,5 +21,5 @@ foreach ($ou in $ous) {
   Get-ADUser -SearchBase $ou @ADUserSplat | Select-Object @selectObjectSplat
 }
 
-$Users | Export-Csv -Path C:\Temp\ME_Users_Global_$(Get-Date -f {MMdyyyyhhmm}).csv -NoTypeInformation
+$Users | Export-Csv -Path D:\Temp\ME_Users_Global_$(Get-Date -f {MMdyyyyhhmm}).csv -NoTypeInformation
 Write-Output "Total User Count: $($Users.Count)"
