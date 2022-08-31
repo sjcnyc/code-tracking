@@ -1,16 +1,19 @@
-function New-PIMGroups {
+function New-AzPIMGroups {
     [CmdletBinding()]
     param (
         [string[]]$Roles = @("Owner", "Contributor", "Reader"),
-        [string]$MGPrefix = "AZ-PIM-MGT-",
+        [string]$MGPrefix = "AZ_PIM_MG_",
         [string]$MGSuffix,
-        [string]$SubPrefix = "AZ-PIM-SUB-",
+        [string]$SubPrefix = "AZ_PIM_SUB_",
         [string]$SubSuffix,
         [ValidateSet("ManagementGroups", "Subscriptions", "Both")]
         $Scope = "Both",
         [string]$ManagementGroupName,
         [string]$SubscriptionName
     )
+
+    #roles
+    # Billing Reader, Network Contributor, Security Admin, Security Reader
 
     if ($Scope -eq "ManagementGroups" -or $Scope -eq "Both") {
         if ($ManagementGroupName -eq $null) {
@@ -21,28 +24,28 @@ function New-PIMGroups {
 
         foreach ($ManagementGroup in $ManagementGroups) {
             foreach ($Role in $Roles) {
-                Write-Host "Checking if group $($MGPrefix)$($ManagementGroup.DisplayName)$($MGSuffix)-$($Role) already exists"
-                $CheckGroup = Get-AzADGroup -DisplayName "$($MGPrefix)$($ManagementGroup.DisplayName)$($MGSuffix)-$($Role)"
+                Write-Output "Checking if group $($MGPrefix)$($ManagementGroup.DisplayName)$($MGSuffix)_$($Role) already exists"
+                $CheckGroup = Get-AzADGroup -DisplayName "$($MGPrefix)$($ManagementGroup.DisplayName)$($MGSuffix)_$($Role)"
                 if ($CheckGroup.Length -eq 0) {
-                    Write-Host "Group not found"
-                    Write-Host "Creating group: $($MGPrefix)$($ManagementGroup.DisplayName)$($MGSuffix)-$($Role) in Azure AD"
-                    New-AzADGroup -DisplayName "$($MGPrefix)$($ManagementGroup.DisplayName)$($MGSuffix)-$($Role)" -MailEnabled:$false -SecurityEnabled:$true -MailNickName "NotSet" | Out-Null
+                    Write-Output "Group not found"
+                    Write-Output "Creating group: $($MGPrefix)$($ManagementGroup.DisplayName)$($MGSuffix)_$($Role) in Azure AD"
+                    New-AzADGroup -DisplayName "$($MGPrefix)$($ManagementGroup.DisplayName)$($MGSuffix)_$($Role)" -MailEnabled:$false -SecurityEnabled:$true -MailNickName "NotSet" | Out-Null
                 } else {
-                    Write-Host "Group $($MGPrefix)$($ManagementGroup.DisplayName)$($MGSuffix)-$($Role) found, skipping creation"
+                    Write-Output "Group $($MGPrefix)$($ManagementGroup.DisplayName)$($MGSuffix)_$($Role) found, skipping creation"
                 }
             }
-            Write-Host "Waiting 10 seconds for Azure AD Groups to be created"
-            Start-Sleep -Seconds 10
+            Write-Output "Waiting 20 seconds for Azure AD Groups to be created"
+            Start-Sleep -Seconds 20
 
             foreach ($Role in $Roles) {
-                Write-Host "Checking if Role assignment present"
-                $GroupId = (Get-AzADGroup -DisplayName "$($MGPrefix)$($ManagementGroup.DisplayName)$($MGSuffix)-$($Role)").id
+                Write-Output "Checking if Role assignment present"
+                $GroupId = (Get-AzADGroup -DisplayName "$($MGPrefix)$($ManagementGroup.DisplayName)$($MGSuffix)_$($Role)").id
                 $CheckRoleAssignment = Get-AzRoleAssignment -ObjectId $GroupId -RoleDefinitionName $Role -Scope "$($ManagementGroup.id)"
                 if ($CheckRoleAssignment.Length -eq 0) {
-                    Write-Host "Adding role: $($Role) to management group: $($ManagementGroup.DisplayName)"
+                    Write-Output "Adding role: $($Role) to management group: $($ManagementGroup.DisplayName)"
                     New-AzRoleAssignment -ObjectId $GroupId -RoleDefinitionName $Role -Scope "$($ManagementGroup.id)" | Out-Null
                 } else {
-                    Write-Host "Role assignment already present"
+                    Write-Output "Role assignment already present"
                 }
             }
         }
@@ -57,30 +60,51 @@ function New-PIMGroups {
 
         foreach ($Subscription in $Subscriptions) {
             foreach ($Role in $Roles) {
-                Write-Host "Checking if group $($SubPrefix)$($Subscription.Name)$($SubSuffix)-$($Role) already exists"
-                $CheckGroup = Get-AzADGroup -DisplayName "$($SubPrefix)$($Subscription.Name)$($SubSuffix)-$($Role)"
+                Write-Output "Checking if group $($SubPrefix)$($Subscription.Name)$($SubSuffix)_$($Role) already exists"
+                $CheckGroup = Get-AzADGroup -DisplayName "$($SubPrefix)$($Subscription.Name)$($SubSuffix)_$($Role)"
                 if ($CheckGroup.Length -eq 0) {
-                    Write-Host "Group not found"
-                    Write-Host "Creating group: $($SubPrefix)$($Subscription.Name)$($SubSuffix)-$($Role) in Azure AD"
-                    New-AzADGroup -DisplayName "$($SubPrefix)$($Subscription.Name)$($SubSuffix)-$($Role)" -MailEnabled:$false -SecurityEnabled:$true -MailNickName "NotSet" | Out-Null
+                    Write-Output "Group not found"
+                    Write-Output "Creating group: $($SubPrefix)$($Subscription.Name)$($SubSuffix)_$($Role) in Azure AD"
+                    New-AzADGroup -DisplayName "$($SubPrefix)$($Subscription.Name)$($SubSuffix)_$($Role)" -MailEnabled:$false -SecurityEnabled:$true -MailNickName "NotSet" | Out-Null
                 } else {
-                    Write-Host "Group $($SubPrefix)$($Subscription.Name)$($SubSuffix)-$($Role) found, skipping creation"
+                    Write-Output "Group $($SubPrefix)$($Subscription.Name)$($SubSuffix)_$($Role) found, skipping creation"
                 }
             }
-            Write-Host "Waiting 10 seconds for Azure AD Groups to be created"
+            Write-Output "Waiting 10 seconds for Azure AD Groups to be created"
             Start-Sleep -Seconds 10
 
             foreach ($Role in $Roles) {
-                Write-Host "Checking if Role assignment present"
-                $GroupId = (Get-AzADGroup -DisplayName "$($SubPrefix)$($Subscription.Name)$($SubSuffix)-$($Role)").id
+                Write-Output "Checking if Role assignment present"
+                $GroupId = (Get-AzADGroup -DisplayName "$($SubPrefix)$($Subscription.Name)$($SubSuffix)_$($Role)").id
                 $CheckRoleAssignment = Get-AzRoleAssignment -ObjectId $GroupId -RoleDefinitionName $Role -Scope "/subscriptions/$($Subscription.id)"
                 if ($CheckRoleAssignment.Length -eq 0) {
-                    Write-Host "Adding role: $($Role) to management group: $($Subscription.DisplayName)"
+                    Write-Output "Adding role: $($Role) to management group: $($Subscription.DisplayName)"
                     New-AzRoleAssignment -ObjectId $GroupId -RoleDefinitionName $Role -Scope "/subscriptions/$($Subscription.id)" | Out-Null
                 } else {
-                    Write-Host "Role assignment already present"
+                    Write-Output "Role assignment already present"
                 }
             }
         }
     }
 }
+
+
+
+<# Import-Module Microsoft.Graph.DeviceManagement.Enrolment
+
+$params = @{
+	Action = "adminAssign"
+	Justification = ""
+	RoleDefinitionId = $Role.Id
+	DirectoryScopeId = "/subscriptions/$($Subscription.id)"
+	PrincipalId = $GroupId
+	ScheduleInfo = @{
+		StartDateTime = [System.DateTime]::Parse("2022-04-10T00:00:00Z")
+		Expiration = @{
+			Type = "NoExpiration"
+		}
+	}
+}
+
+New-MgRoleManagementDirectoryRoleAssignmentScheduleRequest -BodyParameter $params
+ #>
