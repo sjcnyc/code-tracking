@@ -4,12 +4,22 @@ function Update-ADUsersAttributes {
     (
         [Parameter(Mandatory = $true, Position = 0, ParameterSetName = 'CSVPath')]
         [ValidateNotNullOrEmpty()]
-        [String]$CSVPath
+        [String]
+        $CSVPath,
+
+        [parameter(Mandatory= $true, Postion = 1, ParameterSetName = 'LogPath')]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $LogPath,
+
+        [string]
+        $LogName = "update_users_$(Get-Date -Format 'MMddyyHHmmss').txt"
     )
 
     Begin {
         $csvfile = Import-Csv -Path $CSVPath
         Import-Module -Name ActiveDirectory -WarningAction SilentlyContinue
+        $ExternalLog = "$($LogPath)\$($LogName)"
     }
 
     process {
@@ -29,8 +39,9 @@ function Update-ADUsersAttributes {
             $Office         = $_.Office
             $Phone          = $_.Phone
             $Mail           = $_.Email
-            $Manager        = $_.Manager
+            $Manager        = $_.Manager # can be sAMAccountName, or userPrincipalName.
 
+            # Check if $manager exists in AD.
             try {
                 if ($Manager) {
                     $ManagerDN = (Get-ADUser -Identity $Manager).DistinguishedName
@@ -39,17 +50,17 @@ function Update-ADUsersAttributes {
                 }
             }
             catch {
-                Add-Logs -Message "Manager not found: $Manager"
+                Add-Logs -Message "Manager not found: $Manager" -ExternalLog $ExternalLog
             }
 
-            #Check whether $SamAccountName exisits in AD.
+            # Check exists $SamAccountName exists in AD.
             try {
                 $SamExists = (Get-ADUser -Identity $SamAccountName -ErrorAction SilentlyContinue).SamAccountName
             } catch {
-                Add-Logs -text $Error.Exception.Message
+                Add-Logs -text $Error.Exception.Message -ExternalLog $ExternalLog
             }
             try {
-            # Set-ADUser below only if $SamAccountName is in AD and also is in the Csv file, else ignore
+            # Set-ADUser below only if $SamAccountName is in AD and also is in the Csv file, else ignore.
             if ($SamExists -eq $SamAccountName -and $null -ne $SamExists) {
 
                 if ($GivenName) {
@@ -98,23 +109,26 @@ function Update-ADUsersAttributes {
                     Set-ADUser -Identity $SamAccountName -Manager $ManagerDN
                 }
             } else {
-                Add-Logs -text "User $SamAccountName does not exist in Active Directory"
+                Add-Logs -text "User $SamAccountName does not exist in Active Directory and csv file" -ExternalLog $ExternalLog
             }
         }
         catch {
-            Add-Logs -text $Error.Exception.Message
+            Add-Logs -text $Error.Exception.Message -ExternalLog $ExternalLog
         }
         }
     }
     End {
-        Add-Logs -text "Update-ADUsersAttributes completed"
+        Add-Logs -text "Update-ADUsersAttributes completed" -ExternalLog $ExternalLog
     }
 }
 function Add-Logs {
 	[CmdletBinding()]
 	param (
+        [string]
         $text,
-        $ExternalLog = "C:\temp\update_users_$(Get-Date -Format 'MMddyyHHmmss').txt"
+
+        [string]
+        $ExternalLog
     )
 	$datesortable = Get-Date -Format "HH':'mm':'ss"
 	"[$datesortable] - $text" + [environment]::NewLine
