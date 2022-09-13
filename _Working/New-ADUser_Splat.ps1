@@ -14,7 +14,7 @@ function Add-Logs {
     }
 }
 
-$CSVFile = Import-Csv "Import user csv here"
+$CSVFile = Import-Csv D:\Downloads\AWAL_Onboarding_AD_and_SF_2022.09.09_Sean.csv
 
 # Generate a initial securestring password for user object
 $PasswordSecureString = ([char[]]([char]33 .. [char]95) + ([char[]]([char]97 .. [char]126)) + 0 .. 20 |
@@ -25,76 +25,76 @@ $PasswordSecureString = ([char[]]([char]33 .. [char]95) + ([char[]]([char]97 .. 
 $CSVFile | ForEach-Object {
     # AD Attributes from csv file
     $paramNewADUser = @{
-        Name                  = $_.DisplayName
-        GivenName             = $_.FirstName
-        Surname               = $_.LastName
-        Initials              = $_.Initials
-        DisplayName           = $_.DisplayName
-        SamAccountName        = $_.SamAccountName
-        UserPrincipalName     = $_.UserPrincipalName
-        EmailAddress          = $_.EmailAddress
-        Description           = $_.Description
-        Office                = $_.Office
-        OfficePhone           = $_.Telephone
-        HomePage              = $_.WebPage
-        StreetAddress         = $_.Street
-        State                 = $_.State
-        PostalCode            = $_.PostalCode
-        City                  = $_.City
-        Title                 = $_.Title
-        Department            = $_.Department
-        Company               = $_.Company
-        POBox                 = $_.POBox
-        ProfilePath           = $_.ProfilePath
-        ScriptPath            = $_.LogonScript
-        HomeDrive             = $_.HomeDrive
-        HomeDirectory         = $_.HomeDirectory
-        Path                  = $_.OULocation
+        #Name                  = $_.DisplayName
+        GivenName             = $_.SF_FirstName
+        Surname               = $_.SF_lastName
+        #Initials              = $_.Initials
+        DisplayName           = "$($_.SF_lastName), $($_.SF_firstName)"
+        SamAccountName        = $_.SF_UserID
+        UserPrincipalName     = $_.SF_OnboardEmail
+        EmailAddress          = $_.SF_OnboardEmail
+        #Description           = $_.Description
+        #Office                = $_.Office
+        #OfficePhone           = $_.Telephone
+        #HomePage              = $_.WebPage
+        #StreetAddress         = $_.Street
+        #State                 = $_.State
+        #PostalCode            = $_.PostalCode
+        #City                  = $_.City
+        Title                 = $_.SF_Title
+        Department            = $_.SF_Department
+        #Company               = $_.Company
+        #POBox                 = $_.POBox
+        #ProfilePath           = $_.ProfilePath
+        #ScriptPath            = $_.LogonScript
+        #HomeDrive             = $_.HomeDrive
+        #HomeDirectory         = $_.HomeDirectory
+        Path                  = "OU=Test,OU=Users,OU=GBL,OU=USA,OU=NA,OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
         AccountPassword       = $PasswordSecureString
         PasswordNeverExpires  = $false
         CannotChangePassword  = $false
         ChangePasswordAtLogon = $true
         Enabled               = $true
-        # Country               = $_.Country
-        OtherAttributes       = @{
-            'c' = $_.c; 'co' = $_.CO # c = $_.C; co = $_.CO; countrycode = $_.CountryCode
-        }
+        #Country               = $_.Country
+        #OtherAttributes       = @{
+        #    'c' = $_.c; 'co' = $_.CO # c = $_.C; co = $_.CO; countrycode = $_.CountryCode
+        #}
         ErrorAction           = 'Stop'
     }
 
     try {
-        Add-Logs -text "INF: Creating user: $($_.SamAccountName)"
+        Add-Logs -text "INF: Creating user: $($_.SF_UserID)"
         New-ADUser @paramNewADUser
         Start-Sleep -Seconds 3
 
-        Add-Logs -text "INF: Checking SamAccountName: $($_.SamaccountName)"
-        $NewUser = Get-ADUser -Identity $($_.SamaccountName) -Properties Name, UserPrincipalName, Distinguishedname, SamAccountname, DisplayName -ErrorAction 'Stop'
+        Add-Logs -text "INF: Checking SamAccountName: $($_.SF_UserID)"
+        $NewUser = Get-ADUser -Identity $($_.SF_UserID) -Properties Name, UserPrincipalName, Distinguishedname, SamAccountname, DisplayName -ErrorAction 'Stop'
     } catch {
         Add-Logs -text "ERR: $($Error.Message)"
     }
 
     if ($NewUser) {
-        if ($_.ProxyAddresses) {
-            Add-Logs -text "INF: Setting ProxyAddresses: $($_.ProxyAddresses)"
-            Set-ADUser $NewUser -Add @{ ProxyAddresses = $_.ProxyAddresses } -ErrorAction 0
+      #  if ($_.ProxyAddresses) {
+      #      Add-Logs -text "INF: Setting ProxyAddresses: $($_.ProxyAddresses)"
+      #      Set-ADUser $NewUser -Add @{ ProxyAddresses = $_.ProxyAddresses } -ErrorAction 0
+      #  }
+        if ($_.SF_UserID) {
+            Add-Logs -text "INF: Setting MailNickname: $($_.SF_UserID)"
+            Set-ADUser $NewUser -Add @{ MailNickname = $_.SF_UserID } -ErrorAction 0
         }
-        if ($_.MailNickname) {
-            Add-Logs -text "INF: Setting MailNickname: $($_.MailNickname)"
-            Set-ADUser $NewUser -Add @{ MailNickname = $_.MailNickname } -ErrorAction 0
+        if ($_.SF_ADTargetAddress) {
+            Add-Logs -text "INF: Setting TargetAddress: $($_.SF_ADTargetAddress)"
+            Set-ADUser $NewUser -Add @{ TargetAddress = $_.SF_ADTargetAddress } -ErrorAction 0
         }
-        if ($_.TargetAddress) {
-            Add-Logs -text "INF: Setting TargetAddress: $($_.TargetAddress)"
-            Set-ADUser $NewUser -Add @{ TargetAddress = $_.TargetAddress } -ErrorAction 0
-        }
-        if ($_.EmployeeNumber) {
-            Add-Logs -text "INF: Setting EmployeeNumber: $($_.EmployeeNumber)"
-            Set-ADUser $NewUser -EmployeeNumber $_.EmployeeNumber -ErrorAction 0
-        }
-        if ($_.EmployeeID) {
-            Add-Logs -text "INF: Setting EmployeeID: $($_.EmployeeID)"
-            Set-ADUser $NewUser -EmployeeID $_.EmployeeID -ErrorAction 0
-        }
-
+      #  if ($_.EmployeeNumber) {
+      #      Add-Logs -text "INF: Setting EmployeeNumber: $($_.EmployeeNumber)"
+      #      Set-ADUser $NewUser -EmployeeNumber $_.EmployeeNumber -ErrorAction 0
+      #  }
+      #  if ($_.EmployeeID) {
+      #      Add-Logs -text "INF: Setting EmployeeID: $($_.EmployeeID)"
+      #      Set-ADUser $NewUser -EmployeeID $_.EmployeeID -ErrorAction 0
+        #}
+<#
         try {
             Add-Logs -text "INF: Processing VPN groups"
 
@@ -122,6 +122,7 @@ $CSVFile | ForEach-Object {
         } catch {
             Add-Logs -text "ERR: $($Error.Message)"
         }
+        #>
     }
     Add-Logs -text $('#' * 62)
 
