@@ -12,7 +12,7 @@ function Get-ADGroupMemberships {
     [System.String]$ReportPath = 'D:\Temp\',
 
     [parameter(Position = 4)]
-    [System.String]$ReportName = 'Columbia_Share_Report',
+    [System.String]$ReportName = 'Share_Report',
 
     [parameter(Position = 5)]
     [System.String]$ReportDate = "_$(Get-Date -Format 'MM-dd-yyy')",
@@ -24,8 +24,8 @@ function Get-ADGroupMemberships {
 
   try {
     $obj = $Groups | Get-ADGroup -PipelineVariable Grp -Properties Name | Get-ADGroupMember |
-    Get-ADUser -Properties GivenName, SurName, SamaccountName, DistinguishedName, UserPrincipalName |
-    Select-Object -Property GivenName, SurName, SamaccountName, DistinguishedName, UserPrincipalName, @{N = 'GroupName'; E = { $Grp.SamAccountName } }
+    Get-ADUser -Properties GivenName, SurName, SamaccountName, DistinguishedName, UserPrincipalName, Description |
+    Select-Object -Property GivenName, SurName, SamaccountName, DistinguishedName, UserPrincipalName, Description, @{N = 'GroupName'; E = { $Grp.SamAccountName } }
     if ($Export) {
       switch ($Extension) {
         csv { $obj | Export-Csv -Path "$($ReportPath)$($ReportName)$($ReportDate).$($Extension)" -NoTypeInformation }
@@ -43,9 +43,11 @@ function Get-ADGroupMemberships {
 }
 
 $Groups = @'
-USA-GBL ISI Columbia Admin
-USA-GBL ISI Columbia RW
-USA-GBL ISI Columbia RO
+USA-GBL ISI-Data GHUB_Production Modify
+USA-GBL ISI-Data GHUB_Production Read
+USA-GBL ISI-Data GHUB_Test Modify
+USA-GBL ISI-Data GHUB_Test Read
+USA-GBL ISI-Data IROYALTY-Cars
 '@ -split [System.Environment]::NewLine
 
 Get-ADGroupMemberships -Groups $Groups -Export -Extension csv
