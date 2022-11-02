@@ -12,7 +12,7 @@ f8a8c972-da89-42d3-82a1-d44189e2cd49
 
 $members = foreach ($group in $groups) {
     $grp = get-MgGroup -groupid $group
-    Get-MgGroupTransitiveMember -all -GroupId $grp.Id | Select-Object -First 100
+    Get-MgGroupTransitiveMember -all -GroupId $grp.Id
 }
 
 Write-Output "Loop started at: $(Get-Date)"
@@ -37,3 +37,5 @@ foreach ($member in $members) {
 }
 
 Write-Output "Loop ended at: $(Get-Date)"
+
+$results | Export-Csv \\storage.me.sonymusic.com\home$\merc015\jumpbox\CAP5Members.csv -NoTypeInformation
