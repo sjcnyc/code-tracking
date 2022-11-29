@@ -18,7 +18,7 @@ $members = foreach ($group in $groups) {
 Write-Output "Loop started at: $(Get-Date)"
 
 foreach ($member in $members) {
-    $user = Get-MgUser -UserId $member.Id -Property SignInActivity | Select-Object SignInActivity
+   # $user = Get-MgUser -UserId $member.Id -Property SignInActivity | Select-Object SignInActivity
     $userObject = [pscustomobject]@{
         displayName           = $member.additionalproperties.displayName
         userPrincipalName     = $member.additionalproperties.userPrincipalName
@@ -29,7 +29,7 @@ foreach ($member in $members) {
         Department            = $member.AdditionalProperties.department
         CompanyName           = $member.AdditionalProperties.companyName
         City                  = $member.AdditionalProperties.city
-        LastSignIn            = $user.SignInActivity.lastSigninDateTime
+       # LastSignIn            = $user.SignInActivity.lastSigninDateTime
         AZ_CAPhase5_UserGroup = if (Confirm-MgUserMemberGroup -UserId $member.Id -GroupIds "e9dc8225-1705-4f2d-9630-901b5dd19fee") { "Yes" }else { "No" }
         AZ_CAPhase5_MAC_TS    = if (Confirm-MgUserMemberGroup -UserId $member.Id -GroupIds "92ffa0cf-f5a1-4e55-a547-b39bdc5e42b2") { "Yes" }else { "No" }
     }
@@ -38,4 +38,4 @@ foreach ($member in $members) {
 
 Write-Output "Loop ended at: $(Get-Date)"
 
-$results | Export-Csv \\storage.me.sonymusic.com\home$\merc015\jumpbox\CAP5Members.csv -NoTypeInformation
+$results | Export-Csv D:\Temp\CAP5Members.csv -NoTypeInformation
