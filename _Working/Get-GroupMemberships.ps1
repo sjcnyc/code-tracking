@@ -12,7 +12,7 @@ function Get-ADGroupMemberships {
     [System.String]$ReportPath = 'D:\Temp\',
 
     [parameter(Position = 4)]
-    [System.String]$ReportName = 'GHUB_Development_Share_Report_',
+    [System.String]$ReportName = 'Share_Report_',
 
     [parameter(Position = 5)]
     [System.String]$ReportDate = "_$(Get-Date -Format 'MM-dd-yyy')",
@@ -41,8 +41,14 @@ function Get-ADGroupMemberships {
 }
 
 $Groups = @'
+USA-GBL ISI-Data GHUB_Production Modify
+USA-GBL ISI-Data GHUB_Production Read
+USA-GBL ISI-Data GHUB_Test Modify
+USA-GBL ISI-Data GHUB_Test Read
 USA-GBL ISI-Data GHUB_Development Modify
-USA-GBL Member Server Administrators
+USA-GBL ISI-Data GHUB_Development Read
 '@ -split [System.Environment]::NewLine
 
-Get-ADGroupMemberships -Groups $Groups -Export -Extension csv
+Write-Host "$(Get-Date)"
+
+Get-ADGroupMemberships -Groups $Groups -Export -Extension pdf
