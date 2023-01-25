@@ -35,7 +35,7 @@ Setting this switch parameter will handle the strings in the ExcludePath paramet
 .PARAMETER CheckHomeDirectory
 Setting this switch parameter will check the full path of the folder against the HomeDirectory attribute of an ADObject, when using this switch make sure that the correct shared folder or DFS path is used, otherwise output can be unreliable
 
-.NOTES   
+.NOTES
 Name: Get-OrphanHomeFolder.ps1
 Author: Jaap Brasser
 Version: 1.9
@@ -45,56 +45,56 @@ Blog: http://www.jaapbrasser.com
 
 .LINK
 http://www.jaapbrasser.com
-    
+
 .EXAMPLE
 .\Get-OrphanHomeFolder.ps1 -HomeFolderPath \\Server01\Home -FolderSize
 
 Description:
 Will list all the folders in the \\Server01\Home path. For each of these folders it will query AD using the foldername, if the query does not return an AD account or a disabled AD account an error will be logged and the size of the folder will be reported
 
-.EXAMPLE   
+.EXAMPLE
 .\Get-OrphanHomeFolder.ps1 -HomeFolderPath \\Server01\Home -FolderSize -DisplayAll
 
 Description:
 Will list all the folders in the \\Server01\Home path. For each of these folders it will query AD using the foldername, regardless of the AD results folder size will be returned
 
-.EXAMPLE   
+.EXAMPLE
 .\Get-OrphanHomeFolder.ps1 -HomeFolderPath \\Server01\Home -SearchBase 'LDAP://OU=YourOU,DC=jaapbrasser,DC=com'
 
 Description:
 Will list all the folders in the \\Server01\Home path. For each of these folders it will query AD, only in the YourOU Organizational Unit of the JaapBrasser domain, using the foldername
 
-.EXAMPLE   
+.EXAMPLE
 .\Get-OrphanHomeFolder.ps1 -HomeFolderPath \\Server02\Fileshare\Home | Format-Table -AutoSize
 
 Description:
 Will list all the folders in the \\Server02\Fileshare\Home. Will wait until all folders are processed before piping the input into the Format-Table Cmdlet and displaying the results in the console.
 
-.EXAMPLE   
+.EXAMPLE
 .\Get-OrphanHomeFolder.ps1 -HomeFolderPath \\Server02\Fileshare\Home -MoveFolderPath \\Server03\Fileshare\MovedHomeFolders
 
 Description:
 Will list all the folders in the \\Server02\Fileshare\Home folder and will move orphaned folders to \\Server03\Fileshare\MovedHomeFolders while displaying results to console.
 
-.EXAMPLE   
+.EXAMPLE
 .\Get-OrphanHomeFolder.ps1 -HomeFolderPath \\Server02\Fileshare\Home -MoveFolderPath \\Server03\Fileshare\MovedHomeFolders -MoveDisabled
 
 Description:
 Will list all the folders in the \\Server02\Fileshare\Home folder and will move orphaned folders and folders that have disabled users accounts to \\Server03\Fileshare\MovedHomeFolders while displaying results to console.
 
-.EXAMPLE   
+.EXAMPLE
 .\Get-OrphanHomeFolder.ps1 -HomeFolderPath \\Server02\Fileshare\Home -MoveFolderPath \\Server03\Fileshare\MovedHomeFolders -ExcludePath \\Server02\Fileshare\Home\JBrasser,\\\\Server02\Fileshare\Home\MShajin -UseRobocopy
 
 Description:
 Will list all the folders in the \\Server02\Fileshare\Home folder and will move orphaned folders using robocopy, excluding JBrasser and MShajin, to \\Server03\Fileshare\MovedHomeFolders while displaying results to console
 
-.EXAMPLE   
+.EXAMPLE
 .\Get-OrphanHomeFolder.ps1 -HomeFolderPath \\Server02\Fileshare\Home -MoveFolderPath \\Server03\Fileshare\MovedHomeFolders -ExcludePath '\.v2$' -RegExExclude
 
 Description:
 Will list all the folders in the \\Server02\Fileshare\Home folder and will move orphaned folders using robocopy, excluding folders that end with .v2
 
-.EXAMPLE   
+.EXAMPLE
 .\Get-OrphanHomeFolder.ps1 -HomeFolderPath \\dfs\share\userfolders\ -CheckHomeDirectory
 
 Description:
@@ -160,7 +160,7 @@ $ListOfFolders | ForEach-Object {
 
     # Execute AD Query and store in $ADResult
     $ADResult = $ADSearcher.Findone()
-    
+
     # If no matching samaccountname is found this code is executed and displayed
     if (!($ADResult)) {
         $HashProps = @{
@@ -172,7 +172,7 @@ $ListOfFolders | ForEach-Object {
                 Measure-Object -Property Length -Sum -ErrorAction SilentlyContinue | Select-Object -Exp Sum)
             $HashProps.SizeinMegaBytes = "{0:n2}" -f ($HashProps.SizeinBytes/1MB)
         }
-        
+
         if ($MoveFolderPath) {
             $HashProps.DestinationFullPath = Join-Path -Path $MoveFolderPath -ChildPath (Split-Path -Path $_.FullName -Leaf)
             if ($UseRobocopy) {
@@ -184,7 +184,7 @@ $ListOfFolders | ForEach-Object {
 
         # Output the object
         New-Object -TypeName PSCustomObject -Property $HashProps
-    
+
     # If samaccountname is found but the account is disabled this information is displayed
     } elseif (([boolean]((-join $ADResult.Properties.useraccountcontrol) -band 2))) {
         $HashProps = @{
