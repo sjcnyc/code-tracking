@@ -23,7 +23,7 @@ function Get-NTFSPermissions {
         $ACLs = Get-Acl -Path $Share
         foreach ($ACL in $ACLs) {
             foreach ($AccessRight in $ACL.Access) {
-                if ($AccessRight.IdentityReference -notlike 'BUILTIN\*' -and $AccessRight.IdentityReference -ne "ME\USA-GBL Member Server Administrators" -and $AccessRight.IdentityReference -ne "ME\USA-GBL IS&T All Share Access") {
+                if ($AccessRight.IdentityReference -notlike 'BUILTIN\*' -and $AccessRight.IdentityReference -ne "ME\USA-GBL Member Server Administrators") {
                     $ObjectGroup = [pscustomobject]@{
                         'DirectoryPath'    = $Share
                         'Identity'         = $AccessRight.IdentityReference
@@ -67,11 +67,12 @@ function Get-NTFSPermissions {
     }
 }
 
-#@"
-#\\Storage.me.sonymusic.com\data$\ACCT
-#"@ -split [environment]::NewLine |
+$Folders= @"
+\\storage.me.sonymusic.com\data$\GHUB_Development
+"@ -split [environment]::NewLine
 
-$Folders = (Get-ChildItem -Directory \\storage.me.sonymusic.com\data$).Fullname
+
+#$Folders = (Get-ChildItem -Directory \\storage.me.sonymusic.com\data$).Fullname
 
 foreach ($Folder in $Folders) {
 
@@ -81,4 +82,5 @@ foreach ($Folder in $Folders) {
 }
 
 
-Get-NTFSPermissions -ShareName "\\storage.me.sonymusic.com\data$\ACCT" -DomainName me -GroupsOnly
+
+#Get-NTFSPermissions -ShareName "\\storage.me.sonymusic.com\data$\ACCT" -DomainName me -GroupsOnly
