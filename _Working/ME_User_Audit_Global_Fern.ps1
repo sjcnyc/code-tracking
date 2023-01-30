@@ -7,7 +7,7 @@ $Users = @()
 
 $getADOrganizationalUnitSplat = @{
   SearchBase = 'OU=Tier-2,DC=me,DC=sonymusic,DC=com'
-  Filter     = 'Name -like "Employees" -or Name -like "Non-employees" -or Name -like "LOH"'
+  Filter     = 'Name -like "Employee" -or Name -like "Non-employee" -or Name -like "LOH"'
 }
 
 $ous = (Get-ADOrganizationalUnit @getADOrganizationalUnitSplat).DistinguishedName
@@ -21,5 +21,5 @@ foreach ($ou in $ous) {
   Get-ADUser -SearchBase $ou @ADUserSplat | Select-Object @selectObjectSplat
 }
 
-$Users | Export-Csv -Path D:\Temp\ME_Users_Global_$(Get-Date -f {MMdyyyyhhmm}).csv -NoTypeInformation
+$Users | Export-Csv -Path C:\Temp\ME_Users_Global_$(Get-Date -f {MMdyyyyhhmm}).csv -NoTypeInformation
 Write-Output "Total User Count: $($Users.Count)"
