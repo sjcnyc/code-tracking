@@ -91,11 +91,11 @@ function Disable-ADStaleAccount {
   }
   if ($SourceOU) {
 
-    $StaleAccounts = &"Get-AD$AccountType" @ADObjectSplat -SearchBase $SourceOU |Where-Object {$_.DistinguishedName -notmatch $Filter}
+    $StaleAccounts = &"Get-AD$AccountType" @ADObjectSplat -SearchBase $SourceOU | Where-Object {$_.DistinguishedName -notmatch $Filter}
   }
   else {
 
-    $StaleAccounts = &"Get-AD$AccountType" @ADObjectSplat |Where-Object {$_.DistinguishedName -notmatch $Filter}
+    $StaleAccounts = &"Get-AD$AccountType" @ADObjectSplat | Where-Object {$_.DistinguishedName -notmatch $Filter}
 
   }
   if ($Disable) {
@@ -129,19 +129,19 @@ function Disable-ADStaleAccount {
       "Total $($AccountType)s" = $StaleAccounts.Count
     }
 
-    $PSArrayList |Export-Csv $CSVFile -NoTypeInformation
+    $PSArrayList | Export-Csv $CSVFile -NoTypeInformation
 
     $HTML = New-HTMLHead -title "ME Stale $($AccountType) Account Cleanup Report" -style $Style1
     $HTML += New-HTMLTable -inputObject $(ConvertTo-PropertyValue -inputObject $InfoBody)
     $HTML += "<h4>See Attached CSV Report</h4>"
-    $HTML += "<h4>Script Completed: $(Get-Date -Format G)</h4>" |Close-HTML
+    $HTML += "<h4>Script Completed: $(Get-Date -Format G)</h4>" | Close-HTML
 
     $EmailParams = @{
       To          = "sean.connealy@sonymusic.com"
       From        = 'Posh Alerts poshalerts@sonymusic.com'
       Subject     = "ME Stale $($AccountType) Account Cleanup Report"
       SmtpServer  = 'cmailsony.servicemail24.de'
-      Body        = ($HTML |Out-String)
+      Body        = ($HTML | Out-String)
       BodyAsHTML  = $true
       Attachments = $CSVFile
     }
@@ -165,11 +165,29 @@ function Disable-ADStaleAccount {
       @{Name = "LastLogonTimeStamp"; Expression = {[datetime]::FromFileTime($_.LastLogonTimeStamp)}}
     }
 
-    $StaleAccounts |Select-Object @ADObjectSplat |Export-Csv $CSVFile -NoTypeInformation
+    $StaleAccounts | Select-Object @ADObjectSplat | Export-Csv $CSVFile -NoTypeInformation
   }
 }
 
 
-#Disable-ADStaleAccount -Domain me.sonymusic.com -StaleThreshold 90 -AccountType Computer -SourceOu "OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com" -TargetOu "OU=Workstations,OU=Deprovision,OU=STG,OU=Tier-2,DC=me,DC=sonymusic,DC=com" -Disable
+$disableADStaleAccountSplat = @{
+  Domain         = 'me.sonymusic.com'
+  StaleThreshold = 90
+  AccountType    = 'Computer'
+  SourceOu       = "OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
+  TargetOu       = "OU=Workstations,OU=Deprovision,OU=STG,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
+  Disable        = $true
+}
 
-#Disable-ADStaleAccount -Domain me.sonymusic.com -StaleThreshold 90 -AccountType User -SourceOu "OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com" -TargetOu "OU=Users,OU=Deprovision,OU=STG,OU=Tier-2,DC=me,DC=sonymusic,DC=com" -Disable
+Disable-ADStaleAccount @disableADStaleAccountSplat
+
+$disableADStaleAccountSplat = @{
+  Domain         = 'me.sonymusic.com'
+  StaleThreshold = 90
+  AccountType    = 'User'
+  SourceOu       = "OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
+  TargetOu       = "OU=Users,OU=Deprovision,OU=STG,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
+  Disable        = $true
+}
+
+Disable-ADStaleAccount @disableADStaleAccountSplat
