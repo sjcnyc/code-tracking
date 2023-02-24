@@ -9,10 +9,10 @@ function Get-ADGroupMemberships {
     [System.Management.Automation.SwitchParameter]$Export,
 
     [parameter(Position = 3)]
-    [System.String]$ReportPath = 'D:\Temp\',
+    [System.String]$ReportPath = 'C:\Temp\',
 
     [parameter(Position = 4)]
-    [System.String]$ReportName = 'Share_Report_',
+    [System.String]$ReportName = 'Share_Report',
 
     [parameter(Position = 5)]
     [System.String]$ReportDate = "_$(Get-Date -Format 'MM-dd-yyy')",
@@ -51,4 +51,4 @@ USA-GBL ISI-Data GHUB_Development Read
 
 Write-Host "$(Get-Date)"
 
-Get-ADGroupMemberships -Groups $Groups -Export -Extension pdf
+Get-ADGroupMemberships -Groups $Groups -Export -Extension csv
