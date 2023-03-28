@@ -2,7 +2,7 @@ Import-Module Az
 $ErrorActionPreference = "Continue"
 $ADUser = $null
 $LocalXMLPath = 'D:\Blobs'
-$ConnectionString = "DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=sa01sftx3406815508;AccountKey=2u6z1WymVz3kYLZZa+xHsLdZSvDYQLXVMN/V27TMUgQe6XKE2bUYyVySBjvC5ps0XHo/nsqSRjufyScGVg7f4Q=="
+$ConnectionString = "DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=sa01sftx3406815508;AccountKey=hTcPz4b69+50NXAxlE/P/bOFeD7uqVy3rISDkBcmzD7eVL228oCho4xf96g6zJcGqxdlCM1gSXAY+AStckodmg=="
 $SourceStorageContext = New-AzStorageContext -ConnectionString $ConnectionString
 $SrcContainer = "con01-sf-dropoff"
 $DestContainer = "con01-sf-archive"
