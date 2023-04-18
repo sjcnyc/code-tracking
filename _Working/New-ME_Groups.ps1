@@ -1,20 +1,20 @@
 $Groups = @"
-GF_WORKFLOW_IT
-GF_WORKFLOW_SUPPLY
-GF_WORKFLOW_FINANCE
-GF_WORKFLOW_DRH
-GF_WORKFLOW_SG
-GF_WORKFLOW_SGX
-GF_WORKFLOW_COMM
-GF_WORKFLOW_BA
+STG-SEP Royalties
+STG-SEP Royalties Owner
+STG-SEP Royalties - CO - R
+STG-SEP Royalties - CO - RW
+STG-SEP Royalties - SE - R
+STG-SEP Royalties - SE - RW
+STG-SEP Royalties - UI - R
+STG-SEP Royalties - UI - RW
 "@ -split [environment]::NewLine
 
 foreach ($Group in $Groups) {
 
   $newADGroupSplat = @{
-    Path          = "OU=Groups,OU=PAR,OU=FRA,OU=EU,OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
+    Path          = "OU=Groups,OU=STG,OU=CHL,OU=LA,OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
     GroupCategory = 'Security'
-    GroupScope    = 'Global'
+    #GroupScope    = 'Global'
     Description   = 'Owner: Myriam Bilardu'
     PassThru      = $true
     Verbose       = $true
