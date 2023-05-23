@@ -10,4 +10,5 @@ $getADUserSplat = @{
 }
 
 
-Get-ADUser @getADUserSplat | Select-Object UserPrincipalname, SamAccountName, CanonicalName, PasswordNeverExpires, PasswordNotRequired, Enabled, PasswordLastSet, PasswordExpired, @{N = 'LastLogonTimeStamp'; E = { [DateTime]::FromFileTime($_.LastLogonTimeStamp) } } | Export-Csv $CSVFile -NoTypeInformation
+Get-ADUser @getADUserSplat |
+Select-Object UserPrincipalname, SamAccountName, CanonicalName, PasswordNeverExpires, PasswordNotRequired, Enabled, PasswordLastSet, PasswordExpired, @{N = 'LastLogonTimeStamp'; E = { [DateTime]::FromFileTime($_.LastLogonTimeStamp) } } | Export-Csv $CSVFile -NoTypeInformation
