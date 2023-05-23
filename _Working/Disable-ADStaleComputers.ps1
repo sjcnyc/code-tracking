@@ -62,7 +62,6 @@ function Disable-ADStaleComputers {
   $DaysAgo = (Get-Date).AddDays(-$StaleThreshold)
   $Date = (get-date -f yyyy-MM-dd)
   $CSVFile = "C:\temp\StaleComputerAccounts_$($StaleThreshold)_Days_$($Date).csv"
-  $PSArrayList = New-Object System.Collections.ArrayList
 
   $ADObjectSplat = @{
     Filter     = { LastLogonTimeSTamp -lt $DaysAgo }
@@ -78,24 +77,24 @@ function Disable-ADStaleComputers {
 
   if ($Disable) {
 
+    $PSArrayList =
     foreach ($StaleAccount in $StaleAccounts) {
 
-      #Disable the account
-      #  &"Set-AD$AccountType" -Identity $StaleAccount -Enabled $false -Server $Domain
+      #Disable the computer account
+      #  Set-ADComputer -Identity $StaleAccount -Enabled $false -Server $Domain
 
-      #Move the disable account
+      #Move the disabled computer account
       #  Move-ADObject -Identity $StaleAccount -TargetPath $TargetOu -Server $Domain
 
-      $PSUserObj = [pscustomobject][ordered]@{
-        Name               = $StaleAccount.Name
-        SamAccountName     = $StaleAccount.SamAccountName
-        Distinguishedname  = $StaleAccount.DistinguishedName
-        Description        = $StaleAccount.Description
-        LastLogonTimeStamp = [datetime]::FromFileTime($StaleAccount.LastLogonTimeSTamp)
-        PwdLastSet         = [datetime]::FromFileTime($StaleAccount.PwdLastSet)
-        SourceOU           = $StaleAccount.CanonicalName -replace "me.sonymusic.com/", ""
+      [pscustomobject][ordered]@{
+          Name               = $StaleAccount.Name
+          SamAccountName     = $StaleAccount.SamAccountName
+          Distinguishedname  = $StaleAccount.DistinguishedName
+          Description        = $StaleAccount.Description
+          LastLogonTimeStamp = [datetime]::FromFileTime($StaleAccount.LastLogonTimeSTamp)
+          PwdLastSet         = [datetime]::FromFileTime($StaleAccount.PwdLastSet)
+          SourceOU           = $StaleAccount.CanonicalName -replace "me.sonymusic.com/", ""
       }
-      [void]$PSArrayList.Add($PSUserObj)
     }
 
     $InfoBody = [pscustomobject]@{
