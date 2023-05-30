@@ -39,3 +39,5 @@ function Write-LogNew {
               }
        }
 }
+
+Write-LogNew -Message "This is a test message" -LogLevel SUCCESS -ConsoleOutput
