@@ -1,13 +1,13 @@
 $ADUserSplat = @{
   Filter     = '*' # { (Enabled -eq $True) }
-  Properties = 'sAMAccountName', 'givenName', 'sn', 'enabled', 'CanonicalName', 'whenCreated', 'whenChanged', 'LastLogonTimeStamp'
+  Properties = 'sAMAccountName', 'userPrincipalName', 'givenName', 'sn', 'enabled', 'CanonicalName', 'whenCreated', 'whenChanged', 'LastLogonTimeStamp'
 }
 
 $Users = @()
 
 $getADOrganizationalUnitSplat = @{
   SearchBase = 'OU=Tier-2,DC=me,DC=sonymusic,DC=com'
-  Filter     = 'Name -like "Employee" -or Name -like "Non-employee" -or Name -like "LOH"'
+  Filter     = 'Name -like "Employee" -or Name -like "Non-employee" -or Name -like "LOH" -or Name -like "LOA" -and Enabled -eq $true'
 }
 
 $ous = (Get-ADOrganizationalUnit @getADOrganizationalUnitSplat).DistinguishedName
@@ -15,7 +15,7 @@ $ous = (Get-ADOrganizationalUnit @getADOrganizationalUnitSplat).DistinguishedNam
 $Users =
 foreach ($ou in $ous) {
   $selectObjectSplat = @{
-    Property = 'sAMAccountName', 'givenName', 'sn', 'enabled', 'CanonicalName', 'whenCreated', 'whenChanged', @{n = 'LastLogon'; e = { [DateTime]::FromFileTime($_.LastLogonTimeStamp) } }
+    Property = 'sAMAccountName', 'userPrincipalName', 'givenName', 'sn', 'enabled', 'CanonicalName', 'whenCreated', 'whenChanged', @{n = 'LastLogon'; e = { [DateTime]::FromFileTime($_.LastLogonTimeStamp) } }
   }
 
   Get-ADUser -SearchBase $ou @ADUserSplat | Select-Object @selectObjectSplat
