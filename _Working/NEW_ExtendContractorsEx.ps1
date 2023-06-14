@@ -96,7 +96,7 @@ Error:    $($Error[0].Exception.Message)
 UserId:      $($UserId)
 Ticket#:     $($TicketXML.userAction.ticketnumber)
 RefId:       $($TicketXML.userAction.RefId)
-ExpiresDate: $(($NewAccountexpires.ExpiryDate).ToString('MM/dd/yyyy HH:mm:ss tt')) 
+ExpiresDate: $(($NewAccountexpires.ExpiryDate).ToString('MM/dd/yyyy HH:mm:ss tt'))
 </pre>
 "@
         $EmailParams3 = @{
@@ -115,8 +115,8 @@ ExpiresDate: $(($NewAccountexpires.ExpiryDate).ToString('MM/dd/yyyy HH:mm:ss tt'
           Name              = $ADUser.Name
           SamAccountName    = $ADUser.sAMAccountName
           DistinguishedName = $ADUser.DistinguishedName
-          AccountExpires    = ($ADUser.ExpiryDate).ToString('MM/dd/yyyy HH:mm:ss tt') 
-          NewAccountExpires = ($NewAccountexpires.ExpiryDate).ToString('MM/dd/yyyy HH:mm:ss tt') 
+          AccountExpires    = ($ADUser.ExpiryDate).ToString('MM/dd/yyyy HH:mm:ss tt')
+          NewAccountExpires = ($NewAccountexpires.ExpiryDate).ToString('MM/dd/yyyy HH:mm:ss tt')
           Scriptexecution   = (Get-Date).ToString('MM/dd/yyyy HH:mm:ss tt')
         }
 
