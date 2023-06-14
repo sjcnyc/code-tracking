@@ -24,8 +24,8 @@ function Get-ADGroupMemberships {
 
   try {
     $obj = $Groups | Get-ADGroup -PipelineVariable Grp -Properties Name, Description | Get-ADGroupMember |
-    Get-ADUser -Properties GivenName, SurName, SamaccountName, DistinguishedName, UserPrincipalName, Description |
-    Select-Object -Property GivenName, SurName, SamaccountName, DistinguishedName, UserPrincipalName, Description, @{N = 'GroupName'; E = { $Grp.SamAccountName } }, @{N = 'Path'; E = { $Grp.Description} }
+    Get-ADUser -Properties GivenName, SurName, SamaccountName, Enabled, DistinguishedName, UserPrincipalName, Description |
+    Select-Object -Property GivenName, SurName, SamaccountName, Enabled, DistinguishedName, UserPrincipalName, Description, @{N = 'GroupName'; E = { $Grp.SamAccountName } }, @{N = 'Path'; E = { $Grp.Description} }
     if ($Export) {
       switch ($Extension) {
         csv { $obj | Export-Csv -Path "$($ReportPath)$($ReportName)$($ReportDate).$($Extension)" -NoTypeInformation }
@@ -41,17 +41,34 @@ function Get-ADGroupMemberships {
 }
 
 $Groups = @'
-USA-GBL ISI-Data GHUB_Production Modify
-USA-GBL ISI-Data GHUB_Production Read
-USA-GBL Member Server Administrators
+AZ_AVD_Cognizant_FullDesktop
+AZ_AVD_DataMart_FullDesktop
+AZ_AVD_FRA_FullDesktop
+AZ_AVD_FRA_RemoteApps
+AZ_AVD_GRP_FullDesktop
+AZ_AVD_GSA_FullDesktop
+AZ_AVD_Itopia_FullDesktop
+AZ_AVD_ITT_FullDesktop
+AZ_AVD_RGL_FullDesktop
+AZ_AVD_RGL_RemoteApps
+AZ_AVD_SAP_FullDesktop
+AZ_AVD_SME_FullDesktop
+AZ_AVD_SME_RemoteApps
+AZ_AVD_SomLivre_FullDesktop
+AZ_AVD_TCS_FullDesktop
+AZ_AVD_WNS_FullDesktop
+AZ_AVD_WNS_RemoteApps
+AZ_AVD_WWI_FullDesktop
 '@ -split [System.Environment]::NewLine
-<#
-
-
-USA-GBL ISI-Data GHUB_Production Modify
-USA-GBL ISI-Data GHUB_Production Read
-#>
 
 Write-Host "$(Get-Date)"
 
-Get-ADGroupMemberships -Groups $Groups -Export -Extension csv
+Get-ADGroupMemberships -Groups $Groups -Export -Extension csv -ReportName 'AVD_Group_Memberships' -ReportPath 'C:\Temp\'
+
+<#
+AZ_AVD_DSC_FullDesktop
+AZ_AVD_DAG_FullDesktop
+AZ_AVD_RDC_FullDesktop
+AZ_AVD_SCUBA_FullDesktop
+AZ_AVD_UltraRecords_FullDesktop
+#>
