@@ -76,7 +76,7 @@ Error:    $($Error[0].Exception.Message)
           bodyashtml = $true
         }
 
-       Send-MailMessage @EmailParams2 3>$null
+        Send-MailMessage @EmailParams2 3>$null
         Write-Output "Sending error email, user: $($UserId)"
         $ADUser = $null
     }
