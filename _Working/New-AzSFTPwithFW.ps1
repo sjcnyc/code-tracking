@@ -3,7 +3,7 @@ $location = "EastUS"
 $storageaccountname = "stsftpstorage"
 $staticEP = "10.0.1.10"
 $SubscriptionName = "EUS-INFRA"
-$UserPrincipalName = ""
+$UserPrincipalName = "sean.connealy.peak@sonymusic.com"
 $ContainerName = "sftpdatapeus"
 
 # Create a new resource group
@@ -131,7 +131,7 @@ New-AzStorageAccount @newAzStorageAccountSplat
 
  # Get the subscription and user information
  $subscriptionId = (Get-AzSubscription -SubscriptionName "$SubscriptionName").SubscriptionId
- $user = Get-AzADUser -UserPrincipalName "sean.connealy.peak@sonymusic.com"
+ $user = Get-AzADUser -UserPrincipalName $UserPrincipalName
 
  # Give the user contributor role
  $newAzRoleAssignmentSplat = @{
