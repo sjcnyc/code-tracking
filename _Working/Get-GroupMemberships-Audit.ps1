@@ -41,29 +41,12 @@ function Get-ADGroupMemberships {
 }
 
 $Groups = @'
-AZ_AVD_Cognizant_FullDesktop
-AZ_AVD_DataMart_FullDesktop
-AZ_AVD_FRA_FullDesktop
-AZ_AVD_FRA_RemoteApps
-AZ_AVD_GRP_FullDesktop
-AZ_AVD_GSA_FullDesktop
-AZ_AVD_Itopia_FullDesktop
-AZ_AVD_ITT_FullDesktop
-AZ_AVD_RGL_FullDesktop
-AZ_AVD_RGL_RemoteApps
-AZ_AVD_SAP_FullDesktop
-AZ_AVD_SME_FullDesktop
-AZ_AVD_SME_RemoteApps
-AZ_AVD_SomLivre_FullDesktop
-AZ_AVD_TCS_FullDesktop
-AZ_AVD_WNS_FullDesktop
-AZ_AVD_WNS_RemoteApps
-AZ_AVD_WWI_FullDesktop
+USA-GBL ISI LegacyAR
 '@ -split [System.Environment]::NewLine
 
 Write-Host "$(Get-Date)"
 
-Get-ADGroupMemberships -Groups $Groups -Export -Extension csv -ReportName 'AVD_Group_Memberships' -ReportPath 'C:\Temp\'
+Get-ADGroupMemberships -Groups $Groups -Export -Extension csv -ReportName 'LegacyAR_Group_Memberships' -ReportPath 'C:\Temp\'
 
 <#
 AZ_AVD_DSC_FullDesktop
