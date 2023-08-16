@@ -34,7 +34,7 @@ function New-AzPIMGroups {
                     Write-Output "Group $($MGPrefix)$($ManagementGroup.DisplayName)$($MGSuffix)_$($Role.Replace(" ","_")) found, skipping creation"
                 }
             }
-            Write-Output "Waiting 6- seconds for Azure AD Groups to be created"
+            Write-Output "Waiting 60 seconds for Azure AD Groups to be created"
             Start-Sleep -Seconds 60
 
             foreach ($Role in $Roles) {
@@ -92,4 +92,4 @@ function New-AzPIMGroups {
 
 #New-AzPIMGroups -ManagementGroupName "EMEA" -Scope "ManagementGroups"
 
-New-AzPIMGroups -SubscriptionName "WEU-MGMT" -Scope "Subscriptions"
+New-AzPIMGroups -SubscriptionName "EUS-AZOpenAI" -Scope "Subscriptions" -Roles "User Access Administrator"
