@@ -13,7 +13,7 @@ function New-AzPIMGroups {
     )
 
     #roles
-    # Billing Reader, Network Contributor, Security Admin, Security Reader
+    # Billing Reader, Network Contributor, Security Admin, Security Reader.
 
     if ($Scope -eq "ManagementGroups" -or $Scope -eq "Both") {
         if ($ManagementGroupName -eq $null) {
