@@ -41,12 +41,12 @@ function Get-ADGroupMemberships {
 }
 
 $Groups = @'
-USA-GBL ISI LegacyAR
+USA-GBL ISI-Data-Share law
 '@ -split [System.Environment]::NewLine
 
 Write-Host "$(Get-Date)"
 
-Get-ADGroupMemberships -Groups $Groups -Export -Extension csv -ReportName 'LegacyAR_Group_Memberships' -ReportPath 'C:\Temp\'
+Get-ADGroupMemberships -Groups $Groups -Export -Extension csv -ReportName 'Law_Group_Memberships' -ReportPath 'C:\Temp\'
 
 <#
 AZ_AVD_DSC_FullDesktop

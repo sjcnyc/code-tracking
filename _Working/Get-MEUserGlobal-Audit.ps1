@@ -7,7 +7,7 @@ $Users = @()
 
 $getADOrganizationalUnitSplat = @{
   SearchBase = 'OU=Tier-2,DC=me,DC=sonymusic,DC=com'
-  Filter     = 'Name -like "Employee" -or Name -like "Non-employee" -or Name -like "LOH" -or Name -like "LOA" -and Enabled -eq $true'
+  Filter     = 'Name -like "Employee" -or Name -like "Non-employee" -or Name -like "LOH" -or Name -like "LOA"'
 }
 
 $ous = (Get-ADOrganizationalUnit @getADOrganizationalUnitSplat).DistinguishedName
