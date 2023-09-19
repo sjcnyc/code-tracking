@@ -41,12 +41,15 @@ function Get-ADGroupMemberships {
 }
 
 $Groups = @'
-USA-GBL ISI-Data-Share law
+USA-GBL ISI-Data GHUB_Development Modify
+USA-GBL ISI-Data GHUB_Development Read
+USA-GBL ISI-Data GHUB_Test Modify
+USA-GBL ISI-Data GHUB_Test Read
 '@ -split [System.Environment]::NewLine
 
 Write-Host "$(Get-Date)"
 
-Get-ADGroupMemberships -Groups $Groups -Export -Extension csv -ReportName 'Law_Group_Memberships' -ReportPath 'C:\Temp\'
+Get-ADGroupMemberships -Groups $Groups -Export -Extension csv -ReportName 'GHUB1_Group_Memberships' -ReportPath 'C:\Temp\'
 
 <#
 AZ_AVD_DSC_FullDesktop
