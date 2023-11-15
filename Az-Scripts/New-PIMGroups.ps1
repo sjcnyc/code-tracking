@@ -92,4 +92,4 @@ function New-AzPIMGroups {
 
 #New-AzPIMGroups -ManagementGroupName "EMEA" -Scope "ManagementGroups"
 
-New-AzPIMGroups -SubscriptionName "EUS-AZOpenAI" -Scope "Subscriptions" -Roles "User Access Administrator"
+New-AzPIMGroups -SubscriptionName "EUS-ML_AI_FinancialSystems" -Scope "Subscriptions" -Roles "Contributor"
