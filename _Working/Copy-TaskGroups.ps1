@@ -1,14 +1,14 @@
 function Copy-TaskGroups {
     param (
-       # [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $SourceTaskGroup,
 
-        #[Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $TargetTaskGroup,
 
-        #[Parameter(Mandatory)]
+        [Parameter(Mandatory)]
         [ValidateSet("T0", "T1", "T2", "All")]
         [string]
         $Tier
@@ -20,7 +20,7 @@ function Copy-TaskGroups {
         $Tiers = "$Tier"
     }
 
-    $Groups = Get-ADGroup -Filter "Name -like '*$($Tiers)*$($SourceTaskGroup)*'" -Properties Name, DistinguishedName | Where-Object { $_.DistinguishedName -like "*OU=Tasks,OU=Groups*"}
+    $Groups = Get-ADGroup -Filter "Name -like '*$($Tiers)*$($SourceTaskGroup)*'" -Properties Name, DistinguishedName | Where-Object { $_.DistinguishedName -like "*OU=Tasks,OU=Groups*" }
     $Groups.count
 
     $Output = foreach ($Group in $Groups) {
@@ -31,7 +31,22 @@ function Copy-TaskGroups {
         }
     }
 
-    $Output | Select-Object -first 5 #$Export-Csv C:\Temp\Modify_Extension_Attributes_new.csv -NoTypeInformation
+    #$Output
+
+    foreach ($Group in $Output) {
+
+        $newADGroupSplat = @{
+            Path          = $Group.DN
+            GroupCategory = 'Security'
+            GroupScope    = 'DomainLocal'
+            #Description  = 'Task Group'
+            PassThru      = $true
+            Verbose       = $true
+            Name          = $Group.Name
+        }
+
+        New-ADGroup @newADGroupSplat -WhatIf
+    }
 }
 
-Copy-TaskGroups -SourceTaskGroup "Modify_Organization_Tab" -TargetTaskGroup "Modify_Extension_Attributes" -Tier T1
+#Copy-TaskGroups -SourceTaskGroup "Modify_Organization_Tab" -TargetTaskGroup "Modify_Extension_Attributes" -Tier T1
