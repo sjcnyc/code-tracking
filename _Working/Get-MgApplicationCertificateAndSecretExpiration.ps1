@@ -74,8 +74,7 @@ Function Get-MgApplicationCertificateAndSecretExpiration {
                                 KeyType             = 'Certificate'
                                 ExpirationDate      = $Cert.EndDateTime
                                 DaysUntilExpiration = (($Cert.EndDateTime) - (Get-Date) | Select-Object -ExpandProperty TotalDays) -as [int]
-                                ThumbPrint          = [System.Convert]::ToBase64String($Cert.CustomKeyIdentifier)
-                                #ThumbPrint          = $Cert.PublicKey.Key.Encrypt($EncodedString, [System.Security.Cryptography.RSAEncryptionPadding]::OaepSHA256)
+                                #ThumbPrint          = [System.Convert]::ToBase64String($Cert.CustomKeyIdentifierS)
                                 Id                  = $App.Id
                                 KeyId               = $Cert.KeyId
                                 Description         = $Cert.DisplayName
