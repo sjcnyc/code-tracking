@@ -154,8 +154,6 @@ function Disable-ADStaleAccount {
 
     $ADObjectSplat = @{
       Properties =
-      'PwdLastSet',
-      'LastLogonTimeStamp',
       'Description',
       'distinguishedName',
       'SamAccountName',
@@ -165,29 +163,31 @@ function Disable-ADStaleAccount {
       @{Name = "LastLogonTimeStamp"; Expression = {[datetime]::FromFileTime($_.LastLogonTimeStamp)}}
     }
 
-    $StaleAccounts | Select-Object @ADObjectSplat | Export-Csv $CSVFile -NoTypeInformation
+    $StaleAccounts  | Select-Object $ADObjectSplat.Properties | Export-Csv $CSVFile -NoTypeInformation
   }
 }
 
 
 $disableADStaleAccountSplat = @{
   Domain         = 'me.sonymusic.com'
-  StaleThreshold = 90
+  StaleThreshold = 120
   AccountType    = 'Computer'
   SourceOu       = "OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
-  TargetOu       = "OU=Workstations,OU=Deprovision,OU=STG,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
-  Disable        = $true
+ # TargetOu       = "OU=Workstations,OU=Deprovision,OU=STG,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
+  Disable        = $false
 }
 
 Disable-ADStaleAccount @disableADStaleAccountSplat
 
+<#
 $disableADStaleAccountSplat = @{
   Domain         = 'me.sonymusic.com'
   StaleThreshold = 90
   AccountType    = 'User'
   SourceOu       = "OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
   TargetOu       = "OU=Users,OU=Deprovision,OU=STG,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
-  Disable        = $true
+  Disable        = $false
 }
 
 Disable-ADStaleAccount @disableADStaleAccountSplat
+#>
