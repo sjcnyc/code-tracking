@@ -131,7 +131,7 @@ function Disable-ADStaleComputers {
 
 $disableADStaleAccountSplat = @{
   Domain         = 'me.sonymusic.com'
-  StaleThreshold = 90
+  StaleThreshold = 120
   Disable        = $true
 }
 
