@@ -179,6 +179,8 @@ $disableADStaleAccountSplat = @{
 
 Disable-ADStaleAccount @disableADStaleAccountSplat
 
+#git sync error 2021-07-20 10:00
+
 <#
 $disableADStaleAccountSplat = @{
   Domain         = 'me.sonymusic.com'
