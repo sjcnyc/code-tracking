@@ -136,3 +136,4 @@ $disableADStaleAccountSplat = @{
 }
 
 Disable-ADStaleComputers @disableADStaleAccountSplat
+#git sync fix.  Stop syncing with multiple computers sean
