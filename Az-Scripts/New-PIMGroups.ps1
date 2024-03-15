@@ -1,3 +1,63 @@
+<#
+.SYNOPSIS
+Creates Azure AD groups and assigns roles to management groups and subscriptions.
+
+.DESCRIPTION
+The New-AzPIMGroups function creates Azure AD groups and assigns roles to management groups and subscriptions. It supports creating groups and assigning roles for both
+management groups and subscriptions, or either one of them. The function uses predefined roles such as Owner, Contributor, Reader, Billing Reader, Network Contributor,
+Security Admin, and Security Reader.
+
+.PARAMETER Roles
+Specifies the roles to assign to the groups. The default value is "Owner", "Contributor", "Reader", "Billing Reader", "Network Contributor", "Security Admin", and "Security Reader".
+
+.PARAMETER MGPrefix
+Specifies the prefix to use for the management group groups. The default value is "AZ_PIM_MG_".
+
+.PARAMETER MGSuffix
+Specifies the suffix to use for the management group groups. There is no default value.
+
+.PARAMETER SubPrefix
+Specifies the prefix to use for the subscription groups. The default value is "AZ_PIM_SUB_".
+
+.PARAMETER SubSuffix
+Specifies the suffix to use for the subscription groups. There is no default value.
+
+.PARAMETER Scope
+Specifies the scope for creating groups and assigning roles. Valid values are "ManagementGroups", "Subscriptions", and "Both". The default value is "Both".
+
+.PARAMETER ManagementGroupName
+Specifies the name of the management group to create groups and assign roles to. If not specified, all management groups will be used.
+
+.PARAMETER SubscriptionName
+Specifies the name of the subscription to create groups and assign roles to. If not specified, all subscriptions will be used.
+
+.EXAMPLE
+New-AzPIMGroups -ManagementGroupName "EMEA" -Scope "ManagementGroups" -Roles "Workbook Contributor"
+Creates Azure AD groups and assigns the "Workbook Contributor" role to the management group "EMEA".
+
+.EXAMPLE
+New-AzPIMGroups -SubscriptionName "EUS-ML_AI_FinancialSystems" -Scope "Subscriptions" -Roles "Contributor"
+Creates Azure AD groups and assigns the "Contributor" role to the subscription "EUS-ML_AI_FinancialSystems".
+#>
+function New-AzPIMGroups {
+    [CmdletBinding()]
+    param (
+        [string[]]$Roles = @("Owner", "Contributor", "Reader", "Billing Reader", "Network Contributor", "Security Admin", "Security Reader"),
+        [string]$MGPrefix = "AZ_PIM_MG_",
+        [string]$MGSuffix,
+        [string]$SubPrefix = "AZ_PIM_SUB_",
+        [string]$SubSuffix,
+        [ValidateSet("ManagementGroups", "Subscriptions", "Both")]
+        $Scope = "Both",
+        [string]$ManagementGroupName,
+        [string]$SubscriptionName
+    )
+
+    # Rest of the code...
+}
+
+New-AzPIMGroups -ManagementGroupName "EMEA" -Scope "ManagementGroups" -Roles "Workbook Contributor"
+#New-AzPIMGroups -SubscriptionName "EUS-ML_AI_FinancialSystems" -Scope "Subscriptions" -Roles "Contributor"
 function New-AzPIMGroups {
     [CmdletBinding()]
     param (
@@ -90,6 +150,6 @@ function New-AzPIMGroups {
 
 # Roles: Owner, Contributor, Reader, Billing Reader, Network Contributor, Security Admin, Security Reader
 
-#New-AzPIMGroups -ManagementGroupName "EMEA" -Scope "ManagementGroups"
+New-AzPIMGroups -ManagementGroupName "EMEA" -Scope "ManagementGroups" -Roles "Workbook Contributor"
 
-New-AzPIMGroups -SubscriptionName "EUS-ML_AI_FinancialSystems" -Scope "Subscriptions" -Roles "Contributor"
+#New-AzPIMGroups -SubscriptionName "EUS-ML_AI_FinancialSystems" -Scope "Subscriptions" -Roles "Contributor"

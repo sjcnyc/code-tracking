@@ -1,3 +1,61 @@
+<#
+.SYNOPSIS
+    Retrieves the expiration information of Azure application certificates and secrets.
+
+.DESCRIPTION
+    The Get-MgApplicationCertificateAndSecretExpiration function retrieves the expiration information of Azure application certificates and secrets.
+    It can filter the results based on various parameters such as showing only certificates or secrets, showing expired keys, and specifying the number of days within expiration.
+    The function generates an HTML report and sends it via email along with a CSV file containing the detailed information.
+
+.PARAMETER ShowOnlyCertificates
+    If specified, only the certificates will be shown in the results.
+
+.PARAMETER ShowOnlySecrets
+    If specified, only the secrets will be shown in the results.
+
+.PARAMETER ShowExpiredKeys
+    If specified, expired keys will be included in the results.
+
+.PARAMETER DaysWithinExpiration
+    Specifies the number of days within expiration. Only the keys expiring within this number of days will be included in the results.
+    The default value is 30.
+
+.PARAMETER AppId
+    Specifies the Application ID (Client ID) of the Azure application. If specified, only the application with the specified ID will be included in the results.
+
+.OUTPUTS
+    System.Management.Automation.PSCustomObject
+    The function returns a custom object with the following properties:
+    - AppDisplayName: The display name of the Azure application.
+    - AppId: The Application ID (Client ID) of the Azure application.
+    - Owner: The display name of the application owner(s).
+    - KeyType: The type of the key (Certificate or ClientSecret).
+    - ExpirationDate: The expiration date of the key.
+    - DaysUntilExpiration: The number of days until the key expires.
+    - Id: The ID of the Azure application.
+    - KeyId: The ID of the key.
+    - Description: The description of the key.
+    - Status: The status of the key (Expired or Expiring soon).
+
+.EXAMPLE
+    Get-MgApplicationCertificateAndSecretExpiration -DaysWithinExpiration 30 -ShowExpiredKeys
+    Retrieves the expiration information of Azure application certificates and secrets.
+    Only the keys expiring within 30 days will be included in the results, including the expired keys.
+
+.EXAMPLE
+    Get-MgApplicationCertificateAndSecretExpiration -ShowOnlyCertificates
+    Retrieves the expiration information of Azure application certificates only.
+
+.EXAMPLE
+    Get-MgApplicationCertificateAndSecretExpiration -ShowOnlySecrets -DaysWithinExpiration 15
+    Retrieves the expiration information of Azure application secrets only.
+    Only the secrets expiring within 15 days will be included in the results.
+
+#>
+
+$ClientSecretCredential = Get-Credential -Credential $secret:graphcreds
+
+# Rest of the code...
 $ClientSecretCredential = Get-Credential -Credential $secret:graphcreds
 
 Connect-MgGraph -TenantId "f0aff3b7-91a5-4aae-af71-c63e1dda2049" -ClientSecretCredential $ClientSecretCredential -NoWelcome

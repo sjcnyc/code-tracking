@@ -1,3 +1,52 @@
+<#
+.SYNOPSIS
+  Retrieves the group memberships of Active Directory groups and exports the results to a CSV or PDF file.
+
+.DESCRIPTION
+  The Get-ADGroupMemberships function retrieves the group memberships of Active Directory groups and provides options to export the results to a CSV or PDF file.
+  The function takes an array of group names as input and returns a custom object with properties including user details, group name, and group path.
+
+.PARAMETER Groups
+  Specifies the array of group names for which to retrieve the group memberships.
+
+.PARAMETER Export
+  Indicates whether to export the results to a file. If specified, the function exports the results based on the specified extension.
+
+.PARAMETER ReportPath
+  Specifies the path where the exported report file will be saved. The default path is 'C:\Temp\'.
+
+.PARAMETER ReportName
+  Specifies the name of the exported report file. The default name is 'Share_Report'.
+
+.PARAMETER ReportDate
+  Specifies the date format to append to the report name. The default format is '_MM-dd-yyyy'.
+
+.PARAMETER Extension
+  Specifies the file extension for the exported report file. Valid values are 'csv' and 'pdf'.
+
+.OUTPUTS
+  The function outputs a custom object with the following properties:
+  - GivenName
+  - SurName
+  - SamaccountName
+  - Enabled
+  - DistinguishedName
+  - UserPrincipalName
+  - Description
+  - GroupName
+  - Path
+
+.EXAMPLE
+  $Groups = @(
+    'USA-GBL Member Server Administrators'
+  )
+
+  Get-ADGroupMemberships -Groups $Groups -Export -Extension csv -ReportName 'Server_admins' -ReportPath 'C:\Temp\'
+
+  This example retrieves the group memberships for the specified groups and exports the results to a CSV file named 'Server_admins_MM-dd-yyyy.csv' in the 'C:\Temp\' directory.
+
+#>
+
 function Get-ADGroupMemberships {
   [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSShouldProcess', '')]
   [CmdletBinding(SupportsShouldProcess = $true)]
@@ -48,10 +97,3 @@ Write-Host "$(Get-Date)"
 
 Get-ADGroupMemberships -Groups $Groups -Export -Extension csv -ReportName 'Server_admins' -ReportPath 'C:\Temp\'
 
-<#
-AZ_AVD_DSC_FullDesktop
-AZ_AVD_DAG_FullDesktop
-AZ_AVD_RDC_FullDesktop
-AZ_AVD_SCUBA_FullDesktop
-AZ_AVD_UltraRecords_FullDesktop
-#>

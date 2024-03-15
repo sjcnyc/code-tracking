@@ -1,4 +1,23 @@
 function Test-RegistryValue {
+<#
+.SYNOPSIS
+This function is used to test a registry value.
+
+.DESCRIPTION
+The Test-RegistryValue function is designed to check the existence of a registry value and return a boolean result.
+
+.PARAMETER ValueName
+Specifies the name of the registry value to test.
+
+.PARAMETER RegistryPath
+Specifies the path to the registry key containing the value to test.
+
+.EXAMPLE
+Test-RegistryValue -ValueName "ExampleValue" -RegistryPath "HKLM:\Software\Example"
+
+This example tests the existence of the registry value "ExampleValue" under the "HKLM:\Software\Example" registry key.
+
+#>
 
     [CmdletBinding()]
     param (
@@ -53,20 +72,20 @@ function Test-RegistryValue {
 }
 Function Get-RDSActiveSessions {
 <#
-    .SYNOPSIS
-        Returns open sessions of a local workstation
-    .DESCRIPTION
-        Get-ActiveSessions uses the command line tool qwinsta to retrieve all open user sessions
-        on a computer regardless of how they are connected.
-    .OUTPUTS
-        A custom object with the following members:
-            UserName: [string]
-            SessionName: [string]
-            ID: [string]
-            Type: [string]
-            State: [string]
-
+.SYNOPSIS
+    Remove local file system profiles.
+.DESCRIPTION
+    This script removes local file system profiles from the system. It supports removing profiles for UPDs (User Profile Disks) and FSL (FSLogix) profiles.
+    For UPDs, it excludes currently logged in users and specific profiles defined in the $profilesToExclude array.
+    For FSL profiles, it excludes currently logged in users, the local_ folder of logged in users, and specific profiles defined in the $profilesToExclude array.
+    The script uses the DelProf2.exe command-line tool for profile removal.
+.PARAMETER None
+    This script does not accept any parameters.
+.EXAMPLE
+    Remove-LocalFSLProfiles.ps1
+    This example runs the script to remove local file system profiles.
 #>
+
     Begin {
         $Name = $env:COMPUTERNAME
         $ActiveUsers = @()
