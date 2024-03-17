@@ -32,16 +32,16 @@ This script requires the Active Directory module to be installed.
 #>
 
 # Tune this variables to your needs
-$FSLogixPath = "\\NUTANIX_FILES\UserProfiles"                       # Set FSLogix containers path.
-[string[]]$ExcludeFolders = @('FSLogix_Redirections', 'Template')   # Excluded directories from the FSLogix containers path.
+$FSLogixPath = "\\stsmewns001.file.core.windows.net\wns-userprofiles"                       # Set FSLogix containers path.
+#[string[]]$ExcludeFolders = @('FSLogix_Redirections', 'Template')   # Excluded directories from the FSLogix containers path.
 $DaysInactive      = 90                                             # Days of inactivity before FSLogix containers are removed.
-$DeleteDisabled    = 0                                              # Delete containers from disabled users.
-$DeleteNotExisting = 0                                              # Delete containers from not existing users.
+$DeleteDisabled    = 1                                              # Delete containers from disabled users.
+$DeleteNotExisting = 1                                              # Delete containers from not existing users.
 $DeleteInactive    = 1                                              # Delete containers from inactive users.
-$OnlyDeleteODFC    = 1                                              # When this is 1 only the office cache container will be deleted and not the profile container.
-$FlipFlopEnabled   = 1                                              # When 1 the default naming convention of the folders is used.
+$OnlyDeleteODFC    = 0                                              # When this is 1 only the office cache container will be deleted and not the profile container.
+$FlipFlopEnabled   = 0                                              # When 1 the default naming convention of the folders is used.
 $ShowTable         = 1                                              # Show table at the end of the script.
-$DryRun            = 1                                              # Override switch, nothing will be deleted, script will also output user names and what will be deleted.
+$DryRun            = 0                                              # Override switch, nothing will be deleted, script will also output user names and what will be deleted.
 
 # Script Start
 $PotentialSpaceReclamation = 0
@@ -63,7 +63,7 @@ if ($DryRun -eq 1) {
     }
 }
 
-$PathItems = Get-ChildItem -Path "$($FSLogixPath)" -Directory -Exclude $ExcludeFolders
+$PathItems = Get-ChildItem -Path "$($FSLogixPath)" -Directory #-Exclude $ExcludeFolders
 
 
 foreach ($PathItem in $PathItems) {
@@ -164,6 +164,7 @@ if ($ShowTable -eq 1) {
     $UsersTable | ForEach-Object { [PSCustomObject]$_ } | Format-Table UserName, State, SpaceinGB
 }
 Write-Host "========================================="
+Write-Host "FLS Path: $FSLogixPath"
 Write-Host "Processed Container Folderss:"$Counter
 if ($DryRun -eq 1) {
     Write-Host "Potential $PotentialSpaceReclamation can be reclaimed."
