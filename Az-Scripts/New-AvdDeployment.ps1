@@ -1,12 +1,12 @@
 # AVD Distribution Name
-$DistName = "RDC"
+$DistName = "WNSD"
 
 # Active Directory process
-$GroupsOu = "OU=Groups,OU=GBL,OU=USA,OU=NA,OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
+$GroupsOu     = "OU=Groups,OU=GBL,OU=USA,OU=NA,OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
 $ContribGroup = "AZ_AVD_$($DistName)_Contributor_Users"
 $DesktopGroup = "AZ_AVD_$($DistName)_FullDesktop"
-$CAGroup = "AZ_AVD_ConditionalAcccess_Users"
-$Users = @("sconnea","NGOM002")
+$CAGroup      = "AZ_AVD_ConditionalAcccess_Users"
+$Users        = @("sconnea","NGOM002")
 
 # Create avd/fslogix AD security groups
 $groups = @{
@@ -33,10 +33,10 @@ Add-ADGroupMember -Identity $CAGroup -Members $ContribGroup
 # Add default users, sean/mike
 Add-ADGroupMember -Identity $DesktopGroup -Members $Users
 
-# WAIT 20 MIN FOR AD SYNC TO SYN AD GROUPS BEFORE PROCEEDING ##########################################################
+# WAIT 20 MIN FOR AD SYNC TO SYNC AD GROUPS BEFORE PROCEEDING ##########################################################
 
 # Azure Process
-Import-Module -Name AzFilesHybrid 
+Import-Module -Name AzFilesHybrid
 
 # Azure vars
 $Date           = Get-Date -f "MM/dd/yyyy"
