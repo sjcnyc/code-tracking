@@ -152,4 +152,4 @@ function New-AzPIMGroups {
 
 #New-AzPIMGroups -ManagementGroupName "EMEA" -Scope "ManagementGroups" -Roles "Workbook Contributor"
 
-New-AzPIMGroups -SubscriptionName "DE-Carma-OpenAI" -Scope "Subscriptions"
+New-AzPIMGroups -SubscriptionName "DE-Carma-OpenAI" -Scope "Subscriptions" # git sync
