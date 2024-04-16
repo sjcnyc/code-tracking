@@ -150,6 +150,6 @@ function New-AzPIMGroups {
 
 # Roles: Owner, Contributor, Reader, Billing Reader, Network Contributor, Security Admin, Security Reader
 
-New-AzPIMGroups -ManagementGroupName "EMEA" -Scope "ManagementGroups" -Roles "Workbook Contributor"
+#New-AzPIMGroups -ManagementGroupName "EMEA" -Scope "ManagementGroups" -Roles "Workbook Contributor"
 
-#New-AzPIMGroups -SubscriptionName "EUS-ML_AI_FinancialSystems" -Scope "Subscriptions" -Roles "Contributor"
+New-AzPIMGroups -SubscriptionName "DE-Carma-OpenAI" -Scope "Subscriptions"
