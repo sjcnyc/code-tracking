@@ -7,7 +7,7 @@ This script is used to delete FSLogix containers for disabled, inactive, and non
     3.  $DaysInactive      : Minimum amount of days when the last logon occured.
     4.  $DeleteDisabled    : Set this to 0 or 1. 0 will NOT delete conainters from disabled user accounts. 1 will ;)
     5.  $DeleteNotExisting : When an user is deleted and the conainers aren't deleted set this to 1 and the containers will be deleted.
-    6.  $DeleteInactive    : Users with a last logon longer the the $DaysInactive will be deleted if this is set to 1.
+    6.  $DeleteInactive    : Users with a last logon longer the the $DaysInactive will be deleted if this is set to 1
     7.  $OnlyDeleteODFC    : Only the Office cache container will be deleted. Keeping the Profile container.
     8.  $FlipFlopEnabled   : When the folder starts with the username set this to 1.
     9.  $ShowTable         : Set this to 1 to show a table at the end of the script.
