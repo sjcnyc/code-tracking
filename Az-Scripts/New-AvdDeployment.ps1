@@ -97,7 +97,6 @@ Add-ADGroupMember -Identity $CAGroup -Members $ContribGroup
 # Add default users, Sean/Mani
 Add-ADGroupMember -Identity $DesktopGroup -Members $Users
 
-
 #########################################################################################################################
 # WAIT 20 MIN FOR AD SYNC TO SYNC AD GROUPS BEFORE PROCEEDING!
 # TODO: Need to get Azure AD Connect module to force the sync to happen. This is a manual process for now.
@@ -176,5 +175,5 @@ $newAzRoleAssignmentSplat = @{
 
 New-AzRoleAssignment @newAzRoleAssignmentSplat
 
-# We are done.  Sheesh this needs to be refactored
+# We are done.
 # TODO: Refactor in Bicep manybe.  Lot's of moving parts.
