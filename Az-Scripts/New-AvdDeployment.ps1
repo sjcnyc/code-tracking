@@ -1,3 +1,5 @@
+# This script needs to be run from a Tier-2 or Tier-1 jumpbox depending on the deployment scope.
+
 # AVD Distribution Name
 $DistName = "WNSD"
 
@@ -6,7 +8,7 @@ $GroupsOu     = "OU=Groups,OU=GBL,OU=USA,OU=NA,OU=STD,OU=Tier-2,DC=me,DC=sonymus
 $ContribGroup = "AZ_AVD_$($DistName)_Contributor_Users"
 $DesktopGroup = "AZ_AVD_$($DistName)_FullDesktop"
 $CAGroup      = "AZ_AVD_ConditionalAcccess_Users"
-$Users        = @("sconnea","NGOM002")
+$Users        = @("sconnea")
 
 # Create avd/fslogix AD security groups
 $groups = @{
@@ -23,7 +25,7 @@ $groups.GetEnumerator() | ForEach-Object {
         Path        = $GroupsOu
     }
 
-    NEW-ADGroup @nEWADGroupSplat
+    New-ADGroup @nEWADGroupSplat
 }
 
 # Add nested memberships
@@ -36,13 +38,15 @@ Add-ADGroupMember -Identity $DesktopGroup -Members $Users
 # WAIT 20 MIN FOR AD SYNC TO SYNC AD GROUPS BEFORE PROCEEDING ##########################################################
 
 # Azure Process
+# https://github.com/Azure-Samples/azure-files-samples/releases/download/v0.2.9/AzFilesHybrid.zip
 Import-Module -Name AzFilesHybrid
 
 # Azure vars
 $Date           = Get-Date -f "MM/dd/yyyy"
 $CreatedBy      = "sean.connealy@sonymusic.com"
 $TenantID       = "f0aff3b7-91a5-4aae-af71-c63e1dda2049"
-$SubscriptionID = "bcda95b7-72ae-40ce-8967-f83a6597d40a"
+$SubscriptionID = "bcda95b7-72ae-40ce-8967-f83a6597d40a"  # EUS-AVD
+
 # Kim needs to create the OU in AD first
 $TargetOu       = "OU=$($DistName),OU=AzureVDI,OU=Workstations,OU=GBL,OU=USA,OU=NA,OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
 
