@@ -41,18 +41,6 @@ The ID of the Azure subscription.
 .PARAMETER TargetOu
 The distinguished name of the OU where the AVD deployment will be created in AD.
 
-.EXAMPLE
-.\New-AvdDeployment.ps1 `
-    -DistName "WNSD" `
-    -GroupsOu "OU=Groups,OU=GBL,OU=USA,OU=NA,OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com" `
-    -ContribGroup "AZ_AVD_WNSD_Contributor_Users" `
-    -DesktopGroup "AZ_AVD_WNSD_FullDesktop" `
-    -CAGroup "AZ_AVD_ConditionalAcccess_Users" `
-    -Users @("sconnea") `
-    -TenantID "f0aff3b7-91a5-4aae-af71-c63e1dda2049" `
-    -SubscriptionID "bcda95b7-72ae-40ce-8967-f83a6597d40a" `
-    -TargetOu "OU=WNSD,OU=AzureVDI,OU=Workstations,OU=GBL,OU=USA,OU=NA,OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
-
 .NOTES
 File Name      : New-AvdDeployment.ps1
 Author         : Sean Connealy
@@ -76,7 +64,13 @@ $GroupsOu     = "OU=Groups,OU=GBL,OU=USA,OU=NA,OU=STD,OU=Tier-2,DC=me,DC=sonymus
 $ContribGroup = "AZ_AVD_$($DistName)_Contributor_Users"
 $DesktopGroup = "AZ_AVD_$($DistName)_FullDesktop"
 $CAGroup      = "AZ_AVD_ConditionalAcccess_Users"
-$Users        = @("sconnea")
+$Users        = @("sconnea", "AIRA003")
+
+# Azure vars
+$Date           = Get-Date -f "MM/dd/yyyy"
+$CreatedBy      = "sean.connealy@sonymusic.com"
+$TenantID       = "f0aff3b7-91a5-4aae-af71-c63e1dda2049"
+$SubscriptionID = "bcda95b7-72ae-40ce-8967-f83a6597d40a"  # EUS-AVD
 
 # Create avd/fslogix AD security groups
 $groups = @{
@@ -100,21 +94,19 @@ $groups.GetEnumerator() | ForEach-Object {
 Add-ADGroupMember -Identity $ContribGroup -Members $DesktopGroup
 Add-ADGroupMember -Identity $CAGroup -Members $ContribGroup
 
-# Add default users, sean/mike
+# Add default users, Sean/Mani
 Add-ADGroupMember -Identity $DesktopGroup -Members $Users
 
-# WAIT 20 MIN FOR AD SYNC TO SYNC AD GROUPS BEFORE PROCEEDING! ##########################################################
 
-
-# Azure vars
-$Date           = Get-Date -f "MM/dd/yyyy"
-$CreatedBy      = "sean.connealy@sonymusic.com"
-$TenantID       = "f0aff3b7-91a5-4aae-af71-c63e1dda2049"
-$SubscriptionID = "bcda95b7-72ae-40ce-8967-f83a6597d40a"  # EUS-AVD
+#########################################################################################################################
+# WAIT 20 MIN FOR AD SYNC TO SYNC AD GROUPS BEFORE PROCEEDING!
+# TODO: Need to get Azure AD Connect module to force the sync to happen. This is a manual process for now.
+#########################################################################################################################
 
 # Kim needs to create the OU in AD first
-$TargetOu       = "OU=$($DistName),OU=AzureVDI,OU=Workstations,OU=GBL,OU=USA,OU=NA,OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
+$TargetOu = "OU=$($DistName),OU=AzureVDI,OU=Workstations,OU=GBL,OU=USA,OU=NA,OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
 
+# Connect to Azure
 Connect-AzAccount -Tenant $TenantID -SubscriptionId $SubscriptionID
 
 # Create deployment resource group and tags
@@ -149,19 +141,19 @@ $newAzStorageAccountSplat = @{
 
 New-AzStorageAccount @newAzStorageAccountSplat
 
-# Get newly create storage account
+# Get storage account
 $StorageAccountName = Get-AzStorageAccount -ResourceGroupName $ResourceGroupName -StorageAccountName $StorageAccountName
 
-# Enable smb multi channel
+# Enable SMB multi-channel
 Update-AzStorageFileServiceProperty -StorageAccount $storageAccountName -EnableSmbMultichannel $true
 
-# Azure Files share name
+# Create azure files file share
 $ShareName = "$($DistName.ToLower())-userprofiles"
 
-# Create azure files file share, set quota to 100gig
+# Set quota to 100GB
 New-AzRmStorageShare -StorageAccount $StorageAccountName -Name $ShareName -EnabledProtocol SMB -QuotaGiB 100
 
-# Join storage account to ad for smb auth
+# Join storage account to AD for SMB authentication
 $JoinAzStorageAccoutnForAuth = @{
   ResourceGroupName                   = $ResourceGroupName
   StorageAccountName                  = $StorageAccountName.StorageAccountName
@@ -171,7 +163,7 @@ $JoinAzStorageAccoutnForAuth = @{
 
 Join-AzStorageAccountForAuth @JoinAzStorageAccoutnForAuth
 
-# Get ID for "AVD $($DistName) FSLogix Users" AD group
+# Get the security group id for the contributor group
 $GroupID = (Get-AzADGroup -DisplayName $ContribGroup).id
 
 # Add "Storage File Data SMB Share Contributor" role to security group for access to storage account
