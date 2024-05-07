@@ -176,4 +176,4 @@ $newAzRoleAssignmentSplat = @{
 New-AzRoleAssignment @newAzRoleAssignmentSplat
 
 # We are done.
-# TODO: Refactor in Bicep manybe.  Lot's of moving parts.
+# TODO: Finish refactor in Bicep  Lot's of moving parts, and Infosec blocks.  Will probably never be fully automated. :(
