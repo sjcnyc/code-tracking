@@ -152,4 +152,4 @@ function New-AzPIMGroups {
 
 #New-AzPIMGroups -ManagementGroupName "EMEA" -Scope "ManagementGroups" -Roles "Workbook Contributor"
 
-New-AzPIMGroups -SubscriptionName "EUS-BLA-Content-Protection" -Scope "Subscriptions"
+New-AzPIMGroups -SubscriptionName "EUS-GitHub" -Scope "Subscriptions"
