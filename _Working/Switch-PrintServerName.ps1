@@ -1,3 +1,27 @@
+<#
+.SYNOPSIS
+    This script is used to switch the print server name for printers mapped to an old print server.
+
+.DESCRIPTION
+    The Switch-PrintServerName function replaces the old print server name with the new print server name for printers mapped to the old print server.
+    It also updates the default printer if necessary.
+
+.PARAMETER NewPrintServer
+    Specifies the new print server name to replace the old print server name.
+
+.PARAMETER OldPrintServer
+    Specifies the old print server name to be replaced.
+
+.EXAMPLE
+    Switch-PrintServerName -NewPrintServer "usnaspwfs02.me.sonymusic.com" -OldPrintServer "usnaspwfs01.me.sonymusic.com"
+    Switch-PrintServerName -NewPrintServer "usnaspwfs02.me.sonymusic.com" -OldPrintServer "usnaspwfs01"
+
+    This example switches the print server name from "usnaspwfs01.me.sonymusic.com" to "usnaspwfs02.me.sonymusic.com" for printers mapped to the old
+    print server.
+
+.NOTES
+    Author: Sean Connely
+#>
 function Switch-PrintServerName {
     Param (
         [Parameter(Mandatory = $true)]
@@ -50,15 +74,8 @@ function Switch-PrintServerName {
     }
 }
 
-Switch-PrintServerName -NewPrintServer "usculvwprt402.me.sonymusic.com" -OldPrintServer "usbvhpwfs01.me.sonymusic.com"
-Switch-PrintServerName -NewPrintServer "usculvwprt402.me.sonymusic.com" -OldPrintServer "usbvhpwfs01"
-
 Switch-PrintServerName -NewPrintServer "usnaspwfs02.me.sonymusic.com" -OldPrintServer "usnaspwfs01.me.sonymusic.com"
 Switch-PrintServerName -NewPrintServer "usnaspwfs02.me.sonymusic.com" -OldPrintServer "usnaspwfs01"
-
-
-#Switch-PrintServername -newPrintServer usbvhpwfs01 -oldPrintServer stm
-
 
 
 <# Regex for 25mad printer names
