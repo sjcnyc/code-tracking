@@ -45,7 +45,6 @@ The distinguished name of the OU where the AVD deployment will be created in AD.
 File Name      : New-AvdDeployment.ps1
 Author         : Sean Connealy
 Prerequisite   : Azure PowerShell module
-Copyright 2021 : Sean Connealy
 Requirements   : PowerShell 5.1 or later
                : This script needs to be run from a Tier-2 or Tier-1 jumpbox depending on the deployment scope
 #>
