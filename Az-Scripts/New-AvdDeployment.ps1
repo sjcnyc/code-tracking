@@ -56,7 +56,7 @@ Import-Module Az
 Import-Module AzFilesHybrid
 
 # AVD Distribution Name
-$DistName = "WNSD"
+$DistName = "WNSD" #
 
 # Active Directory vars
 $GroupsOu     = "OU=Groups,OU=GBL,OU=USA,OU=NA,OU=STD,OU=Tier-2,DC=me,DC=sonymusic,DC=com"
