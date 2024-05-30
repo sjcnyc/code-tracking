@@ -55,9 +55,6 @@
 
 $ClientSecretCredential = Get-Credential -Credential $secret:graphcreds
 
-# Rest of the code...
-$ClientSecretCredential = Get-Credential -Credential $secret:graphcreds
-
 Connect-MgGraph -TenantId "f0aff3b7-91a5-4aae-af71-c63e1dda2049" -ClientSecretCredential $ClientSecretCredential -NoWelcome
 
 Function Get-MgApplicationCertificateAndSecretExpiration {

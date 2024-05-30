@@ -56,7 +56,7 @@ function New-AzPIMGroups {
     # Rest of the code...
 }
 
-New-AzPIMGroups -ManagementGroupName "EMEA" -Scope "ManagementGroups" -Roles "Workbook Contributor"
+#New-AzPIMGroups -ManagementGroupName "EMEA" -Scope "ManagementGroups" -Roles "Workbook Contributor"
 #New-AzPIMGroups -SubscriptionName "EUS-ML_AI_FinancialSystems" -Scope "Subscriptions" -Roles "Contributor"
 function New-AzPIMGroups {
     [CmdletBinding()]
@@ -152,4 +152,4 @@ function New-AzPIMGroups {
 
 #New-AzPIMGroups -ManagementGroupName "EMEA" -Scope "ManagementGroups" -Roles "Workbook Contributor"
 
-New-AzPIMGroups -SubscriptionName "EUS-GitHub" -Scope "Subscriptions"
+New-AzPIMGroups -SubscriptionName "WEU-InnovDev" -Scope "Subscriptions"
