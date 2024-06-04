@@ -21,6 +21,11 @@ Exports role assignments for all subscriptions in the tenant and saves the data 
 Export-RoleAssignments -OutputPath "C:\Temp" -SelectCurrentSubscription
 Exports role assignments for the currently selected subscription and saves the data to a CSV file at the specified path.
 
+File Name      : Export-AzRoleAssignments.ps1
+Author         : Sean Connealy
+Prerequisite   : Azure PowerShell module
+Requirements   : PowerShell 5.1 or later
+
 #>
 function Export-AzRoleAssignments {
 
