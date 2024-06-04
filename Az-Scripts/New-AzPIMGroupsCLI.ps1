@@ -38,6 +38,12 @@ Creates Azure AD groups and assigns the "Workbook Contributor" role to the manag
 .EXAMPLE
 New-AzPIMGroups -SubscriptionName "EUS-ML_AI_FinancialSystems" -Scope "Subscriptions" -Roles "Contributor"
 Creates Azure AD groups and assigns the "Contributor" role to the subscription "EUS-ML_AI_FinancialSystems".
+
+.NOTES
+File Name      : New-AzPIMGroupsCLI.ps1
+Author         : Sean Connealy
+Prerequisite   : Azure PowerShell module
+Requirements   : PowerShell 5.1 or later
 #>
 
 
@@ -53,9 +59,6 @@ param (
     [string]$ManagementGroupName,
     [string]$SubscriptionName
 )
-
-#roles
-# Billing Reader, Network Contributor, Security Admin, Security Reader.
 
 if ($Scope -eq "ManagementGroups" -or $Scope -eq "Both") {
     if ($ManagementGroupName -eq $null) {
@@ -128,9 +131,3 @@ if ($Scope -eq "Subscriptions" -or $Scope -eq "Both") {
         }
     }
 }
-
-
-# Roles: Owner, Contributor, Reader, Billing Reader, Network Contributor, Security Admin, Security Reader
-
-#New-AzPIMGroups -ManagementGroupName "EMEA" -Scope "ManagementGroups"
-
