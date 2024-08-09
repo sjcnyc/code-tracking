@@ -1,5 +1,6 @@
 {
   "powershell.codeFormatting.addWhitespaceAroundPipe": true,
   "powerShellUniversal.appToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWRtaW4iLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9oYXNoIjoiN2UxYWU2MTMtYWRlMy00ZWViLTgyYTktZTNmZjdjOTg5OWUwIiwic3ViIjoiUG93ZXJTaGVsbFVuaXZlcnNhbCIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluaXN0cmF0b3IiLCJuYmYiOjE3MTE0MDA0MDEsImV4cCI6MTc0MjkzNjQwMSwiaXNzIjoiSXJvbm1hblNvZnR3YXJlIiwiYXVkIjoiUG93ZXJTaGVsbFVuaXZlcnNhbCJ9.AunjCnvCGtgFDjYiI54RYeL_WMV7HKFzmy9V1OJV-OM",
-  "powerShellUniversal.url": "http://usazvwpsu101.me.sonymusic.com:5000"
+  "powerShellUniversal.url": "http://usazvwpsu101.me.sonymusic.com:5000",
+  "animations.Install-Method": "Apc Customize UI++"
 }
