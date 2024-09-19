@@ -1,323 +1,369 @@
 ﻿Add-Type -AssemblyName System.Web
+
+# Define Logger class
+enum LogLevel {
+    Info    = 1
+    Warning = 2
+    Error   = 3
+}
+
+class Logger {
+    [string]$LogFilePath
+    [LogLevel]$MinimumLogLevel
+
+    Logger([string]$logFilePath = ".\log.txt", [LogLevel]$minimumLogLevel = [LogLevel]::Info) {
+        $this.LogFilePath = $logFilePath
+        $this.MinimumLogLevel = $minimumLogLevel
+    }
+
+    hidden [void] WriteLogEntry([LogLevel]$level, [string]$message) {
+        if ($level.value__ -ge $this.MinimumLogLevel.value__) {
+            $logEntry = "{0} [{1}] {2}" -f (Get-Date -Format "yyyy-MM-dd HH:mm:ss"), $level, $message
+            Add-Content -Path $this.LogFilePath -Value $logEntry
+            Write-Host $logEntry
+        }
+    }
+
+    [void] Info([string]$message) {
+        $this.WriteLogEntry([LogLevel]::Info, $message)
+    }
+
+    [void] Warning([string]$message) {
+        $this.WriteLogEntry([LogLevel]::Warning, $message)
+    }
+
+    [void] Error([string]$message) {
+        $this.WriteLogEntry([LogLevel]::Error, $message)
+    }
+}
+
+# Define ADUser class
 class ADUser {
-	
-    [String]$City;
-    [String]$FullName;
-    [String]$Company;
-    [String]$Country;
-    [String]$Department;
-    [String]$Description;
-    [String]$EmailAddress;
-    [String]$EmployeeID;
-    [Int]$EmployeeNumber;
-    [Bool]$Enabled;
-    [String]$Firstname;
-    [String]$HomeDirectory;
-    [String]$Manager;
-    [Array]$MemberOf;
-    [String]$OfficePhone;
-    [String]$SamAccountName;
-    [String]$LastName;
-    [String]$Title;
-    [String]$ObjectGuid;
-	
-	ADUser([String]$SAMAccountName)
-	{
-		$this._getADUser($SAMAccountName)
-	}
-	
-	# Method: Get User Information
-	hidden [void] _getADUser([String]$SAMAccountName)
-	{
-		$User = $NUll
-		Try{
-			$User = Get-ADUser $SAMAccountName -properties * -ErrorAction Stop
-		}
-		Catch{
-			Throw "No ADUser matches that SAMAccountName"
-		}
-		
-        [String]$this.City               = $User.city 
-        [String]$this.FullName           = $User.cn
-        [String]$this.Company            = $User.company
-        [String]$this.Country            = $User.country
-        [String]$this.Department         = $User.department
-        [String]$this.Description        = $User.description
-        [String]$this.EmailAddress       = $User.emailaddress
-        [String]$this.EmployeeID         = $User.EmployeeID
-        [String]$this.OfficePhone        = $User.OfficePhone
-        [String]$this.SamAccountName     = $User.SamAccountName
-        [String]$this.LastName           = $User.Surname
-        [String]$this.Title              = $User.Title
-        [String]$this.ObjectGuid         = $User.ObjectGuid
-        [String]$this.Firstname          = $User.givenname
-        [String]$this.HomeDirectory      = $User.HomeDirectory 
-        [String]$this.Manager            = $User.Manager 
-        [Int]$this.EmployeeNumber        = $User.EmployeeNumber
-        [Bool]$this.Enabled              = $User.Enabled 
-        [Array]$this.MemberOf            = $User.MemberOf
+    # Properties
+    [String]$City
+    [String]$FullName
+    [String]$Company
+    [String]$Country
+    [String]$Department
+    [String]$Description
+    [String]$EmailAddress
+    [String]$EmployeeID
+    [Int]$EmployeeNumber
+    [Bool]$Enabled
+    [String]$Firstname
+    [String]$HomeDirectory
+    [String]$Manager
+    [Array]$MemberOf
+    [String]$OfficePhone
+    [String]$SamAccountName
+    [String]$LastName
+    [String]$Title
+    [String]$ObjectGuid
+    [Logger]$Logger
 
-	}
-	
-	# Method: Enable ADUser
-	[String] Enable([System.Management.Automation.PSCredential]$Credential)
-	{
-		Try
-		{
-			Enable-ADAccount -Identity $this.SAMAccountName -Credential $Credential -ErrorAction Stop
-			Return $Null
-		}
-		Catch
-		{
-			Throw "Unable to Enable User : $($_.exception.message)"
-		}
-	}
+    # Constructor
+    ADUser([String]$SamAccountName, [Logger]$Logger = $null) {
+        if ([string]::IsNullOrWhiteSpace($SamAccountName)) {
+            throw "SamAccountName cannot be null or empty"
+        }
+        if ($null -eq $Logger) {
+            $this.Logger = [Logger]::new("c:\temp\ADUser.log", [LogLevel]::Info)
+        } else {
+            $this.Logger = $Logger
+        }
+        $this.Logger.Info("Initializing ADUser for $SamAccountName")
+        $this._getADUser($SamAccountName)
+    }
 
-	# Method: Disable ADUser
-	[String] Disable([System.Management.Automation.PSCredential]$Credential)
-	{
-		Try
-		{
-			Disable-ADAccount -Identity $this.SAMAccountName -Credential $Credential -ErrorAction Stop
-			Return $Null
-		}
-		Catch
-		{
-			Throw "Unable to Disable User : $($_.exception.message)"
-		}
-	}
-	
-	# Method: Set Password
-	[String] SetPassword([String]$Password,[System.Management.Automation.PSCredential]$Credential)
-	{
-		Try
-		{
-			Set-ADAccountPassword -Identity $this.SAMAccountName -Credential $Credential -Reset -NewPassword $Password -ErrorAction Stop
-			Return $Null
-		}
-		Catch
-		{
-			Throw "Unable to Set Password : $($_.exception.message)"
-		}
-	}
-	
-	# Method: Move OU
-	[String] MoveOU([String]$NewOU,[System.Management.Automation.PSCredential]$Credential)
-	{
-		Try
-		{
-			Move-ADObject -TargetPath $NewOU -Identity $this.ObjectGuid -Credential $Credential -Confirm:$False -ErrorAction Stop
-			Return $Null
-		}
-		Catch
-		{
-			Throw "Unable to Change OUs : $($_.exception.message)"
-		}
-	}
-	
-	# Method: Set Description
-	[String] SetDescription([String]$Description,[System.Management.Automation.PSCredential]$Credential)
-	{
-		Try
-		{
+    # Method: Get User Information
+    hidden [void] _getADUser([String]$SamAccountName) {
+        try {
+            $this.Logger.Info("Retrieving AD user information for $SamAccountName")
+            $user = Get-ADUser $SamAccountName -Properties * -ErrorAction Stop
+            $this._mapUserProperties($user)
+            $this.Logger.Info("Successfully retrieved AD user information for $SamAccountName")
+        }
+        catch {
+            $errorMessage = "No ADUser matches the SAMAccountName: $SamAccountName. Error: $($_.Exception.Message)"
+            $this.Logger.Error($errorMessage)
+            throw $errorMessage
+        }
+    }
+
+    # Helper method to map user properties
+    hidden [void] _mapUserProperties($user) {
+        if ($null -eq $user) {
+            $errorMessage = "Invalid user object provided for property mapping"
+            $this.Logger.Error($errorMessage)
+            throw $errorMessage
+        }
+        $this.City = $user.City
+        $this.FullName = $user.CN
+        $this.Company = $user.Company
+        $this.Country = $user.Country
+        $this.Department = $user.Department
+        $this.Description = $user.Description
+        $this.EmailAddress = $user.EmailAddress
+        $this.EmployeeID = $user.EmployeeID
+        $this.OfficePhone = $user.OfficePhone
+        $this.SamAccountName = $user.SamAccountName
+        $this.LastName = $user.Surname
+        $this.Title = $user.Title
+        $this.ObjectGuid = $user.ObjectGuid
+        $this.Firstname = $user.GivenName
+        $this.HomeDirectory = $user.HomeDirectory
+        $this.Manager = $user.Manager
+        $this.EmployeeNumber = $user.EmployeeNumber
+        $this.Enabled = $user.Enabled
+        $this.MemberOf = $user.MemberOf
+        $this.Logger.Info("Mapped properties for user $($this.SamAccountName)")
+    }
+
+    # Method: Enable ADUser
+    [void] Enable([System.Management.Automation.PSCredential]$Credential) {
+        if ($null -eq $Credential) {
+            throw "Credential cannot be null"
+        }
+        $this._executeADCommand({
+            $this.Logger.Info("Enabling AD account for $($this.SamAccountName)")
+            Enable-ADAccount -Identity $this.SamAccountName -Credential $Credential -ErrorAction Stop
+            $this.Logger.Info("Successfully enabled AD account for $($this.SamAccountName)")
+        }, "Unable to Enable User")
+    }
+
+    # Method: Disable ADUser
+    [void] Disable([System.Management.Automation.PSCredential]$Credential) {
+        if ($null -eq $Credential) {
+            throw "Credential cannot be null"
+        }
+        $this._executeADCommand({
+            $this.Logger.Info("Disabling AD account for $($this.SamAccountName)")
+            Disable-ADAccount -Identity $this.SamAccountName -Credential $Credential -ErrorAction Stop
+            $this.Logger.Info("Successfully disabled AD account for $($this.SamAccountName)")
+        }, "Unable to Disable User")
+    }
+
+    # Method: Set Password
+    [void] SetPassword([SecureString]$Password, [System.Management.Automation.PSCredential]$Credential) {
+        if ($null -eq $Password) {
+            throw "Password cannot be null"
+        }
+        if ($null -eq $Credential) {
+            throw "Credential cannot be null"
+        }
+        if ($Password.Length -lt 8) {
+            $errorMessage = "Password must be at least 8 characters long"
+            $this.Logger.Error($errorMessage)
+            throw $errorMessage
+        }
+        $this._executeADCommand({
+            $this.Logger.Info("Setting new password for $($this.SamAccountName)")
+            Set-ADAccountPassword -Identity $this.SamAccountName -Credential $Credential -Reset -NewPassword $Password -ErrorAction Stop
+            $this.Logger.Info("Successfully set new password for $($this.SamAccountName)")
+        }, "Unable to Set Password")
+    }
+
+    # Method: Move OU
+    [void] MoveOU([String]$NewOU, [System.Management.Automation.PSCredential]$Credential) {
+        if ([string]::IsNullOrWhiteSpace($NewOU)) {
+            throw "NewOU cannot be null or empty"
+        }
+        if ($null -eq $Credential) {
+            throw "Credential cannot be null"
+        }
+        if (-not ($NewOU -match '^OU=.*,DC=.*')) {
+            $errorMessage = "Invalid OU format. Expected format: 'OU=...,DC=...'"
+            $this.Logger.Error($errorMessage)
+            throw $errorMessage
+        }
+        $this._executeADCommand({
+            $this.Logger.Info("Moving $($this.SamAccountName) to OU: $NewOU")
+            Move-ADObject -TargetPath $NewOU -Identity $this.ObjectGuid -Credential $Credential -Confirm:$False -ErrorAction Stop
+            $this.Logger.Info("Successfully moved $($this.SamAccountName) to OU: $NewOU")
+        }, "Unable to Change OUs")
+    }
+
+    # Method: Set Description
+    [void] SetDescription([String]$Description, [System.Management.Automation.PSCredential]$Credential) {
+        if ($null -eq $Description) {
+            throw "Description cannot be null"
+        }
+        if ($null -eq $Credential) {
+            throw "Credential cannot be null"
+        }
+        if ($Description.Length -gt 1024) {
+            $errorMessage = "Description exceeds maximum length of 1024 characters"
+            $this.Logger.Error($errorMessage)
+            throw $errorMessage
+        }
+        $this._executeADCommand({
+            $this.Logger.Info("Setting description for $($this.SamAccountName)")
             Set-ADUser $this.SamAccountName -Description $Description -Credential $Credential -Confirm:$False -ErrorAction Stop
-            Return $Null
-		}
-		Catch
-		{
-			Throw "Unable to set the description : $($_.exception.message)"
-		}
-	}
-	
-	# Method: Set Company
-	[String] SetCompany([String]$Company,[System.Management.Automation.PSCredential]$Credential)
-	{
-		Try
-		{
+            $this.Logger.Info("Successfully set description for $($this.SamAccountName)")
+        }, "Unable to set the description")
+    }
+
+    # Method: Set Company
+    [void] SetCompany([String]$Company, [System.Management.Automation.PSCredential]$Credential) {
+        if ([string]::IsNullOrWhiteSpace($Company)) {
+            throw "Company cannot be null or empty"
+        }
+        if ($null -eq $Credential) {
+            throw "Credential cannot be null"
+        }
+        $this._executeADCommand({
+            $this.Logger.Info("Setting company for $($this.SamAccountName) to: $Company")
             Set-ADUser $this.SamAccountName -Company $Company -Credential $Credential -Confirm:$False -ErrorAction Stop
-            Return $Null
-		}
-		Catch
-		{
-			Throw "Unable to set the company : $($_.exception.message)"
-		}
-	}
-	
-	# Method: Clear Account Expiration Date
-	[String] ClearExpiration([System.Management.Automation.PSCredential]$Credential)
-	{
-		Try
-		{
-			Clear-ADAccountExpiration -Identity $this.SamAccountName -Credential $Credential -Confirm:$False -ErrorAction Stop
-			Return $Null
-		}
-		Catch
-		{
-			Throw "Unable to clear expiration date : $($_.exception.message)"
-		}
-	}
-	
-	# Method: Add To AD Group
-	[String] AddToGroup([String]$GroupName,[System.Management.Automation.PSCredential]$Credential)
-	{
-		Try
-		{
-			Add-ADGroupMember -Identity $GroupName -Members $this.SamAccountName -Confirm:$False -Credential $Credential -ErrorAction Stop
-			Return $Null
-		}
-		Catch
-		{
-			Throw "Unable to add to specified group : $($_.exception.message)"
-		}
-	}
-	
-	# Method: Get Group Memberships
-	[Array] GetGroupMemberships()
-	{
-		Try
-		{
-			$Memberships = Get-ADPrincipalGroupMembership $this.SamAccountName -ErrorAction Stop
-			Return $Memberships
-		}
-		Catch
-		{
-			Throw "Unable to get group memberships : $($_.exception.message)"
-		}
-	}
-	
-	# Method: Remove From Groups
-	[String] RemoveFromGroup([Array]$Groups,[System.Management.Automation.PSCredential]$Credential)
-	{
-        [Array]$RemovedGroups = @()
-        [Array]$FailedGroups = @()
-        ForEach($Group in $Groups){
-		    Try
-		    {
-                $Splat = @{
-                    'Identity'    = $Group
-                    'Members'     = $this.SamAccountName
-                    'Credential'  = $Credential
-                    'ErrorAction' = 'Stop'
-                }
-                Remove-ADGroupMember @Splat -Confirm:$False
-			    $RemovedGroups += $Group
-		    }
-		    Catch
-		    {
-			    $FailedGroups += $Group 
-		    }
-        }
-        If(($FailedGroups | Measure-Object).count -eq 0){
-            Return $Null
-        }
-        Else{
-            Return $FailedGroups -join ','
-        }
-	}
-}
-
-#Create New AD User Object
-Try{
-    $User = [ADUser]::new('SAMACCOUNTNAME')
-    Write-Host "User Object Created" -ForegroundColor Green
-}
-Catch{
-    Write-Host $($_.exception.message) -ForegroundColor Red
-}
-
-#Disable User Account
-Try{
-    $User.Disable($ADMCredential)
-    Write-Host "Disable AD User Account : SUCCESS" -ForegroundColor Green
-}
-Catch{
-    Write-Host "Disable AD User Account : FAILURE" -ForegroundColor Red
-}
-
-#Reset User Password
-Try{
-    $NewPassword = ConvertTo-SecureString -String ([System.Web.Security.Membership]::GeneratePassword(16,6)) -AsPlainText -Force
-    $User.SetPassword($NewPassword,$ADMCredential)
-    Write-Host "Reset AD User Password : SUCCESS" -ForegroundColor Green 
-}
-Catch{
-    Write-Host "Reset AD User Password : FAILURE" -ForegroundColor Red
-}
-
-#Move User OU
-Try{
-    $DisabledUserOU = 'OU=Disabled Accounts,DC=place,DC=contoso,DC=com'
-    $User.MoveOU($DisabledUserOU,$ADMCredential)
-    Write-Host "Move AD User To Disabled OU : SUCCESS" -ForegroundColor Green
-}
-Catch{
-    Write-Host "Move AD User To Disabled OU                   : FAILURE" -ForegroundColor Red
-}
-
-#Set AD Description
-Try{
-    Write-host "Please Enter the 'leave date'" -ForegroundColor Yellow
-    $Date = Read-Host
-    $Description = "Left the Firm " + $Date + " reset pw " + "by $ENV:USERNAME"
-    $User.SetDescription($Desription,$ADMCredential)
-    Write-Host "Set AD User Description : SUCCESS" -ForegroundColor Green 
-}
-Catch{
-    Write-Host "Set AD User Description                       : FAILURE" -ForegroundColor Red
-}
-
-#Set AD Company
-Try{
-    $User.SetCompany('No Longer With the Firm',$ADMCredential)
-    Write-Host "Set AD User Company Field : SUCCESS" -ForegroundColor Green 
-}
-Catch{
-    Write-Host "Set AD User Company Field                     : FAILURE" -ForegroundColor Red
-}
-
-#Clear AD Expiration
-Try{
-    $User.ClearExpiration($ADMCredential)
-    Write-Host "Remove AD User Expiration Date : SUCCESS" -ForegroundColor Green 
-}
-Catch{
-    Write-Host "Remove AD User Expiration Date : FAILURE" -ForegroundColor Red
-}
-
-#Add to Group
-Try{
-    $User.AddToGroup($Group,$ADMCredential)
-    Write-Host "Add User to $GroupName Group  : SUCCESS" -ForegroundColor Green
-}
-Catch{
-    If($_.exception.message -like '*The specified account name is already a member of the group*' -or $_.exception.message -like '*Either the specified user account is already a member of the specified group*')
-    {
-        Write-host "User is already a member of the $GroupName Group" -ForegroundColor Yellow
+            $this.Logger.Info("Successfully set company for $($this.SamAccountName) to: $Company")
+        }, "Unable to set the company")
     }
-    Else{
-        Write-Host $_.exception.message
-        Write-Host "Add User to $GroupName Group  : FAILURE" -ForegroundColor Red
+
+    # Method: Clear Account Expiration Date
+    [void] ClearExpiration([System.Management.Automation.PSCredential]$Credential) {
+        if ($null -eq $Credential) {
+            throw "Credential cannot be null"
+        }
+        $this._executeADCommand({
+            $this.Logger.Info("Clearing account expiration date for $($this.SamAccountName)")
+            Clear-ADAccountExpiration -Identity $this.SamAccountName -Credential $Credential -Confirm:$False -ErrorAction Stop
+            $this.Logger.Info("Successfully cleared account expiration date for $($this.SamAccountName)")
+        }, "Unable to clear expiration date")
+    }
+
+    # Method: Add To AD Group
+    [void] AddToGroup([String]$GroupName, [System.Management.Automation.PSCredential]$Credential) {
+        if ([string]::IsNullOrWhiteSpace($GroupName)) {
+            throw "GroupName cannot be null or empty"
+        }
+        if ($null -eq $Credential) {
+            throw "Credential cannot be null"
+        }
+        $this._executeADCommand({
+            $this.Logger.Info("Adding $($this.SamAccountName) to group: $GroupName")
+            Add-ADGroupMember -Identity $GroupName -Members $this.SamAccountName -Confirm:$False -Credential $Credential -ErrorAction Stop
+            $this.Logger.Info("Successfully added $($this.SamAccountName) to group: $GroupName")
+        }, "Unable to add to specified group")
+    }
+
+    # Method: Get Group Memberships
+    [Array] GetGroupMemberships() {
+        try {
+            $this.Logger.Info("Retrieving group memberships for $($this.SamAccountName)")
+            $memberships = Get-ADPrincipalGroupMembership $this.SamAccountName -ErrorAction Stop
+            $this.Logger.Info("Successfully retrieved group memberships for $($this.SamAccountName)")
+            return $memberships
+        }
+        catch {
+            $errorMessage = "Unable to get group memberships: $($_.Exception.Message)"
+            $this.Logger.Error($errorMessage)
+            throw $errorMessage
+        }
+    }
+
+    # Method: Remove From Groups
+    [String[]] RemoveFromGroup([String[]]$Groups, [System.Management.Automation.PSCredential]$Credential) {
+        if ($null -eq $Groups) {
+            throw "Groups cannot be null"
+        }
+        if ($null -eq $Credential) {
+            throw "Credential cannot be null"
+        }
+        $failedGroups = @()
+        foreach ($group in $Groups) {
+            if ([string]::IsNullOrWhiteSpace($group)) {
+                $this.Logger.Warning("Skipping empty or null group name")
+                continue
+            }
+            try {
+                $this.Logger.Info("Removing $($this.SamAccountName) from group: $group")
+                Remove-ADGroupMember -Identity $group -Members $this.SamAccountName -Credential $Credential -Confirm:$False -ErrorAction Stop
+                $this.Logger.Info("Successfully removed $($this.SamAccountName) from group: $group")
+            }
+            catch {
+                $errorMessage = "Failed to remove $($this.SamAccountName) from group $($group): $($_.Exception.Message)"
+                $this.Logger.Error($errorMessage)
+                $failedGroups += $group
+            }
+        }
+        return $failedGroups
+    }
+
+    # Helper method to execute AD commands with error handling
+    hidden [void] _executeADCommand($command, $errorMessage) {
+        try {
+            & $command
+        }
+        catch {
+            $fullErrorMessage = "$errorMessage : $($_.Exception.Message)"
+            $this.Logger.Error($fullErrorMessage)
+            throw $fullErrorMessage
+        }
     }
 }
 
-#Get Group Memberships
-$Groups = $NULL
-Try{
-    $Groups = $User.GetGroupMemberships()
-    Write-Host "Gather Group Memberships                      : SUCCESS" -ForegroundColor Green
-}
-Catch{
-    Write-Host "Gather Group Memberships                      : FAILURE" -ForegroundColor Red
-}
+# Example usage of the ADUser class
+function Example-ADUserUsage {
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]$SamAccountName,
 
-#Remove From Groups
-Try{
-    $User.RemoveFromGroup($Groups,$ADMCredential)
-    Write-Host "Remove User from Unneeded Groups : SUCCESS" -ForegroundColor Green
-}
-Catch{
-    $FailedGroups = $_.exception.message -split ','
-    Foreach($Group in $FailedGroups){
-        Write-Host "Failed to remove User from $Group" -ForegroundColor Red
+        [Parameter(Mandatory=$true)]
+        [System.Management.Automation.PSCredential]$ADMCredential
+    )
+
+    $logger = [Logger]::new("c:\temp\ADUserExample.log", [LogLevel]::Info)
+    $logger.Info("Starting Example-ADUserUsage for $SamAccountName")
+
+    try {
+        $user = [ADUser]::new($SamAccountName, $logger)
+        $logger.Info("User Object Created for $SamAccountName")
+
+        # Disable User Account
+        $user.Disable($ADMCredential)
+        $logger.Info("Disabled AD User Account for $SamAccountName")
+
+        # Reset User Password
+        $newPassword = ConvertTo-SecureString -String ([System.Web.Security.Membership]::GeneratePassword(16,6)) -AsPlainText -Force
+        $user.SetPassword($newPassword, $ADMCredential)
+        $logger.Info("Reset AD User Password for $SamAccountName")
+
+        # Move User OU
+        $disabledUserOU = 'OU=Disabled Accounts,DC=place,DC=contoso,DC=com'
+        $user.MoveOU($disabledUserOU, $ADMCredential)
+        $logger.Info("Moved AD User $SamAccountName To Disabled OU")
+
+        # Set AD Description
+        $leaveDate = Read-Host "Please enter the 'leave date'"
+        $description = "Left the Firm $leaveDate reset pw by $ENV:USERNAME"
+        $user.SetDescription($description, $ADMCredential)
+        $logger.Info("Set AD User Description for $SamAccountName")
+
+        # Set AD Company
+        $user.SetCompany('No Longer With the Firm', $ADMCredential)
+        $logger.Info("Set AD User Company Field for $SamAccountName")
+
+        # Clear AD Expiration
+        $user.ClearExpiration($ADMCredential)
+        $logger.Info("Removed AD User Expiration Date for $SamAccountName")
+
+        # Get Group Memberships
+        $groups = $user.GetGroupMemberships()
+        $logger.Info("Gathered Group Memberships for $SamAccountName")
+
+        # Remove From Groups
+        $failedGroups = $user.RemoveFromGroup($groups, $ADMCredential)
+        if ($failedGroups.Count -eq 0) {
+            $logger.Info("Removed User $SamAccountName from All Groups")
+        } else {
+            $logger.Warning("Failed to remove User $SamAccountName from the following groups: $($failedGroups -join ', ')")
+        }
+
+        $logger.Info("Completed Example-ADUserUsage for $SamAccountName")
+    }
+    catch {
+        $logger.Error("An error occurred in Example-ADUserUsage for $$SamAccountName): $($_.Exception.Message)")
     }
 }
+
+# Uncomment the following line to run the example (replace with actual credentials)
+# Example-ADUserUsage -SamAccountName "SAMACCOUNTNAME" -ADMCredential $ADMCredential
