@@ -97,25 +97,25 @@ class ADUser {
             $this.Logger.Error($errorMessage)
             throw $errorMessage
         }
-        $this.City = $user.City
-        $this.FullName = $user.CN
-        $this.Company = $user.Company
-        $this.Country = $user.Country
-        $this.Department = $user.Department
-        $this.Description = $user.Description
-        $this.EmailAddress = $user.EmailAddress
-        $this.EmployeeID = $user.EmployeeID
-        $this.OfficePhone = $user.OfficePhone
+        $this.City           = $user.City
+        $this.FullName       = $user.CN
+        $this.Company        = $user.Company
+        $this.Country        = $user.Country
+        $this.Department     = $user.Department
+        $this.Description    = $user.Description
+        $this.EmailAddress   = $user.EmailAddress
+        $this.EmployeeID     = $user.EmployeeID
+        $this.OfficePhone    = $user.OfficePhone
         $this.SamAccountName = $user.SamAccountName
-        $this.LastName = $user.Surname
-        $this.Title = $user.Title
-        $this.ObjectGuid = $user.ObjectGuid
-        $this.Firstname = $user.GivenName
-        $this.HomeDirectory = $user.HomeDirectory
-        $this.Manager = $user.Manager
+        $this.LastName       = $user.Surname
+        $this.Title          = $user.Title
+        $this.ObjectGuid     = $user.ObjectGuid
+        $this.Firstname      = $user.GivenName
+        $this.HomeDirectory  = $user.HomeDirectory
+        $this.Manager        = $user.Manager
         $this.EmployeeNumber = $user.EmployeeNumber
-        $this.Enabled = $user.Enabled
-        $this.MemberOf = $user.MemberOf
+        $this.Enabled        = $user.Enabled
+        $this.MemberOf       = $user.MemberOf
         $this.Logger.Info("Mapped properties for user $($this.SamAccountName)")
     }
 

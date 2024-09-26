@@ -15,4 +15,4 @@ foreach ($Group in $Groups) {
     }
 }
 
-$Table | Export-Csv C:\Temp\PIM_Roles.csv -NoTypeInformation
+$Table | Export-Csv C:\Temp\PIM_Roles_$(Get-Date -Format 'MM-dd-yyy').csv -NoTypeInformation
