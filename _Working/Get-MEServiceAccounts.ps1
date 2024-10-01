@@ -18,7 +18,7 @@ foreach ($OU in $ServiceOus) {
 
   $ADUserSplat = @{
     SearchBase = $OU
-    Properties = 'DisplayName', 'SamAccountName', 'DistinguishedName', 'CanonicalName', 'Enabled', 'Description'
+    Properties = 'DisplayName', 'SamAccountName', 'DistinguishedName', 'CanonicalName', 'Enabled', 'Description', 'LastLogonDate', 'PasswordLastSet'
   }
 
   Get-ADUser @ADUserSplat -Filter * | select-object $ADUserSplat.Properties
