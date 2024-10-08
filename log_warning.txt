@@ -1,2 +1,0 @@
-2024-09-18 17:35:07 [Warning] This warning message will be logged
-2024-09-18 17:35:07 [Error] This error message will be logged
