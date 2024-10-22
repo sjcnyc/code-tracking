@@ -1,1 +1,2 @@
+function Reset-VWanHub {
 }
