@@ -1,0 +1,37 @@
+// Azure Virtual Desktop (AVD) Last Logon Query with Session Host Information
+// Shows the last successful logon date for each AVD user including session host details
+
+let AVDConnections = WVDConnections
+    | union (AVDConnections);
+SigninLogs
+| where AppDisplayName contains "Windows Virtual Desktop"
+    or AppDisplayName contains "Azure Virtual Desktop"
+| where Status.errorCode == 0 // Only successful sign-ins
+| join kind=leftouter (
+    AVDConnections
+    | where State == "Connected"
+    | project TimeGenerated,
+        SessionHostName,
+        UserPrincipalName
+) on UserPrincipalName
+| summarize
+    LastLogonTime = max(TimeGenerated),
+    LastSessionHost = arg_max(TimeGenerated, SessionHostName),
+    LastDeviceName = arg_max(TimeGenerated, tostring(DeviceDetail.displayName)),
+    LastOS = arg_max(TimeGenerated, tostring(DeviceDetail.operatingSystem)),
+    LastLocation = arg_max(TimeGenerated, strcat(
+        tostring(LocationDetails.city), ", ", 
+        tostring(LocationDetails.state), ", ",
+        tostring(LocationDetails.countryOrRegion)
+    ))
+    by UserPrincipalName
+| extend DaysSinceLastLogon = datetime_diff('day', now(), LastLogonTime)
+| project 
+    ['User Principal Name'] = UserPrincipalName,
+    ['Last Logon Time'] = LastLogonTime,
+    ['Days Since Last Logon'] = DaysSinceLastLogon,
+    ['Session Host'] = LastSessionHost,
+    ['Device Name'] = LastDeviceName,
+    ['Operating System'] = LastOS,
+    ['Last Location'] = LastLocation
+| order by ['Days Since Last Logon'] desc
