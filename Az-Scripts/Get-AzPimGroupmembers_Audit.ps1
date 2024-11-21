@@ -1,3 +1,13 @@
+$connectMgGraphSplat = @{
+    NoWelcome             = $true
+    ClientId              = '91152ce4-ea23-4c83-852e-05e564545fb9'
+    TenantId              = 'f0aff3b7-91a5-4aae-af71-c63e1dda2049'
+    CertificateThumbprint = 'c838457e980e940c42d9950fa3b3bd8f05b6e919'
+}
+
+Connect-MgGraph @connectMgGraphSplat
+
+
 
 $Groups = Get-MgGroup -Filter "startsWith(displayName, 'Az_PIM_')" -ConsistencyLevel eventual -CountVariable countVar -All
 
@@ -15,4 +25,4 @@ foreach ($Group in $Groups) {
     }
 }
 
-$Table | Export-Csv C:\Temp\PIM_Roles_$(Get-Date -Format 'MM-dd-yyy').csv -NoTypeInformation
+$Table | Export-Csv C:\Temp\Az_PIM_Roles_$(Get-Date -Format 'MM-dd-yyy').csv -NoTypeInformation
