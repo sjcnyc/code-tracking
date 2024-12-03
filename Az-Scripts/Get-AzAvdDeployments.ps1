@@ -17,8 +17,10 @@ Author: Sean Connealy
 Date:   05/10/2024
 #>
 
+$Date = (Get-Date -Format "yyyyMMdd_HHmmss")
+
 $getAdgroupSplat = @{
-    Filter     = 'Name -like "az_avd_*FullDesktop" -or Name -like "*AZ_AVD_*RemoteApps" -and Name -notlike "*InfraPersonal*"'
+    Filter     = 'Name -like "az_avd_*FullDesktop" -and Name -notlike "*AZ_AVD_*RemoteApps" -and Name -notlike "*InfraPersonal*"'
     Properties = '*'
 }
 
@@ -31,4 +33,4 @@ foreach ($Group in $Groups) {
     Select-Object -Property GivenName, SurName, SamaccountName, DistinguishedName, UserPrincipalName, @{N = 'GroupName'; E = { $Grp.SamAccountName } }
 }
 
-$userobj | Export-Csv -Path C:\temp\ADUsers_05052024.csv -NoTypeInformation
+$userobj | Export-Csv -Path C:\temp\ADUsers_$($Date).csv -NoTypeInformation
