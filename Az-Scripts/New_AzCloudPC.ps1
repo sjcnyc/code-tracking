@@ -30,7 +30,7 @@
 #>
 
 # Function to check and install required modules
-function Ensure-Module {
+function Get-EnsureModule {
     param (
         [string]$ModuleName
     )
@@ -43,8 +43,8 @@ function Ensure-Module {
 }
 
 # Ensure required modules are installed
-Ensure-Module -ModuleName "Microsoft.Graph"
-Ensure-Module -ModuleName "Microsoft.Graph.Authentication"
+Get-EnsureModule -ModuleName "Microsoft.Graph"
+Get-EnsureModule -ModuleName "Microsoft.Graph.Authentication"
 
 # Define the parameters for connecting to Microsoft Graph
 $connectMgGraphSplat = @{
