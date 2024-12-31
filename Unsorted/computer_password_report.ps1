@@ -1,2 +1,0 @@
-Get-ADComputer -Properties samaccountname, PasswordNotRequired, distinguishedname, OperatingSystem -Filter { PasswordNotRequired -eq $true} |
-    Select-Object samaccountname, PasswordNotRequired, distinguishedname, OperatingSystem | Export-Csv c:\temp\computer_passNotRequired3.csv -NoTypeInformation
