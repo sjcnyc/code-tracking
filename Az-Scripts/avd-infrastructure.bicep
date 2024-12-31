@@ -18,6 +18,7 @@ var resourceGroupName = 'RG-${distName}-P-EUS'
 var storageAccountName = 'stsme${distName}${uniqueString(resourceGroup().id)}'
 var shareName = '${toLower(distName)}-userprofiles'
 var roleDefinitionId = resourceId('Microsoft.Authorization/roleDefinitions', '0c867c2a-1d8c-454a-a3db-ab2ea1bdc8bb') // Storage File Data SMB Share Contributor
+var name = '${storageAccount.name}/default/${shareName}'
 
 // Resource Group is created in PowerShell script as Bicep doesn't support RG creation
 
@@ -33,17 +34,6 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
     allowBlobPublicAccess: false
     largeFileSharesState: 'Enabled'
     minimumTlsVersion: 'TLS1_2'
-    fileServices: {
-      properties: {
-        protocolSettings: {
-          smb: {
-            multichannel: {
-              enabled: true
-            }
-          }
-        }
-      }
-    }
   }
   tags: {
     CreatedBy: createdBy
@@ -53,7 +43,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
 
 // File Share
 resource fileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
-  name: '${storageAccount.name}/default/${shareName}'
+  name: name
   properties: {
     shareQuota: 100
     enabledProtocols: 'SMB'
