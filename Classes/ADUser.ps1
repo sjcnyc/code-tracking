@@ -345,7 +345,7 @@ class ADUser {
 }
 
 # Example usage of the ADUser class
-function Example-ADUserUsage {
+function New-ADUserUsageExample {
     param (
         [Parameter(Mandatory = $true)]
         [string]$SamAccountName,
