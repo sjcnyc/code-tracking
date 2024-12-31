@@ -73,15 +73,15 @@ class ADUser {
             $this.Logger = $Logger
         }
         $this.Logger.Info("Initializing ADUser for $SamAccountName")
-        $this._getADUser($SamAccountName)
+        $this.GetAdUser($SamAccountName)
     }
 
     # Method: Get User Information
-    hidden [void] _getADUser([String]$SamAccountName) {
+    hidden [void] GetAdUser([String]$SamAccountName) {
         try {
             $this.Logger.Info("Retrieving AD user information for $SamAccountName")
             $user = Get-ADUser $SamAccountName -Properties * -ErrorAction Stop
-            $this._mapUserProperties($user)
+            $this.MapUserProperties($user)
             $this.Logger.Info("Successfully retrieved AD user information for $SamAccountName")
         }
         catch {
@@ -92,7 +92,7 @@ class ADUser {
     }
 
     # Helper method to map user properties
-    hidden [void] _mapUserProperties($user) {
+    hidden [void] MapUserProperties($user) {
         if ($null -eq $user) {
             $errorMessage = "Invalid user object provided for property mapping"
             $this.Logger.Error($errorMessage)
@@ -121,13 +121,13 @@ class ADUser {
     }
 
     # Method: Check if SamAccountName is unique
-    hidden [bool] _isSamAccountNameUnique($SamAccountName) {
+    hidden [bool] IsSamAccountNameUnique($SamAccountName) {
         $user = Get-ADUser -Filter { SamAccountName -eq $SamAccountName } -ErrorAction SilentlyContinue
         return $null -eq $user
     }
 
     # Method: Generate random alphanumeric password
-    hidden [string] _generateRandomPassword() {
+    hidden [string] GenerateRandomPassword() {
         $length = 12
         $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
         $password = -join (1..$length | ForEach-Object { $chars | Get-Random })
@@ -136,11 +136,11 @@ class ADUser {
 
     # Method: Create new ADUser
     [void] CreateNewUser([string]$GivenName, [string]$Surname, [string]$SamAccountName, [bool]$Enabled) {
-        if (-not $this._isSamAccountNameUnique($SamAccountName)) {
+        if (-not $this.IsSamAccountNameUnique($SamAccountName)) {
             throw "SamAccountName '$SamAccountName' is already in use"
         }
 
-        $password = $this._generateRandomPassword()
+        $password = $this.GenerateRandomPassword()
         $userParams = @{
             GivenName         = $GivenName
             Surname           = $Surname
@@ -167,7 +167,7 @@ class ADUser {
         if ($null -eq $Credential) {
             throw "Credential cannot be null"
         }
-        $this._executeADCommand({
+        $this.ExecuteAdCommand({
                 $this.Logger.Info("Enabling AD account for $($this.SamAccountName)")
                 Enable-ADAccount -Identity $this.SamAccountName -Credential $Credential -ErrorAction Stop
                 $this.Logger.Info("Successfully enabled AD account for $($this.SamAccountName)")
@@ -179,7 +179,7 @@ class ADUser {
         if ($null -eq $Credential) {
             throw "Credential cannot be null"
         }
-        $this._executeADCommand({
+        $this.ExecuteAdCommand({
                 $this.Logger.Info("Disabling AD account for $($this.SamAccountName)")
                 Disable-ADAccount -Identity $this.SamAccountName -Credential $Credential -ErrorAction Stop
                 $this.Logger.Info("Successfully disabled AD account for $($this.SamAccountName)")
@@ -199,7 +199,7 @@ class ADUser {
             $this.Logger.Error($errorMessage)
             throw $errorMessage
         }
-        $this._executeADCommand({
+        $this.ExecuteAdCommand({
                 $this.Logger.Info("Setting new password for $($this.SamAccountName)")
                 Set-ADAccountPassword -Identity $this.SamAccountName -Credential $Credential -Reset -NewPassword $Password -ErrorAction Stop
                 $this.Logger.Info("Successfully set new password for $($this.SamAccountName)")
@@ -219,7 +219,7 @@ class ADUser {
             $this.Logger.Error($errorMessage)
             throw $errorMessage
         }
-        $this._executeADCommand({
+        $this.ExecuteAdCommand({
                 $this.Logger.Info("Moving $($this.SamAccountName) to OU: $NewOU")
                 Move-ADObject -TargetPath $NewOU -Identity $this.ObjectGuid -Credential $Credential -Confirm:$False -ErrorAction Stop
                 $this.Logger.Info("Successfully moved $($this.SamAccountName) to OU: $NewOU")
@@ -239,7 +239,7 @@ class ADUser {
             $this.Logger.Error($errorMessage)
             throw $errorMessage
         }
-        $this._executeADCommand({
+        $this.ExecuteAdCommand({
                 $this.Logger.Info("Setting description for $($this.SamAccountName)")
                 Set-ADUser $this.SamAccountName -Description $Description -Credential $Credential -Confirm:$False -ErrorAction Stop
                 $this.Logger.Info("Successfully set description for $($this.SamAccountName)")
@@ -254,7 +254,7 @@ class ADUser {
         if ($null -eq $Credential) {
             throw "Credential cannot be null"
         }
-        $this._executeADCommand({
+        $this.ExecuteAdCommand({
                 $this.Logger.Info("Setting company for $($this.SamAccountName) to: $Company")
                 Set-ADUser $this.SamAccountName -Company $Company -Credential $Credential -Confirm:$False -ErrorAction Stop
                 $this.Logger.Info("Successfully set company for $($this.SamAccountName) to: $Company")
@@ -266,7 +266,7 @@ class ADUser {
         if ($null -eq $Credential) {
             throw "Credential cannot be null"
         }
-        $this._executeADCommand({
+        $this.ExecuteAdCommand({
                 $this.Logger.Info("Clearing account expiration date for $($this.SamAccountName)")
                 Clear-ADAccountExpiration -Identity $this.SamAccountName -Credential $Credential -Confirm:$False -ErrorAction Stop
                 $this.Logger.Info("Successfully cleared account expiration date for $($this.SamAccountName)")
@@ -281,7 +281,7 @@ class ADUser {
         if ($null -eq $Credential) {
             throw "Credential cannot be null"
         }
-        $this._executeADCommand({
+        $this.ExecuteAdCommand({
                 $this.Logger.Info("Adding $($this.SamAccountName) to group: $GroupName")
                 Add-ADGroupMember -Identity $GroupName -Members $this.SamAccountName -Confirm:$False -Credential $Credential -ErrorAction Stop
                 $this.Logger.Info("Successfully added $($this.SamAccountName) to group: $GroupName")
@@ -332,7 +332,7 @@ class ADUser {
     }
 
     # Helper method to execute AD commands with error handling
-    hidden [void] _executeADCommand($command, $errorMessage) {
+    hidden [void] ExecuteAdCommand($command, $errorMessage) {
         try {
             & $command
         }
