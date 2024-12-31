@@ -2,9 +2,9 @@
 
 # Define Logger class
 enum LogLevel {
-    Info    = 1
+    Info = 1
     Warning = 2
-    Error   = 3
+    Error = 3
 }
 
 class Logger {
@@ -62,13 +62,14 @@ class ADUser {
     [Logger]$Logger
 
     # Constructor
-    ADUser([String]$SamAccountName, [Logger]$Logger = $null) {
+    ADUser([String]$SamAccountName, [string]$LogPath = "c:\temp\ADUser.log" ,[Logger]$Logger = $null) {
         if ([string]::IsNullOrWhiteSpace($SamAccountName)) {
             throw "SamAccountName cannot be null or empty"
         }
         if ($null -eq $Logger) {
-            $this.Logger = [Logger]::new("c:\temp\ADUser.log", [LogLevel]::Info)
-        } else {
+            $this.Logger = [Logger]::new($LogPath, [LogLevel]::Info)
+        }
+        else {
             $this.Logger = $Logger
         }
         $this.Logger.Info("Initializing ADUser for $SamAccountName")
@@ -97,26 +98,68 @@ class ADUser {
             $this.Logger.Error($errorMessage)
             throw $errorMessage
         }
-        $this.City           = $user.City
-        $this.FullName       = $user.CN
-        $this.Company        = $user.Company
-        $this.Country        = $user.Country
-        $this.Department     = $user.Department
-        $this.Description    = $user.Description
-        $this.EmailAddress   = $user.EmailAddress
-        $this.EmployeeID     = $user.EmployeeID
-        $this.OfficePhone    = $user.OfficePhone
+        $this.City = $user.City
+        $this.FullName = $user.CN
+        $this.Company = $user.Company
+        $this.Country = $user.Country
+        $this.Department = $user.Department
+        $this.Description = $user.Description
+        $this.EmailAddress = $user.EmailAddress
+        $this.EmployeeID = $user.EmployeeID
+        $this.OfficePhone = $user.OfficePhone
         $this.SamAccountName = $user.SamAccountName
-        $this.LastName       = $user.Surname
-        $this.Title          = $user.Title
-        $this.ObjectGuid     = $user.ObjectGuid
-        $this.Firstname      = $user.GivenName
-        $this.HomeDirectory  = $user.HomeDirectory
-        $this.Manager        = $user.Manager
+        $this.LastName = $user.Surname
+        $this.Title = $user.Title
+        $this.ObjectGuid = $user.ObjectGuid
+        $this.Firstname = $user.GivenName
+        $this.HomeDirectory = $user.HomeDirectory
+        $this.Manager = $user.Manager
         $this.EmployeeNumber = $user.EmployeeNumber
-        $this.Enabled        = $user.Enabled
-        $this.MemberOf       = $user.MemberOf
+        $this.Enabled = $user.Enabled
+        $this.MemberOf = $user.MemberOf
         $this.Logger.Info("Mapped properties for user $($this.SamAccountName)")
+    }
+
+    # Method: Check if SamAccountName is unique
+    hidden [bool] _isSamAccountNameUnique($SamAccountName) {
+        $user = Get-ADUser -Filter { SamAccountName -eq $SamAccountName } -ErrorAction SilentlyContinue
+        return $null -eq $user
+    }
+
+    # Method: Generate random alphanumeric password
+    hidden [string] _generateRandomPassword() {
+        $length = 12
+        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+        $password = -join (1..$length | ForEach-Object { $chars | Get-Random })
+        return $password
+    }
+
+    # Method: Create new ADUser
+    [void] CreateNewUser([string]$GivenName, [string]$Surname, [string]$SamAccountName, [bool]$Enabled) {
+        if (-not $this._isSamAccountNameUnique($SamAccountName)) {
+            throw "SamAccountName '$SamAccountName' is already in use"
+        }
+
+        $password = $this._generateRandomPassword()
+        $userParams = @{
+            GivenName         = $GivenName
+            Surname           = $Surname
+            SamAccountName    = $SamAccountName
+            Name              = "$GivenName $Surname"
+            UserPrincipalName = "$SamAccountName@yourdomain.com"
+            Enabled           = $Enabled
+            AccountPassword   = (ConvertTo-SecureString -AsPlainText $password -Force)
+            Path              = "OU=Users,DC=yourdomain,DC=com"
+        }
+
+        try {
+            New-ADUser @userParams -ErrorAction Stop
+            $this.Logger.Info("Successfully created AD user $SamAccountName with password $password")
+        }
+        catch {
+            $this.Logger.Error("Failed to create AD user $SamAccountName $_")
+            throw $_
+        }
     }
 
     # Method: Enable ADUser
@@ -125,10 +168,10 @@ class ADUser {
             throw "Credential cannot be null"
         }
         $this._executeADCommand({
-            $this.Logger.Info("Enabling AD account for $($this.SamAccountName)")
-            Enable-ADAccount -Identity $this.SamAccountName -Credential $Credential -ErrorAction Stop
-            $this.Logger.Info("Successfully enabled AD account for $($this.SamAccountName)")
-        }, "Unable to Enable User")
+                $this.Logger.Info("Enabling AD account for $($this.SamAccountName)")
+                Enable-ADAccount -Identity $this.SamAccountName -Credential $Credential -ErrorAction Stop
+                $this.Logger.Info("Successfully enabled AD account for $($this.SamAccountName)")
+            }, "Unable to Enable User")
     }
 
     # Method: Disable ADUser
@@ -137,30 +180,30 @@ class ADUser {
             throw "Credential cannot be null"
         }
         $this._executeADCommand({
-            $this.Logger.Info("Disabling AD account for $($this.SamAccountName)")
-            Disable-ADAccount -Identity $this.SamAccountName -Credential $Credential -ErrorAction Stop
-            $this.Logger.Info("Successfully disabled AD account for $($this.SamAccountName)")
-        }, "Unable to Disable User")
+                $this.Logger.Info("Disabling AD account for $($this.SamAccountName)")
+                Disable-ADAccount -Identity $this.SamAccountName -Credential $Credential -ErrorAction Stop
+                $this.Logger.Info("Successfully disabled AD account for $($this.SamAccountName)")
+            }, "Unable to Disable User")
     }
 
     # Method: Set Password
-    [void] SetPassword([SecureString]$Password, [System.Management.Automation.PSCredential]$Credential) {
+    [void] SetPassword([SecureString]$Password, [System.Management.Automation.PSCredential]$Credential, [int]$Length) {
         if ($null -eq $Password) {
             throw "Password cannot be null"
         }
         if ($null -eq $Credential) {
             throw "Credential cannot be null"
         }
-        if ($Password.Length -lt 8) {
-            $errorMessage = "Password must be at least 8 characters long"
+        if ($Password.Length -lt $Length) {
+            $errorMessage = "Password must be at least $($Length) characters long"
             $this.Logger.Error($errorMessage)
             throw $errorMessage
         }
         $this._executeADCommand({
-            $this.Logger.Info("Setting new password for $($this.SamAccountName)")
-            Set-ADAccountPassword -Identity $this.SamAccountName -Credential $Credential -Reset -NewPassword $Password -ErrorAction Stop
-            $this.Logger.Info("Successfully set new password for $($this.SamAccountName)")
-        }, "Unable to Set Password")
+                $this.Logger.Info("Setting new password for $($this.SamAccountName)")
+                Set-ADAccountPassword -Identity $this.SamAccountName -Credential $Credential -Reset -NewPassword $Password -ErrorAction Stop
+                $this.Logger.Info("Successfully set new password for $($this.SamAccountName)")
+            }, "Unable to Set Password")
     }
 
     # Method: Move OU
@@ -177,10 +220,10 @@ class ADUser {
             throw $errorMessage
         }
         $this._executeADCommand({
-            $this.Logger.Info("Moving $($this.SamAccountName) to OU: $NewOU")
-            Move-ADObject -TargetPath $NewOU -Identity $this.ObjectGuid -Credential $Credential -Confirm:$False -ErrorAction Stop
-            $this.Logger.Info("Successfully moved $($this.SamAccountName) to OU: $NewOU")
-        }, "Unable to Change OUs")
+                $this.Logger.Info("Moving $($this.SamAccountName) to OU: $NewOU")
+                Move-ADObject -TargetPath $NewOU -Identity $this.ObjectGuid -Credential $Credential -Confirm:$False -ErrorAction Stop
+                $this.Logger.Info("Successfully moved $($this.SamAccountName) to OU: $NewOU")
+            }, "Unable to Change OUs")
     }
 
     # Method: Set Description
@@ -197,10 +240,10 @@ class ADUser {
             throw $errorMessage
         }
         $this._executeADCommand({
-            $this.Logger.Info("Setting description for $($this.SamAccountName)")
-            Set-ADUser $this.SamAccountName -Description $Description -Credential $Credential -Confirm:$False -ErrorAction Stop
-            $this.Logger.Info("Successfully set description for $($this.SamAccountName)")
-        }, "Unable to set the description")
+                $this.Logger.Info("Setting description for $($this.SamAccountName)")
+                Set-ADUser $this.SamAccountName -Description $Description -Credential $Credential -Confirm:$False -ErrorAction Stop
+                $this.Logger.Info("Successfully set description for $($this.SamAccountName)")
+            }, "Unable to set the description")
     }
 
     # Method: Set Company
@@ -212,10 +255,10 @@ class ADUser {
             throw "Credential cannot be null"
         }
         $this._executeADCommand({
-            $this.Logger.Info("Setting company for $($this.SamAccountName) to: $Company")
-            Set-ADUser $this.SamAccountName -Company $Company -Credential $Credential -Confirm:$False -ErrorAction Stop
-            $this.Logger.Info("Successfully set company for $($this.SamAccountName) to: $Company")
-        }, "Unable to set the company")
+                $this.Logger.Info("Setting company for $($this.SamAccountName) to: $Company")
+                Set-ADUser $this.SamAccountName -Company $Company -Credential $Credential -Confirm:$False -ErrorAction Stop
+                $this.Logger.Info("Successfully set company for $($this.SamAccountName) to: $Company")
+            }, "Unable to set the company")
     }
 
     # Method: Clear Account Expiration Date
@@ -224,10 +267,10 @@ class ADUser {
             throw "Credential cannot be null"
         }
         $this._executeADCommand({
-            $this.Logger.Info("Clearing account expiration date for $($this.SamAccountName)")
-            Clear-ADAccountExpiration -Identity $this.SamAccountName -Credential $Credential -Confirm:$False -ErrorAction Stop
-            $this.Logger.Info("Successfully cleared account expiration date for $($this.SamAccountName)")
-        }, "Unable to clear expiration date")
+                $this.Logger.Info("Clearing account expiration date for $($this.SamAccountName)")
+                Clear-ADAccountExpiration -Identity $this.SamAccountName -Credential $Credential -Confirm:$False -ErrorAction Stop
+                $this.Logger.Info("Successfully cleared account expiration date for $($this.SamAccountName)")
+            }, "Unable to clear expiration date")
     }
 
     # Method: Add To AD Group
@@ -239,10 +282,10 @@ class ADUser {
             throw "Credential cannot be null"
         }
         $this._executeADCommand({
-            $this.Logger.Info("Adding $($this.SamAccountName) to group: $GroupName")
-            Add-ADGroupMember -Identity $GroupName -Members $this.SamAccountName -Confirm:$False -Credential $Credential -ErrorAction Stop
-            $this.Logger.Info("Successfully added $($this.SamAccountName) to group: $GroupName")
-        }, "Unable to add to specified group")
+                $this.Logger.Info("Adding $($this.SamAccountName) to group: $GroupName")
+                Add-ADGroupMember -Identity $GroupName -Members $this.SamAccountName -Confirm:$False -Credential $Credential -ErrorAction Stop
+                $this.Logger.Info("Successfully added $($this.SamAccountName) to group: $GroupName")
+            }, "Unable to add to specified group")
     }
 
     # Method: Get Group Memberships
@@ -304,10 +347,10 @@ class ADUser {
 # Example usage of the ADUser class
 function Example-ADUserUsage {
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]$SamAccountName,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [System.Management.Automation.PSCredential]$ADMCredential
     )
 
@@ -323,7 +366,7 @@ function Example-ADUserUsage {
         $logger.Info("Disabled AD User Account for $SamAccountName")
 
         # Reset User Password
-        $newPassword = ConvertTo-SecureString -String ([System.Web.Security.Membership]::GeneratePassword(16,6)) -AsPlainText -Force
+        $newPassword = ConvertTo-SecureString -String ([System.Web.Security.Membership]::GeneratePassword(16, 6)) -AsPlainText -Force
         $user.SetPassword($newPassword, $ADMCredential)
         $logger.Info("Reset AD User Password for $SamAccountName")
 
@@ -354,7 +397,8 @@ function Example-ADUserUsage {
         $failedGroups = $user.RemoveFromGroup($groups, $ADMCredential)
         if ($failedGroups.Count -eq 0) {
             $logger.Info("Removed User $SamAccountName from All Groups")
-        } else {
+        }
+        else {
             $logger.Warning("Failed to remove User $SamAccountName from the following groups: $($failedGroups -join ', ')")
         }
 
