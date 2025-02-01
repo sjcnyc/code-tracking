@@ -1,21 +1,47 @@
-## Description: This script installs the required modules for Nerdio Manager for Enterprise and
-## registers scheduled tasks for updating modules and removing FSLogix profiles.
+# Ensure TLS 1.2 is used for secure connections
+[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
 
-# Set the execution policy to allow script execution with powersehll 7
-Set-PSResourceRepository -Name PSGallery -Trusted
 
-# Import the required modules
-$installModuleSplat = @{
-    Name = 'Update-AllPSModules', 'MicrosoftTeams', 'Microsoft.Online.SharePoint.PowerShell', 'Microsoft.Graph', 'ExchangeOnlineManagement', 'Az', 'PSReadline', 'Terminal-Icons'
+# Install module in PowerShell 5.1
+$modules = @('Update-AllPSModules', 'MicrosoftTeams', 'Microsoft.Online.SharePoint.PowerShell', 'Microsoft.Graph', 'ExchangeOnlineManagement', 'PSReadline', 'Terminal-Icons', 'Az*')
+
+foreach ($ModuleName in $modules) {
+    if (-not (Get-Module -ListAvailable -Name $ModuleName | Where-Object { $_.ModuleBase -like "C:\Program Files\WindowsPowerShell\Modules\*" }).Count -gt 0) {
+        try {
+
+            Write-Output "Installing $ModuleName in PowerShell 5.1..."
+            Install-Module -Name $ModuleName -Force -Scope AllUsers -SkipPublisherCheck -ErrorAction Stop
+            Write-Output "$ModuleName installed successfully in PowerShell 5.1."
+        }
+        catch {
+            Write-Error "Failed to install $ModuleName in PowerShell 5.1: $_"
+        }
+    }
+    else {
+        Write-Output "$ModuleName is already installed in PowerShell 5.1."
+    }
 }
-# Install the required modules in c:\program files\windowspowershell\modules
-Install-Module @installModuleSplat -Scope AllUsers -Force -AllowClobber -Verbose -SkipPublisherCheck
-# Install the required modules in c:program files\powershell\7\modules
-pwsh.exe -NoLogo -NoProfile -Command "
-Set-PSResourceRepository -Name PSGallery -Trusted;
-Install-Module 'Update-AllPSModules', 'MicrosoftTeams', 'Microsoft.Online.SharePoint.PowerShell', 'Microsoft.Graph', 'ExchangeOnlineManagement', 'Az', 'PSReadline', 'Terminal-Icons' -Scope AllUsers -Force -AllowClobber -Verbose -SkipPublisherCheck;
-Exit
-"
+
+# Install module in PowerShell 7
+pwsh.exe -command {
+    $modules = @('Update-AllPSModules', 'MicrosoftTeams', 'Microsoft.Online.SharePoint.PowerShell', 'Microsoft.Graph', 'ExchangeOnlineManagement', 'PSReadline', 'Terminal-Icons', 'Az*')
+    foreach ($ModuleName in $modules) {
+        if (-not (Get-Module -ListAvailable -Name $ModuleName | Where-Object { $_.ModuleBase -like "C:\Program Files\PowerShell\Modules\*" }).Count -gt 0) {
+            try {
+                Write-Output "Installing $ModuleName in PowerShell 7..."
+                Install-Module -Name $ModuleName -Force -Scope AllUsers -SkipPublisherCheck -ErrorAction Stop
+                Write-Output "$ModuleName installed successfully in PowerShell 7."
+            }
+            catch {
+                Write-Error "Failed to install $ModuleName in PowerShell 7: $_"
+            }
+        }
+        else {
+            Write-Output "$ModuleName is already installed in PowerShell 7."
+        }
+    }
+}
+
 
 # Register the Remove-FSL-Profiles scheduled task
 $xml1 = @"
@@ -125,12 +151,48 @@ $xml2 = @"
 </Task>
 "@
 
-Register-ScheduledTask -Xml $xml1 -TaskName "Remove-FSL-Profiles.xml" -TaskPath "\"
-Register-ScheduledTask -Xml $xml2 -TaskName "Update-AllPSModules.xml" -TaskPath "\"
+$tasks = @([PSCustomObject]@{Xml = $xml1; TaskName = "Remove-FSL-Profiles" }, [PSCustomObject]@{Xml = $xml2; TaskName = "Update-AllPSModules" })
+foreach ($task in $tasks) {
+    if (-not (Get-ScheduledTask -TaskName $task.TaskName -ErrorAction SilentlyContinue)) {
+        try {
+            Register-ScheduledTask -Xml $task.Xml -TaskName $task.TaskName -TaskPath "\"
+            Write-Output "Scheduled task $($task.TaskName) registered successfully."
+        }
+        catch {
+            Write-Error "Failed to register scheduled task $($task.TaskName): $_"
+        }
+    }
+    else {
+        Write-Output "Scheduled task $($task.TaskName) is already registered."
+    }
+}
 
 # Install Chocolatey
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072;
-Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+# Check if Chocolatey is already installed
+if (-not (Get-Command choco -ErrorAction SilentlyContinue)) {
+    try {
+        Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+        Write-Output "Chocolatey installed successfully."
+    }
+    catch {
+        Write-Error "Failed to install Chocolatey: $_"
+    }
+}
+else {
+    Write-Output "Chocolatey is already installed."
+}
 
-# Install gsudo
-choco install gsudo -y #--Force
+# Check if gsudo is already installed
+if (-not (Get-Command gsudo -ErrorAction SilentlyContinue)) {
+    try {
+        # Install gsudo using Chocolatey
+        choco install gsudo -y
+        Write-Output "gsudo installed successfully."
+    }
+    catch {
+        Write-Error "Failed to install gsudo: $_"
+    }
+}
+else {
+    Write-Output "gsudo is already installed."
+}
