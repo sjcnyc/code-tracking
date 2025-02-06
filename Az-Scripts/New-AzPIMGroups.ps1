@@ -134,6 +134,6 @@ function New-AzPIMGroups {
 
 # Roles: Owner, Contributor, Reader, Billing Reader, Network Contributor, Security Admin, Security Reader
 
-#New-AzPIMGroups -ManagementGroupName "EMEA" -Scope "ManagementGroups" -Roles "Workbook Contributor"
+New-AzPIMGroups -ManagementGroupName "SME" -Scope "ManagementGroups" -Roles "Support Request Contributor"
 
-New-AzPIMGroups -SubscriptionName "WEU-InnovDev" -Scope "Subscriptions"
+#New-AzPIMGroups -SubscriptionName "WEU-InnovDev" -Scope "Subscriptions"

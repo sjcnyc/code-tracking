@@ -90,10 +90,8 @@ function Get-ADGroupMemberships {
 }
 
 $Groups = @'
-USA-GBL ISI-Data GHUB_Development Modify
-USA-GBL ISI-Data GHUB_Development Read
-USA-GBL ISI-Data GHUB_Test Modify
-USA-GBL ISI-Data GHUB_Test Read
+USA-GBL ISI-Data GHUB_Production Modify
+USA-GBL ISI-Data GHUB_Production Read
 '@ -split [System.Environment]::NewLine
 
 Write-Host "$(Get-Date)"
