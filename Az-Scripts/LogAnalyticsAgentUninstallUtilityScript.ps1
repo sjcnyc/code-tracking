@@ -3,14 +3,14 @@
 # az account set --subscription <subscription_id/subscription_name>
 # This script uses parallel processing, modify the $parallelThrottleLimit parameter to either increase or decrease the number of parallel processes
 # PS> .\LogAnalyticsAgentUninstallUtilityScript.ps1 GetInventory
-# The above command will generate a csv file with the details of Vm's and Vmss and Arc servers that has log analyice Agent extension installed.
+# The above command will generate a csv file with the details of Vm's and Vmss and Arc servers that has log analyice Agent extension installed. 
 # The customer can modify the the csv by adding/removing rows if needed
 # Remove the log analytics agent by running the script again as shown below:
 # PS> .\LogAnalyticsAgentUninstallUtilityScript.ps1 UninstallExtension
 
 # This version of the script requires Powershell version >= 7 in order to improve performance via ForEach-Object -Parallel
 # https://docs.microsoft.com/en-us/powershell/scripting/whats-new/migrating-from-windows-powershell-51-to-powershell-7?view=powershell-7.1
-if ($PSVersionTable.PSVersion.Major -lt 7)
+if ($PSVersionTable.PSVersion.Major -lt 7) 
 {
  Write-Host "This script requires Powershell version 7 or newer to run. Please see https://docs.microsoft.com/en-us/powershell/scripting/whats-new/migrating-from-windows-powershell-51-to-powershell-7?view=powershell-7.1."
  exit 1
@@ -22,7 +22,7 @@ function GetArcServersWithLogAnalyticsAgentExtensionInstalled {
  param (
      $fileName
  )
-
+ 
  $serverList = az connectedmachine list --query "[].{ResourceId:id, ResourceGroup:resourceGroup, ServerName:name}" | ConvertFrom-Json
  if(!$serverList)
  {
@@ -32,7 +32,7 @@ function GetArcServersWithLogAnalyticsAgentExtensionInstalled {
 
  $serversCount = $serverList.Length
  $vmParallelThrottleLimit = $parallelThrottleLimit
- if ($serversCount -lt $vmParallelThrottleLimit)
+ if ($serversCount -lt $vmParallelThrottleLimit) 
  {
      $serverParallelThrottleLimit = $serversCount
  }
@@ -46,9 +46,9 @@ function GetArcServersWithLogAnalyticsAgentExtensionInstalled {
  else
  {
      # split the list into batches to do parallel processing
-     for ($i = 0; $i -lt $serversCount; $i += $vmParallelThrottleLimit)
-     {
-         $serverGroups += , ($serverList[$i..($i + $serverParallelThrottleLimit - 1)])
+     for ($i = 0; $i -lt $serversCount; $i += $vmParallelThrottleLimit) 
+     { 
+         $serverGroups += , ($serverList[$i..($i + $serverParallelThrottleLimit - 1)]) 
      }
  }
 
@@ -109,9 +109,9 @@ function GetVmsWithLogAnalyticsAgentExtensionInstalled
  param(
      $fileName
  )
-
+ 
  $vmList = az vm list --query "[].{ResourceId:id, ResourceGroup:resourceGroup, VmName:name}" | ConvertFrom-Json
-
+  
  if(!$vmList)
  {
      Write-Host "Cannot get the VM list"
@@ -120,7 +120,7 @@ function GetVmsWithLogAnalyticsAgentExtensionInstalled
 
  $vmsCount = $vmList.Length
  $vmParallelThrottleLimit = $parallelThrottleLimit
- if ($vmsCount -lt $vmParallelThrottleLimit)
+ if ($vmsCount -lt $vmParallelThrottleLimit) 
  {
      $vmParallelThrottleLimit = $vmsCount
  }
@@ -132,9 +132,9 @@ function GetVmsWithLogAnalyticsAgentExtensionInstalled
  else
  {
      # split the vm's into batches to do parallel processing
-     for ($i = 0; $i -lt $vmsCount; $i += $vmParallelThrottleLimit)
-     {
-         $vmGroups += , ($vmList[$i..($i + $vmParallelThrottleLimit - 1)])
+     for ($i = 0; $i -lt $vmsCount; $i += $vmParallelThrottleLimit) 
+     { 
+         $vmGroups += , ($vmList[$i..($i + $vmParallelThrottleLimit - 1)]) 
      }
  }
 
@@ -153,7 +153,7 @@ function GetVmsWithLogAnalyticsAgentExtensionInstalled
          $resourceGroup = $_.ResourceGroup
          Write-Debug "Getting extensions for VM: $vmName"
          $extensions = az vm extension list -g $resourceGroup --vm-name $vmName --query "[?contains(['MicrosoftMonitoringAgent', 'OmsAgentForLinux', 'AzureMonitorLinuxAgent', 'AzureMonitorWindowsAgent'], typePropertiesType)].{type: typePropertiesType, name: name}" | ConvertFrom-Json
-
+         
          if (!$extensions) {
              return
          }
@@ -197,7 +197,7 @@ function GetVmssWithLogAnalyticsAgentExtensionInstalled
  )
 
  # get the vmss list which are successfully provisioned
- $vmssList = az vmss list --query "[?provisioningState=='Succeeded'].{ResourceId:id, ResourceGroup:resourceGroup, VmssName:name}" | ConvertFrom-Json
+ $vmssList = az vmss list --query "[?provisioningState=='Succeeded'].{ResourceId:id, ResourceGroup:resourceGroup, VmssName:name}" | ConvertFrom-Json   
 
  $vmssCount = $vmssList.Length
  Write-Host "Detected $vmssCount Vmss in this subscription."
@@ -214,7 +214,7 @@ function GetVmssWithLogAnalyticsAgentExtensionInstalled
      $resourceGroup = $_.ResourceGroup
      Write-Debug "Getting extensions for VMSS: $vmssName"
      $extensions = az vmss extension list -g $resourceGroup --vmss-name $vmssName --query "[?contains(['MicrosoftMonitoringAgent', 'OmsAgentForLinux', 'AzureMonitorLinuxAgent', 'AzureMonitorWindowsAgent'], typePropertiesType)].{type: typePropertiesType, name: name}" | ConvertFrom-Json
-
+     
      if (!$extensions) {
          return
      }
@@ -256,7 +256,7 @@ function GetInventory
      $fileName = "LogAnalyticsAgentExtensionInventory.csv"
  )
 
- # create a new file
+ # create a new file 
  New-Item -Name $fileName -ItemType File -Force
 
  Start-Transcript -Path $logFileName -Append
@@ -273,12 +273,12 @@ function UninstallExtension
  )
  Start-Transcript -Path $logFileName -Append
  Import-Csv $fileName | ForEach-Object -ThrottleLimit $parallelThrottleLimit -Parallel {
-     if ($_.Install_Type -eq "Extension")
+     if ($_.Install_Type -eq "Extension") 
      {
          $extensionName = $_.Extension_Name
          $resourceName = $_.Name
          Write-Debug "Uninstalling extension: $extensionName from $resourceName"
-         if ($_.Resource_Type -eq "VMSS")
+         if ($_.Resource_Type -eq "VMSS") 
          {
              # if the extension is installed with a custom name, provide the name using the flag: --extension-instance-name <extension name>
              az vmss extension delete --name $extensionName --vmss-name $resourceName --resource-group $_.Resource_Group --output none --no-wait
